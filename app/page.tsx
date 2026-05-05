@@ -1,65 +1,41 @@
-import Image from "next/image";
+import Link from "next/link";
+import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import { PricingCard } from "@/components/PricingCard";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="mx-auto w-full max-w-6xl space-y-12 px-4 py-10 md:px-8">
+      <section className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <h1 className="text-4xl font-bold tracking-tight">One shared number to keep the whole family on the same page.</h1>
+        <p className="mt-4 max-w-3xl text-lg text-slate-700">
+          CareRelay turns scattered caregiver texts into organized updates, tasks, reminders, supply lists, medication logs, appointment notes, and daily family summaries.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <Link href="/setup" className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white">Start a care circle</Link>
+          <Link href="/demo" className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-800">View live demo</Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+      <section className="grid gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:grid-cols-2">
+        <div>
+          <h2 className="text-2xl font-semibold">Caregiving group chats get chaotic</h2>
+          <ul className="mt-3 space-y-2 text-slate-700">
+            <li>Did Mom take her meds?</li><li>Who is taking Dad to the appointment?</li><li>Can someone grab groceries?</li><li>What did the doctor say?</li><li>Why did not anyone tell me she fell?</li><li>Who checked in today?</li>
+          </ul>
         </div>
-      </main>
-    </div>
+        <div>
+          <h2 className="text-2xl font-semibold">How CareRelay fixes it</h2>
+          <p className="mt-3 text-slate-700">Family members text one shared number. CareRelay organizes each message into tasks, logs, appointments, supplies, concerns, and summaries.</p>
+          <ol className="mt-3 space-y-2 text-slate-700">
+            <li>1. Create a care circle</li><li>2. Add family members</li><li>3. Text the shared number</li><li>4. Get organized summaries</li>
+          </ol>
+        </div>
+      </section>
+      <section className="grid gap-4 md:grid-cols-3">
+        <PricingCard title="Starter" price="$9/month" planId="starter" features={["One care circle", "Up to 3 family members", "Daily summary", "Basic logs"]} />
+        <PricingCard title="Family" price="$19/month" planId="family" features={["One care circle", "Up to 8 family members", "Tasks, appointments, supplies, medication confirmations", "Daily and weekly summaries"]} />
+        <PricingCard title="Family Plus" price="$39/month" planId="family_plus" features={["Multiple care circles", "Unlimited family members", "Exportable timeline", "Priority setup support"]} />
+      </section>
+      <DisclaimerBanner />
+    </main>
   );
 }
