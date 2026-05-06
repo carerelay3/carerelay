@@ -187,7 +187,7 @@ export function parseCareMessage(message: string): ParsedCareMessage {
     !(
       concernMatches.length === 1 &&
       concernMatches[0] === "dizzy" &&
-      (text.includes("pick up") || text.includes("prescription"))
+      (text.includes("pick up") || text.includes("prescription") || text.includes("meds") || text.includes("medication"))
     );
 
   // If there is a command AND it's not a strong concern override, keep command context

@@ -1,14 +1,23 @@
 import OpenAI from "openai";
 import { appConfig } from "@/lib/config";
 
+export function getOpenAiClient() {
+  if (!appConfig.openAiConfigured) return null;
+  try {
+    return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  } catch {
+    return null;
+  }
+}
+
 export async function createOpenAiSummary(payload: {
   notes: string[];
   concerns: string[];
   context: string;
 }): Promise<string | null> {
-  if (!appConfig.openAiConfigured) return null;
+  const client = getOpenAiClient();
+  if (!client) return null;
   try {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const system = [
       "You summarize family caregiving coordination notes only.",
       "Do not diagnose, triage, or provide treatment advice.",

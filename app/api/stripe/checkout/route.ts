@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { appConfig } from "@/lib/config";
 import { checkoutSchema } from "@/lib/validation/schemas";
+import { getStripeClient } from "@/lib/stripe/client";
 
 const planMap = {
   starter: { name: "Starter", amount: 900 },
@@ -24,7 +25,16 @@ export async function POST(req: Request) {
     });
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const stripe = getStripeClient();
+  if (!stripe) {
+    // Should not happen because we checked stripeConfigured, but fallback
+    return NextResponse.json({
+      mode: "demo",
+      message: `Stripe not configured. Demo checkout complete for ${planMap[parsed.data.planId].name}.`,
+      redirectUrl: "/setup?demoCheckout=1",
+    });
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{
