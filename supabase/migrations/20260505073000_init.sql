@@ -40,6 +40,7 @@ create table if not exists family_members (
   phone_number text,
   email text,
   permission_level text default 'contributor',
+  invite_status text default 'pending',
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -162,6 +163,9 @@ create index if not exists idx_appointment_at on appointments(appointment_at);
 create index if not exists idx_tasks_status on tasks(status);
 create index if not exists idx_supplies_status on supplies(status);
 create index if not exists idx_inbound_concern_flag on inbound_messages(concern_flag);
+create index if not exists idx_concerns_acknowledged on concerns(acknowledged);
+create index if not exists idx_family_members_phone on family_members(phone_number);
+create index if not exists idx_family_members_invite on family_members(invite_status);
 
 alter table care_circles enable row level security;
 alter table family_members enable row level security;

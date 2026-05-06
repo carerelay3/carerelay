@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { appConfig } from "@/lib/config";
 import { checkoutSchema } from "@/lib/validation/schemas";
 import { getStripeClient } from "@/lib/stripe/client";

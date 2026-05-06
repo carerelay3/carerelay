@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { POST as mockPost } from "@/app/api/sms/mock/route";
+
+vi.mock("@/lib/openai/createSummary", () => ({
+  createOpenAiSummary: vi.fn().mockResolvedValue(null)
+}));
 import { POST as inboundPost } from "@/app/api/sms/inbound/route";
 import { GET as seedGet } from "@/app/api/demo/seed/route";
 import { GET as healthGet } from "@/app/api/health/route";
@@ -257,12 +261,18 @@ describe("POST /api/summaries/generate", () => {
 
 describe("POST /api/stripe/checkout", () => {
   it("returns demo checkout when stripe is not configured", async () => {
+    const orig = process.env.STRIPE_SECRET_KEY;
+    process.env.STRIPE_SECRET_KEY = "";
+
     const req = new Request("http://localhost/api/stripe/checkout", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ planId: "starter" }),
     });
     const res = await checkoutPost(req);
+    
+    process.env.STRIPE_SECRET_KEY = orig;
+    
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.mode).toBe("demo");
