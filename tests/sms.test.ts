@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { POST as mockPost } from "@/app/api/sms/mock/route";
 
 vi.mock("@/lib/openai/createSummary", () => ({
@@ -21,6 +21,16 @@ import { POST as invitePost } from "@/app/api/members/invite/route";
 import { POST as prefsPost } from "@/app/api/preferences/update/route";
 
 describe("sms routes", () => {
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("validates empty message on inbound", async () => {
     const req = new Request("http://localhost/api/sms/inbound", {
       method: "POST",
