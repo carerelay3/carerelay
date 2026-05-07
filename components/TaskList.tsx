@@ -5,9 +5,9 @@ import type { DemoTask, DemoMember } from "@/lib/types";
 import type { DemoSnapshot } from "@/lib/demo/types";
 
 const STATUS_STYLES = {
-  open: { bg: "rgba(107, 158, 117, 0.1)", color: "#5A8E65", label: "Open" },
-  done: { bg: "rgba(90, 158, 122, 0.1)", color: "#4A8E6A", label: "Done" },
-  needs_attention: { bg: "rgba(201, 139, 90, 0.1)", color: "#A97B4A", label: "Needs attention" },
+  open: { bg: "rgba(107, 158, 117, 0.12)", color: "#4A8E6A", label: "Open" },
+  done: { bg: "rgba(90, 158, 122, 0.12)", color: "#3A7E5A", label: "Done" },
+  needs_attention: { bg: "rgba(201, 139, 90, 0.12)", color: "#B96B3A", label: "Needs attention" },
 };
 
 export function TaskList({ tasks, members, onUpdate }: { tasks: DemoTask[]; members?: DemoMember[]; onUpdate?: (snapshot: DemoSnapshot) => void }) {
@@ -47,69 +47,76 @@ export function TaskList({ tasks, members, onUpdate }: { tasks: DemoTask[]; memb
   };
 
   return (
-    <div className="glass">
-      <div className="p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
-          <h3 className="text-base font-semibold" style={{ color: 'var(--text)' }}>Tasks</h3>
-          <span className="badge-pill text-[10px]" style={{ background: 'var(--sage-soft)', color: 'var(--sage)' }}>
+    <div className="glass-elevated relative overflow-hidden">
+      <div className="absolute top-0 right-0 h-40 w-40 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: 'var(--sage)' }} />
+      
+      <div className="p-6 sm:p-8 border-b relative z-10" style={{ borderColor: 'var(--glass-border)' }}>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+          <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Tasks</h3>
+          <span className="badge-pill text-xs shadow-sm" style={{ background: 'var(--sage-soft)', color: 'var(--sage)' }}>
             {allTasks.filter((i) => i.status === "open").length} open
           </span>
         </div>
 
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-3 mt-5">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAdd(); } }}
-            placeholder="Add a task…"
-            className="input-glass flex-1"
+            placeholder="Add a new task…"
+            className="input-glass flex-1 font-medium"
+            style={{ padding: '12px 16px' }}
           />
-          <button type="button" onClick={handleAdd} disabled={!title.trim()} className="btn btn-sage" style={{ padding: '10px 16px' }}>Add</button>
+          <button type="button" onClick={handleAdd} disabled={!title.trim()} className="btn btn-sage font-bold" style={{ padding: '12px 24px' }}>Add</button>
         </div>
       </div>
 
       {allTasks.length > 0 && (
-        <div className="px-5 pb-5 space-y-3">
+        <div className="p-6 sm:p-8 space-y-4 relative z-10">
           {allTasks.map((t) => {
             const st = STATUS_STYLES[t.status];
             return (
-              <div key={t.id} className="group rounded-xl p-4 transition-all hover:-translate-y-0.5" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid var(--glass-border)' }}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: st.bg, color: st.color }}>
+              <div key={t.id} className="group rounded-2xl p-5 sm:p-6 transition-all hover:-translate-y-1 hover:shadow-md" style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(16px)', border: '1px solid var(--glass-border)' }}>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <span className="inline-flex rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: st.bg, color: st.color }}>
                       {st.label}
                     </span>
-                    <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>{t.title}</span>
+                    <span className="text-base font-semibold leading-tight pt-0.5" style={{ color: 'var(--text)' }}>{t.title}</span>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-2">
                     {t.status !== "done" && (
-                      <button type="button" onClick={() => void handleStatus(t.id, "done")} className="rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors" style={{ background: 'var(--success-soft)', color: 'var(--success)' }}>Done</button>
+                      <button type="button" onClick={() => void handleStatus(t.id, "done")} className="rounded-xl px-3 py-2 text-xs font-bold transition-transform hover:scale-105" style={{ background: 'var(--success-soft)', color: 'var(--success)' }}>Mark Done</button>
                     )}
                     {t.status !== "open" && (
-                      <button type="button" onClick={() => void handleStatus(t.id, "open")} className="rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors" style={{ background: 'var(--info-soft)', color: 'var(--info)' }}>Reopen</button>
+                      <button type="button" onClick={() => void handleStatus(t.id, "open")} className="rounded-xl px-3 py-2 text-xs font-bold transition-transform hover:scale-105" style={{ background: 'var(--info-soft)', color: 'var(--info)' }}>Reopen</button>
                     )}
                     {t.status !== "needs_attention" && t.status !== "done" && (
-                      <button type="button" onClick={() => void handleStatus(t.id, "needs_attention")} className="rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors" style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>Flag</button>
+                      <button type="button" onClick={() => void handleStatus(t.id, "needs_attention")} className="rounded-xl px-3 py-2 text-xs font-bold transition-transform hover:scale-105" style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>Flag</button>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 mt-3">
-                  {t.assignedToName ? (
-                    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ background: 'var(--primary-soft)', color: 'var(--text-secondary)' }}>
-                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                      {t.assignedToName}
-                    </span>
-                  ) : (
-                    <span className="text-[11px] italic" style={{ color: 'var(--text-subtle)' }}>Not assigned</span>
-                  )}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t pt-4" style={{ borderColor: 'var(--glass-border)' }}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>Assigned to:</span>
+                    {t.assignedToName ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold" style={{ background: 'var(--blue-glow)', color: 'var(--blue-soft)' }}>
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        {t.assignedToName}
+                      </span>
+                    ) : (
+                      <span className="text-xs italic font-medium" style={{ color: 'var(--text-subtle)' }}>Unassigned</span>
+                    )}
+                  </div>
+                  
                   {members && members.length > 0 && onUpdate && (
-                    <div className="ml-auto flex items-center gap-2">
-                      <select value={assignMember[t.id] || ""} onChange={(e) => setAssignMember((prev) => ({ ...prev, [t.id]: e.target.value }))} className="rounded-md border px-2 py-1 text-[11px]" style={{ borderColor: 'var(--glass-border)', background: 'var(--glass-bg)', color: 'var(--text)' }}>
+                    <div className="flex items-center gap-2">
+                      <select value={assignMember[t.id] || ""} onChange={(e) => setAssignMember((prev) => ({ ...prev, [t.id]: e.target.value }))} className="input-glass text-xs font-medium" style={{ padding: '6px 12px', minWidth: '120px' }}>
                         <option value="">Reassign…</option>
                         {members.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
                       </select>
-                      <button type="button" onClick={() => void handleAssign(t.id)} disabled={!assignMember[t.id]} className="rounded-md px-2 py-1 text-[11px] font-medium text-white disabled:opacity-50" style={{ background: 'var(--primary)' }}>Assign</button>
+                      <button type="button" onClick={() => void handleAssign(t.id)} disabled={!assignMember[t.id]} className="btn btn-primary text-xs" style={{ padding: '6px 14px' }}>Assign</button>
                     </div>
                   )}
                 </div>

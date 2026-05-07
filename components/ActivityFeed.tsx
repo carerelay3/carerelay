@@ -41,35 +41,47 @@ const activityColors: Record<string, { bg: string; color: string }> = {
 export function ActivityFeed({ activity }: { activity: DemoActivity[] }) {
   if (!activity.length) {
     return (
-      <div className="glass p-10 text-center">
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No activity yet. When family members text the shared number or you manage tasks, everything will be tracked here.</p>
+      <div className="glass-elevated p-12 text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle at center, var(--sage-soft), transparent 60%)' }} />
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-subtle)] shadow-sm">
+            <svg className="h-6 w-6 text-[var(--text-subtle)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No activity yet. When family members text the shared number or you manage tasks, everything will be tracked here.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="glass">
-      <div className="p-5 border-b" style={{ borderColor: 'var(--glass-border)' }}>
-        <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Activity</h3>
+    <div className="glass-elevated overflow-hidden relative">
+      {/* Ambient background glow */}
+      <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: 'var(--blue-glow)' }} />
+      
+      <div className="relative z-10 p-6 sm:p-8 border-b" style={{ borderColor: 'var(--glass-border)' }}>
+        <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Activity</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>A running log of what happened in your care circle.</p>
       </div>
-      <div className="divide-y" style={{ borderColor: 'var(--glass-border)' }}>
+      
+      <div className="relative z-10 divide-y" style={{ borderColor: 'var(--glass-border)' }}>
         {activity.map((a) => {
           const style = activityColors[a.type] || activityColors.message_received;
           const iconPath = activityIcons[a.type] || activityIcons.message_received;
           return (
-            <div key={a.id} className="flex items-start gap-4 p-5 transition-colors hover:bg-white/40">
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl" style={{ background: style.bg }}>
-                <svg className="h-4 w-4" fill="none" stroke={style.color} viewBox="0 0 24 24">
+            <div key={a.id} className="flex items-start gap-5 p-6 sm:px-8 transition-colors hover:bg-white/50">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl shadow-sm" style={{ background: style.bg, boxShadow: `0 4px 12px ${style.bg.replace('0.1', '0.2')}` }}>
+                <svg className="h-5 w-5" fill="none" stroke={style.color} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={iconPath} />
                 </svg>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm" style={{ color: 'var(--text)' }}>{a.description}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--text-subtle)' }}>
-                  {a.actor && <span className="font-medium" style={{ color: 'var(--sage)' }}>{a.actor}</span>}
-                  <span>·</span>
-                  <time dateTime={a.createdAt}>{new Date(a.createdAt).toLocaleString()}</time>
+              <div className="flex-1 min-w-0 pt-0.5">
+                <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{a.description}</p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--text-subtle)' }}>
+                  {a.actor && <span className="font-semibold uppercase tracking-wider text-[10px]" style={{ color: 'var(--sage)' }}>{a.actor}</span>}
+                  {a.actor && <span>·</span>}
+                  <time dateTime={a.createdAt}>{new Date(a.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</time>
                 </div>
               </div>
             </div>
