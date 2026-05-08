@@ -74,6 +74,11 @@ export function FamilyPresencePanel({
           You have been invited to {members[0] ? `${members[0].name}'s Care Circle` : "a Care Circle"} on CareRelay. CareRelay helps the family organize caregiving updates by text. It is for coordination only, not emergencies or medical advice. Reply YES to join or STOP to opt out.
         </div>
       </div>
+
+      <div className="p-4 bg-slate-100 border border-slate-200 rounded-xl text-sm flex items-center justify-between flex-wrap gap-4 mt-6">
+        <span className="text-slate-600 font-medium">Have a large family? You've used {members.length} member slots.</span>
+        <a href="/pricing" className="text-sage-600 font-bold hover:underline">View upgrade options</a>
+      </div>
     </div>
   );
 }

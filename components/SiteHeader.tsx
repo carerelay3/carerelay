@@ -26,7 +26,6 @@ export function SiteHeader() {
             { href: "/demo", label: "Demo" },
             { href: "/dashboard", label: "Dashboard" },
             { href: "/setup", label: "Setup" },
-            { href: "/founder", label: "Founder" },
           ].map((link) => (
             <Link key={link.href} href={link.href} className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors" style={{ color: 'var(--text-muted)' }}>
               {link.label}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent } from "@/lib/analytics/track";
 
 type Props = {
   title: string;
@@ -16,21 +17,29 @@ export function PricingCard({ title, price, features, planId, accent, popular }:
 
   const onCheckout = async () => {
     setBusy(true);
+    trackEvent("pricing_cta_clicked", { planId });
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ planId }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        trackEvent("checkout_failed", { planId, reason: data.error });
         window.alert(typeof data.error === "string" ? data.error : "Checkout failed. Try again or use demo mode.");
         return;
       }
-      if (data.url) { window.location.href = data.url; return; }
+      if (data.url) { 
+        trackEvent("checkout_started", { planId });
+        window.location.href = data.url; 
+        return; 
+      }
       if (data.redirectUrl) { window.location.href = data.redirectUrl; return; }
+      trackEvent("checkout_failed", { planId, reason: data.message });
       window.alert(data.message || "Unable to start checkout.");
     } catch {
+      trackEvent("checkout_failed", { planId, reason: "network" });
       window.alert("Network error. Try again.");
     } finally {
       setBusy(false);
@@ -64,6 +73,7 @@ export function PricingCard({ title, price, features, planId, accent, popular }:
         type="button"
         onClick={() => void onCheckout()}
         disabled={busy}
+        aria-busy={busy}
         className="btn w-full mt-6"
         style={{
           background: popular ? `linear-gradient(135deg, ${accent || 'var(--sage)'} 0%, ${accent ? accent + 'cc' : '#5A8E65'} 100%)` : 'var(--glass-bg)',

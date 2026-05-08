@@ -2,6 +2,7 @@ import { appConfig } from "@/lib/config";
 
 export type EventName =
   | "demo_message_submitted"
+  | "demo_started"
   | "care_circle_created"
   | "care_circle_keyword_created"
   | "family_member_invited"
@@ -28,9 +29,16 @@ export type EventName =
   | "summary_openai_used"
   | "summary_fallback_used"
   | "summary_safety_filter_triggered"
+  | "pricing_viewed"
   | "pricing_cta_clicked"
+  | "sign_in_started"
   | "signup_started"
   | "signup_completed"
+  | "setup_started"
+  | "homepage_cta_clicked"
+  | "shared_number_explainer_viewed"
+  | "terms_viewed"
+  | "privacy_viewed"
   | "setup_completed";
 
 export function trackEvent(name: EventName, properties?: Record<string, unknown>) {

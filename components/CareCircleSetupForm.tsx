@@ -143,7 +143,7 @@ export function CareCircleSetupForm() {
               <div>
                 <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Add your care team</h2>
                 <p className="text-sm mt-2 font-medium" style={{ color: 'var(--text-muted)' }}>
-                  Add the people who coordinate care. They keep using normal SMS—no app install required.
+                  Each family member texts the same CareRelay number from their own phone. CareRelay uses the phone numbers you add here to route updates to the right care circle.
                 </p>
               </div>
 
@@ -220,7 +220,7 @@ export function CareCircleSetupForm() {
               </div>
               
               <p className="text-xs font-medium max-w-sm mx-auto mt-6" style={{ color: 'var(--text-subtle)' }}>
-                In a live environment, CareRelay uses one shared SMS line. Family members text it like any other contact from their own phones; CareRelay organizes the chaos using your linked phone numbers.
+                Everyone texts the same CareRelay number. CareRelay knows where the message belongs based on the phone numbers linked to each care circle.
               </p>
             </div>
           )}

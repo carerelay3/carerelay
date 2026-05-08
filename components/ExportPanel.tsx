@@ -66,6 +66,11 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
           </div>
         </div>
       )}
+
+      <div className="p-4 bg-slate-100 border border-slate-200 rounded-xl text-sm flex items-center justify-between flex-wrap gap-4 mt-6">
+        <span className="text-slate-600 font-medium">Need to export for multiple care circles?</span>
+        <a href="/pricing" className="text-sage-600 font-bold hover:underline">Upgrade to Family Plus</a>
+      </div>
     </div>
   );
 }
