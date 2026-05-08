@@ -1,5 +1,10 @@
 import { DemoSnapshot } from "../types";
 
+export const demoStore = {
+  careCircleId: "demo-circle-123",
+  messages: [] as any[],
+};
+
 export function getDemoSnapshot(): DemoSnapshot {
   return {
     messages: [
@@ -49,3 +54,20 @@ export function getDemoSnapshot(): DemoSnapshot {
     concerns: []
   };
 }
+
+export function addDemoMessage(msg: any) {
+  demoStore.messages.push(msg);
+}
+
+export function acknowledgeConcern(id: string, notes?: string) {}
+export function addHandoff(handoff: any) {}
+export function addMember(member: any) {}
+export function exportTimeline(format: string, from?: string, to?: string) { 
+  return { format, content: "Mock timeline data" }; 
+}
+export function inviteMember(id: string) {}
+export function reviewHandoff(id: string) {}
+export function updatePreferences(prefs: any) {}
+export function updateSupplyStatus(id: string, status: string) {}
+export function updateTaskAssignee(id: string, assignee: string) {}
+export function updateTaskStatus(id: string, status: string) {}

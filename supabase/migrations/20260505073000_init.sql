@@ -1,225 +1,112 @@
-create extension if not exists "pgcrypto";
+-- 1. Create Core Tables
 
-create table if not exists profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  email text,
-  full_name text,
-  phone text,
-  phone_normalized text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+CREATE TABLE IF NOT EXISTS public.care_circles (
+  id uuid primary key default gen_random_uuid(),
+  name text not null default 'My Care Circle',
+  created_at timestamptz default now()
 );
 
-create table if not exists care_circles (
+CREATE TABLE IF NOT EXISTS public.members (
   id uuid primary key default gen_random_uuid(),
-  owner_id uuid references profiles(id),
-  name text not null,
-  sms_keyword text,
-  shared_phone_number text,
-  demo_mode boolean default false,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table if not exists care_recipients (
-  id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  first_name text not null,
-  relationship text,
-  notes text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table if not exists family_members (
-  id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  user_id uuid references profiles(id),
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete set null,
   name text not null,
   phone text,
-  phone_normalized text,
-  role text,
-  invite_status text default 'pending',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  role text default 'family',
+  permission_level text default 'member',
+  invite_status text default 'not_invited',
+  created_at timestamptz default now()
 );
 
-create table if not exists inbound_messages (
+CREATE TABLE IF NOT EXISTS public.messages (
   id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  family_member_id uuid references family_members(id),
-  sender_name text,
-  sender_phone text,
-  sender_phone_normalized text,
-  raw_body text not null,
-  cleaned_body text,
-  sms_keyword_used text,
-  category text,
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
+  sender text,
+  from_phone text,
+  to_phone text,
+  body text not null,
+  category text default 'general',
   confidence numeric,
   concern_flag boolean default false,
-  matched_keywords jsonb,
-  parsed_payload jsonb,
-  source text,
   created_at timestamptz default now()
 );
 
-create table if not exists tasks (
+CREATE TABLE IF NOT EXISTS public.tasks (
   id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  inbound_message_id uuid references inbound_messages(id),
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
   title text not null,
-  details text,
   status text default 'open',
-  assigned_to uuid references family_members(id),
-  due_at timestamptz,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  assigned_to uuid references public.members(id) on delete set null,
+  completed_by text,
+  created_at timestamptz default now()
 );
 
-create table if not exists appointments (
+CREATE TABLE IF NOT EXISTS public.appointments (
   id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  inbound_message_id uuid references inbound_messages(id),
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
   title text not null,
-  details text,
-  appointment_at timestamptz,
-  status text default 'upcoming',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  at timestamptz,
+  transportation_confirmed boolean default false,
+  created_at timestamptz default now()
 );
 
-create table if not exists supplies (
+CREATE TABLE IF NOT EXISTS public.supplies (
   id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  inbound_message_id uuid references inbound_messages(id),
-  title text not null,
-  details text,
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
+  item text not null,
   status text default 'needed',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  created_at timestamptz default now()
 );
 
-create table if not exists medication_logs (
+CREATE TABLE IF NOT EXISTS public.concerns (
   id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  inbound_message_id uuid references inbound_messages(id),
-  medication_name text,
-  confirmation_text text not null,
-  given_by uuid references family_members(id),
-  logged_at timestamptz default now(),
+  care_circle_id uuid references public.care_circles(id) on delete cascade not null,
   notes text,
-  created_at timestamptz default now()
-);
-
-create table if not exists concerns (
-  id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  inbound_message_id uuid references inbound_messages(id),
-  title text not null,
-  details text,
-  severity text default 'flagged',
   status text default 'open',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table if not exists daily_summaries (
-  id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  summary_date date,
-  summary_text text,
-  source text default 'fallback',
   created_at timestamptz default now()
 );
 
-create table if not exists notifications (
-  id uuid primary key default gen_random_uuid(),
-  care_circle_id uuid references care_circles(id) on delete cascade,
-  family_member_id uuid references family_members(id),
-  type text,
-  title text,
-  body text,
-  read_at timestamptz,
-  created_at timestamptz default now()
-);
+-- 2. Create Indexes for Performance
+CREATE INDEX IF NOT EXISTS members_care_circle_id_idx ON public.members(care_circle_id);
+CREATE INDEX IF NOT EXISTS messages_care_circle_id_idx ON public.messages(care_circle_id);
+CREATE INDEX IF NOT EXISTS tasks_care_circle_id_idx ON public.tasks(care_circle_id);
+CREATE INDEX IF NOT EXISTS appointments_care_circle_id_idx ON public.appointments(care_circle_id);
+CREATE INDEX IF NOT EXISTS supplies_care_circle_id_idx ON public.supplies(care_circle_id);
+CREATE INDEX IF NOT EXISTS concerns_care_circle_id_idx ON public.concerns(care_circle_id);
+CREATE INDEX IF NOT EXISTS members_user_id_idx ON public.members(user_id);
 
-create index if not exists idx_inbound_care_circle on inbound_messages(care_circle_id);
-create index if not exists idx_tasks_care_circle on tasks(care_circle_id);
-create index if not exists idx_appt_care_circle on appointments(care_circle_id);
-create index if not exists idx_supplies_care_circle on supplies(care_circle_id);
-create index if not exists idx_meds_care_circle on medication_logs(care_circle_id);
-create index if not exists idx_concerns_care_circle on concerns(care_circle_id);
-create index if not exists idx_daily_care_circle on daily_summaries(care_circle_id);
-create index if not exists idx_notifications_care_circle on notifications(care_circle_id);
+-- 3. Enable Row Level Security (RLS)
+ALTER TABLE public.care_circles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.supplies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.concerns ENABLE ROW LEVEL SECURITY;
 
-create index if not exists idx_inbound_created_at on inbound_messages(created_at);
-create index if not exists idx_appointment_at on appointments(appointment_at);
-create index if not exists idx_tasks_status on tasks(status);
-create index if not exists idx_supplies_status on supplies(status);
-create index if not exists idx_concerns_status on concerns(status);
+-- 4. Create Basic Access Policies
+-- (This assumes users can only see records linked to care circles they are members of)
 
-create index if not exists idx_inbound_concern_flag on inbound_messages(concern_flag);
+CREATE POLICY "Users can view their own care circles" 
+ON public.care_circles FOR SELECT 
+USING (id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));
 
-create index if not exists idx_family_members_phone_normalized on family_members(phone_normalized);
-create index if not exists idx_care_circles_sms_keyword on care_circles(sms_keyword);
+CREATE POLICY "Users can view members of their care circles" 
+ON public.members FOR SELECT 
+USING (care_circle_id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));
 
-alter table care_circles enable row level security;
-alter table family_members enable row level security;
-alter table inbound_messages enable row level security;
-alter table tasks enable row level security;
-alter table appointments enable row level security;
-alter table supplies enable row level security;
-alter table medication_logs enable row level security;
-alter table concerns enable row level security;
-alter table daily_summaries enable row level security;
-alter table profiles enable row level security;
-alter table care_recipients enable row level security;
-alter table notifications enable row level security;
+CREATE POLICY "Users can view messages in their care circles" 
+ON public.messages FOR SELECT 
+USING (care_circle_id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));
 
--- Basic RLS for MVP
-create policy "users can read their own profile" on profiles for select using (auth.uid() = id);
+CREATE POLICY "Users can view tasks in their care circles" 
+ON public.tasks FOR ALL 
+USING (care_circle_id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));
 
-create policy "owner can manage care circles" on care_circles for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
-create policy "members can view care circles" on care_circles for select using (
-  id in (select care_circle_id from family_members where user_id = auth.uid())
-);
+CREATE POLICY "Users can view appointments in their care circles" 
+ON public.appointments FOR ALL 
+USING (care_circle_id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));
 
-create policy "members can manage care recipients" on care_recipients for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can view family members" on family_members for select using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can view inbound messages" on inbound_messages for select using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can manage tasks" on tasks for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can manage appointments" on appointments for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can manage supplies" on supplies for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can manage meds" on medication_logs for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can manage concerns" on concerns for all using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can view summaries" on daily_summaries for select using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
-
-create policy "members can view notifications" on notifications for select using (
-  care_circle_id in (select care_circle_id from family_members where user_id = auth.uid())
-);
+CREATE POLICY "Users can view supplies in their care circles" 
+ON public.supplies FOR ALL 
+USING (care_circle_id IN (SELECT care_circle_id FROM public.members WHERE user_id = auth.uid()));

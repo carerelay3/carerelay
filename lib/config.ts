@@ -2,6 +2,8 @@ export function relaySmsMode(): "demo" | "live" {
   return process.env.NEXT_PUBLIC_SMS_MODE === "live" ? "live" : "demo";
 }
 
+export const currentMode = relaySmsMode;
+
 export const appConfig = {
   demoMode: process.env.NEXT_PUBLIC_SMS_MODE !== "live",
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
