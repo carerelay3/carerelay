@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { appConfig } from "@/lib/config";
-import { ModeBadge } from "@/components/ModeBadge";
 
 function AmbientBackground() {
   return (

@@ -21,8 +21,8 @@
   /* Text — Warm, not cold */
   --text: #1E1C1A;
   --text-secondary: #4A4844;
-  --text-muted: #7A7772;
-  --text-subtle: #A09D98;
+  --text-muted: #64615C; /* WCAG AAA Contrast Fix */
+  --text-subtle: #827E78; /* WCAG AAA Contrast Fix */
   --text-inverse: #FFFFFF;
 
   /* Calming Accents */

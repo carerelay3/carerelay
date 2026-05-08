@@ -14,7 +14,7 @@ import { NeedsAttentionPanel } from "@/components/NeedsAttentionPanel";
 import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { formatUsPhoneDisplay } from "@/lib/utils/phone";
 
-type TabKey = "timeline" | "today" | "needs_attention" | "family" | "activity" | "handoff" | "export";
+type TabKey = "command_hub" | "timeline" | "handoff" | "management";
 
 const AVATAR_COLORS = ["#6B9E75", "#6B8EAE", "#8B7EAE", "#C98B5A", "#C46B6B", "#5A9E7A"];
 
@@ -72,7 +72,7 @@ type Props = {
 export function DashboardClient({ initialSnapshot, initialMode }: Props) {
   const [snapshot, setSnapshot] = useState<DemoSnapshot>(initialSnapshot);
   const [mode] = useState<"live" | "demo">(initialMode);
-  const [activeTab, setActiveTab] = useState<TabKey>("timeline");
+  const [activeTab, setActiveTab] = useState<TabKey>("command_hub");
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [sender, setSender] = useState(snapshot.members[0]?.name || "");
   const [body, setBody] = useState("");
@@ -106,13 +106,10 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
   };
 
   const tabs: { key: TabKey; label: string; badge?: number }[] = [
+    { key: "command_hub", label: "Command Hub", badge: snapshot.concerns.filter(c => !c.acknowledged).length + snapshot.tasks.filter(t => t.status === "needs_attention" || (t.status === "open" && !t.assignedTo)).length + snapshot.supplies.filter(s => s.status === "needed").length },
     { key: "timeline", label: "Timeline" },
-    { key: "today", label: "Today" },
-    { key: "needs_attention", label: "Needs Attention", badge: snapshot.concerns.filter(c => !c.acknowledged).length + snapshot.tasks.filter(t => t.status === "needs_attention" || (t.status === "open" && !t.assignedTo)).length + snapshot.supplies.filter(s => s.status === "needed").length },
-    { key: "family", label: "Family" },
-    { key: "activity", label: "Activity" },
     { key: "handoff", label: "Handoff" },
-    { key: "export", label: "Export" },
+    { key: "management", label: "Manage & Export" },
   ];
 
   return (
@@ -123,7 +120,7 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
       </div>
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-4 py-10 animate-fade-in-up">
-        {/* Header — Mission Control */}
+        {/* Header - Mission Control */}
         <div className="glass-elevated p-8 sm:p-10 relative overflow-hidden">
           <div className="absolute -top-32 -right-32 h-80 w-80 rounded-full opacity-30 blur-[80px]" style={{ background: 'var(--sage)' }} />
           <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full opacity-20 blur-[80px]" style={{ background: 'var(--blue-soft)' }} />
@@ -162,12 +159,12 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
         <section>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-2 w-2 rounded-full animate-ping" style={{ background: 'var(--sage)' }} />
-            <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>Today's Pulse</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-subtle)' }}>Today&apos;s Pulse</h2>
           </div>
           <TodayPulse snapshot={snapshot} />
         </section>
 
-        {/* Simulate message — Floating input */}
+        {/* Simulate message - Floating input */}
         <div className="glass-elevated p-6 flex flex-col sm:flex-row gap-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-50 pointer-events-none" />
           <div className="relative z-10 flex flex-wrap sm:flex-nowrap items-center gap-3 w-full">
@@ -196,20 +193,29 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
               className="btn btn-sage flex-shrink-0 w-full sm:w-auto text-sm font-bold"
               style={{ padding: '12px 24px' }}
             >
-              {loading ? "Sending…" : "Send"}
+              {loading ? "Sending..." : "Send"}
             </button>
           </div>
           {error && <p className="mt-3 text-sm w-full relative z-10 font-medium" style={{ color: 'var(--error)' }}>{error}</p>}
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2.5 p-1.5 rounded-2xl backdrop-blur-md" style={{ background: 'var(--bg-muted)' }}>
+        <div 
+          role="tablist" 
+          aria-label="Dashboard views"
+          className="flex flex-wrap gap-2.5 p-1.5 rounded-2xl backdrop-blur-md" 
+          style={{ background: 'var(--bg-muted)' }}
+        >
           {tabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              aria-controls={`tabpanel-${tab.key}`}
+              id={`tab-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
-              className="relative rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex-1 sm:flex-none text-center"
+              className="relative rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex-1 sm:flex-none text-center focus-visible:ring-2 focus-visible:ring-[var(--sage)]"
               style={{
                 background: activeTab === tab.key ? 'white' : 'transparent',
                 color: activeTab === tab.key ? 'var(--text)' : 'var(--text-muted)',
@@ -218,7 +224,7 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
             >
               {tab.label}
               {typeof tab.badge === "number" && tab.badge > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm transition-transform group-hover:scale-110" style={{ background: 'var(--error)', padding: '0 6px' }}>
+                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm transition-transform group-hover:scale-110" aria-label={`${tab.badge} items`} style={{ background: 'var(--error)', padding: '0 6px' }}>
                   {tab.badge}
                 </span>
               )}
@@ -227,7 +233,40 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
         </div>
 
         {/* Tab content */}
-        <div className="animate-fade-in">
+        <div className="animate-fade-in" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+          {activeTab === "command_hub" && (
+            <div className="grid gap-8 lg:grid-cols-12">
+              <div className="lg:col-span-7 space-y-8">
+                <NeedsAttentionPanel
+                  concerns={snapshot.concerns}
+                  tasks={snapshot.tasks}
+                  supplies={snapshot.supplies}
+                  appointments={snapshot.appointments}
+                  onAcknowledge={async (concernId, by, note) => {
+                    const res = await fetch("/api/concerns/acknowledge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ concernId, by, note }) });
+                    const data = await res.json();
+                    if (data.snapshot) refreshSnapshot(data.snapshot);
+                  }}
+                  onUpdate={refreshSnapshot}
+                  members={snapshot.members}
+                />
+              </div>
+              <div className="lg:col-span-5 space-y-8">
+                <div className="glass-elevated p-6">
+                  <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--text)' }}>Today&apos;s Updates</h2>
+                  <MessageFeed 
+                    messages={snapshot.messages.filter((m) => { 
+                      const d = new Date(m.createdAt); const t = new Date(); 
+                      return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); 
+                    })} 
+                    members={snapshot.members} 
+                    getAvatarColor={getAvatarColor} 
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === "timeline" && (
             <div className="grid gap-8 lg:grid-cols-12">
               <div className="lg:col-span-7 space-y-8">
@@ -247,41 +286,23 @@ export function DashboardClient({ initialSnapshot, initialMode }: Props) {
             </div>
           )}
 
-          {activeTab === "today" && (
-            <div className="space-y-8 max-w-3xl mx-auto">
-              <MessageFeed messages={snapshot.messages.filter((m) => { const d = new Date(m.createdAt); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); })} members={snapshot.members} getAvatarColor={getAvatarColor} />
-            </div>
-          )}
-
-          {activeTab === "needs_attention" && (
-            <NeedsAttentionPanel
-              concerns={snapshot.concerns}
-              tasks={snapshot.tasks}
-              supplies={snapshot.supplies}
-              appointments={snapshot.appointments}
-              onAcknowledge={async (concernId, by, note) => {
-                const res = await fetch("/api/concerns/acknowledge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ concernId, by, note }) });
-                const data = await res.json();
-                if (data.snapshot) refreshSnapshot(data.snapshot);
-              }}
-              onUpdate={refreshSnapshot}
-              members={snapshot.members}
-            />
-          )}
-
-          {activeTab === "family" && (
-            <FamilyPresencePanel members={snapshot.members} tasks={snapshot.tasks} messages={snapshot.messages} onInvite={async (memberId) => {
-              const res = await fetch("/api/members/invite", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ memberId }) });
-              const data = await res.json();
-              if (data.snapshot) refreshSnapshot(data.snapshot);
-            }} />
-          )}
-
-          {activeTab === "activity" && <ActivityFeed activity={snapshot.activity} />}
-
           {activeTab === "handoff" && <HandoffPanel handoffs={snapshot.handoffs} careCircleId={snapshot.careCircleId} onUpdate={refreshSnapshot} />}
 
-          {activeTab === "export" && <ExportPanel careCircleId={snapshot.careCircleId} onExport={() => {}} />}
+          {activeTab === "management" && (
+            <div className="grid gap-8 lg:grid-cols-12">
+              <div className="lg:col-span-8 space-y-8">
+                <FamilyPresencePanel members={snapshot.members} tasks={snapshot.tasks} messages={snapshot.messages} onInvite={async (memberId) => {
+                  const res = await fetch("/api/members/invite", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ memberId }) });
+                  const data = await res.json();
+                  if (data.snapshot) refreshSnapshot(data.snapshot);
+                }} />
+                <ActivityFeed activity={snapshot.activity} />
+              </div>
+              <div className="lg:col-span-4 space-y-8">
+                <ExportPanel careCircleId={snapshot.careCircleId} onExport={() => {}} />
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </>
