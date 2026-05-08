@@ -173,7 +173,7 @@ export async function extractMedicalInsights(bucket: string, path: string) {
   return object;
 }
 
-export async function extractMedicalInsightsBackground(bucket: string, path: string, userId: string) {
+export async function extractMedicalInsightsBackground(bucket: string, path: string, userId: string, recordId: string) {
   // Use the admin client to bypass RLS since background jobs do not have the user's cookie
   const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
   const supabaseAdmin = createSupabaseClient(
@@ -209,6 +209,20 @@ export async function extractMedicalInsightsBackground(bucket: string, path: str
     ]
   });
 
-  // In production, save `object` to a 'patient_insights' table here using supabaseAdmin
+  // Save the extracted insights to Supabase and mark the job as completed
+  const { error: updateError } = await supabaseAdmin
+    .from('patient_insights')
+    .update({
+      status: 'completed',
+      transcription: object.transcription,
+      diagnoses: object.diagnoses,
+      prescriptions: object.prescriptions,
+      instructions: object.instructions,
+      is_flagged: object.isFlaggedForReview
+    })
+    .eq('id', recordId);
+    
+  if (updateError) throw new Error(`Failed to save insights: ${updateError.message}`);
+
   return object;
 }

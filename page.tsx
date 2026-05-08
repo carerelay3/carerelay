@@ -1,142 +1,144 @@
-'use client';
+import React from 'react';
+import Link from 'next/link';
 
-import { useState } from 'react';
-
-const MOCK_TICKETS = [
-  { id: 'TK-992', user: 'sarah.connor@example.com', subject: 'Account locked after upgrade', intent: 'Access', urgency: 'Critical', time: '4m ago' },
-  { id: 'TK-991', user: 't-1000@example.com', subject: 'Invoice #4401 missing', intent: 'Billing', urgency: 'High', time: '12m ago' },
-  { id: 'TK-988', user: 'kyle.reese@example.com', subject: 'Cannot establish API sync', intent: 'Technical', urgency: 'Medium', time: '2h ago' },
-  { id: 'TK-984', user: 'john.connor@example.com', subject: 'How do I add a team member?', intent: 'Access', urgency: 'Low', time: '5h ago' },
-];
-
-export default function TriagePage() {
-  const [activeTicket, setActiveTicket] = useState(MOCK_TICKETS[0]);
-  const [scratchpad, setScratchpad] = useState('- User attempted upgrade at 10:42 AM\n- Flagged by automated fraud detection (Stripe)\n- **Action required:** Verify government ID before lifting suspension.');
-
+export default function MedicalOcrMarketingPage() {
   return (
-    <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-100px)] gap-4 overflow-y-auto lg:overflow-hidden relative">
-      
-      {/* Left Pane: Triage Queue (Responsive) */}
-      <div className="w-full lg:w-1/4 flex flex-col h-64 lg:h-full bg-surface-elevated border border-surface-overlay rounded-lg shadow-lg overflow-hidden shrink-0">
-        <div className="p-4 border-b border-surface-overlay bg-surface-base/30 flex justify-between items-center">
-          <h2 className="font-semibold text-content-primary flex items-center gap-2">
-            <span>📥</span> Active Queue
-          </h2>
-          <span className="bg-semantic-alert text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse">
-            {MOCK_TICKETS.length}
-          </span>
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-semantic-info selection:text-white">
+      {/* Navigation */}
+      <nav className="flex items-center justify-between px-6 lg:px-12 py-6 max-w-[1440px] mx-auto border-b border-surface-overlay/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-semantic-info shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center text-white font-bold text-xl">
+            +
+          </div>
+          <span className="font-bold text-xl tracking-tight">CareRelay</span>
         </div>
-        
-        <div className="flex-1 overflow-y-auto p-2 space-y-2">
-          {MOCK_TICKETS.map(ticket => {
-            const isActive = activeTicket.id === ticket.id;
-            const isCritical = ticket.urgency === 'Critical';
-            
-            return (
-              <button 
-                key={ticket.id}
-                onClick={() => setActiveTicket(ticket)}
-                className={`w-full text-left p-3 rounded-md border transition-all duration-200 outline-none focus:ring-2 focus:ring-semantic-info ${
-                  isActive ? 'bg-surface-overlay border-surface-overlay shadow-inner' : 'bg-surface-base/50 border-transparent hover:bg-surface-overlay/50'
-                } ${isCritical && !isActive ? 'border-l-2 border-l-semantic-alert' : ''}`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <span className={`text-[10px] uppercase font-bold tracking-wider ${
-                    ticket.urgency === 'Critical' ? 'text-semantic-alert' : 
-                    ticket.urgency === 'High' ? 'text-semantic-warning' : 'text-content-secondary'
-                  }`}>
-                    {ticket.urgency}
-                  </span>
-                  <span className="text-[11px] text-content-secondary font-mono">{ticket.time}</span>
-                </div>
-                <h3 className="text-[13px] font-semibold text-content-primary truncate">{ticket.subject}</h3>
-                <div className="flex justify-between items-end mt-2">
-                  <span className="text-xs text-content-secondary truncate max-w-[140px]">{ticket.user}</span>
-                  <span className="text-[10px] bg-surface-base border border-surface-overlay px-1.5 py-0.5 rounded text-content-secondary">
-                    {ticket.intent}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+        <div className="hidden md:flex gap-8 items-center">
+          <Link href="#features" className="text-sm font-medium text-content-secondary hover:text-content-primary transition-colors">Features</Link>
+          <Link href="#security" className="text-sm font-medium text-content-secondary hover:text-content-primary transition-colors">HIPAA & Security</Link>
+          <Link href="/admin/triage" className="text-sm font-medium px-5 py-2.5 bg-surface-overlay hover:bg-surface-elevated border border-surface-overlay rounded-md transition-colors shadow-sm">
+            Admin Login
+          </Link>
         </div>
-      </div>
+      </nav>
 
-      {/* Center Pane: Active Workspace / Chat Thread */}
-      <div className="flex-1 flex flex-col min-h-[500px] lg:h-full bg-surface-elevated border border-surface-overlay rounded-lg shadow-lg overflow-hidden shrink-0">
-        <div className="p-4 border-b border-surface-overlay bg-surface-base/30 flex justify-between items-center">
-          <div>
-            <div className="flex items-center gap-3">
-              <h2 className="font-semibold text-content-primary">{activeTicket.subject}</h2>
-              <span className="text-xs font-mono text-content-secondary bg-surface-overlay px-2 py-0.5 rounded">{activeTicket.id}</span>
-            </div>
-            <p className="text-xs text-content-secondary mt-1">{activeTicket.user}</p>
+      <main className="max-w-[1440px] mx-auto px-6 lg:px-12 py-24">
+        {/* Hero Section */}
+        <div className="text-center max-w-4xl mx-auto mb-24 animate-in slide-in-from-bottom-8 fade-in duration-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-semantic-info/10 text-semantic-info border border-semantic-info/20 text-xs font-bold uppercase tracking-wider mb-8">
+            <span className="w-2 h-2 rounded-full bg-semantic-info animate-pulse" />
+            New: Vision AI Extraction Pipeline
           </div>
-          <button className="text-xs bg-semantic-success/10 text-semantic-success border border-semantic-success/20 hover:bg-semantic-success hover:text-white px-3 py-1.5 rounded transition-colors font-medium">
-            ✓ Mark Resolved
-          </button>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Incoming Message */}
-          <div className="flex flex-col items-start max-w-[85%]">
-            <span className="text-[11px] text-content-secondary mb-1 ml-1">Customer • 4 mins ago</span>
-            <div className="bg-surface-overlay border border-surface-base p-4 rounded-2xl rounded-tl-sm text-[13px] text-content-primary shadow-sm">
-              <p>Hello, I just upgraded to the Enterprise tier but now my account says it's locked? We have a massive launch in an hour, I need this fixed immediately!</p>
-            </div>
-          </div>
-          
-          {/* System Telemetry Event */}
-          <div className="flex justify-center">
-            <span className="text-[10px] font-mono text-content-secondary bg-surface-base border border-surface-overlay px-3 py-1 rounded-full flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-semantic-alert animate-pulse" />
-              SYSTEM: Stripe Radar blocked transaction (Risk Score: 89)
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+            Turn Messy Handwriting into <span className="text-semantic-info relative inline-block">
+              Structured Clinical Data
+              <div className="absolute -bottom-2 left-0 w-full h-1 bg-semantic-info/50 rounded-full blur-sm" />
             </span>
+          </h1>
+          <p className="text-lg md:text-xl text-content-secondary mb-10 leading-relaxed max-w-2xl mx-auto">
+            Automate your clinic's triage routing. CareRelay's multimodal AI digitizes, semantically corrects, and categorizes unstructured medical records in seconds with zero latency.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/admin/triage" className="bg-semantic-info hover:bg-blue-600 text-white font-medium px-8 py-3.5 rounded-lg shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] text-lg flex items-center justify-center gap-2">
+              Try the Live Pipeline <span className="font-mono text-sm opacity-80">❯</span>
+            </Link>
+            <button className="bg-surface-elevated hover:bg-surface-overlay border border-surface-overlay text-content-primary font-medium px-8 py-3.5 rounded-lg transition-colors text-lg">
+              Read the Whitepaper
+            </button>
           </div>
         </div>
 
-        {/* Unified Input Composer */}
-        <div className="p-4 bg-surface-base/80 border-t border-surface-overlay">
-          <div className="bg-surface-elevated border border-surface-overlay rounded-lg focus-within:ring-1 focus-within:ring-semantic-info transition-all p-2">
-            <textarea 
-              placeholder="Type your reply or use / for commands..." 
-              className="w-full bg-transparent border-none outline-none text-[13px] text-content-primary resize-none h-16 p-2"
-            />
-            <div className="flex justify-between items-center px-2 pt-2 border-t border-surface-overlay/50">
-              <div className="flex gap-2">
-                <button className="text-content-secondary hover:text-content-primary transition-colors text-sm px-2">📎</button>
-                <button className="text-content-secondary hover:text-content-primary transition-colors text-sm px-2">📚 Articles</button>
+        {/* Side-by-Side Comparison Section */}
+        <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-32">
+          {/* Left: Messy Input (Simulated) */}
+          <div className="bg-surface-elevated border border-surface-overlay rounded-2xl p-6 lg:p-8 shadow-2xl flex flex-col relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-semantic-warning to-semantic-alert opacity-50" />
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-semibold text-content-primary flex items-center gap-2">
+                <span>📄</span> Raw Patient Upload
+              </h3>
+              <span className="text-xs font-mono text-content-secondary bg-surface-base px-2 py-1 rounded border border-surface-overlay flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-semantic-warning animate-pulse" />
+                scan_001.jpg
+              </span>
+            </div>
+            {/* Mock handwritten note area */}
+            <div className="flex-1 bg-[#FDFBF7] rounded-xl p-8 border border-surface-overlay relative min-h-[350px] flex items-center justify-center shadow-inner overflow-hidden">
+              <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/lined-paper.png')]" />
+              <div className="transform -rotate-2 opacity-80 text-gray-800 font-serif text-2xl lg:text-3xl leading-relaxed max-w-sm blur-[0.3px] select-none">
+                Pt presents w/ severe migraines. BP 140/90. 
+                <br/><br/>
+                Dx: Tension HA. 
+                <br/><br/>
+                Rx: Sumatriptan 50mg PRN. Follow up in 2 wks.
               </div>
-              <button className="bg-semantic-info hover:bg-blue-600 text-white text-[13px] font-medium px-6 py-1.5 rounded shadow-md transition-colors">
-                Send Reply
-              </button>
+            </div>
+          </div>
+
+          {/* Right: Structured Output */}
+          <div className="bg-surface-elevated border border-surface-overlay rounded-2xl p-6 lg:p-8 shadow-2xl flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-semantic-info to-semantic-success opacity-50" />
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-semibold text-content-primary flex items-center gap-2">
+                <span>⚡</span> AI Structured JSON
+              </h3>
+              <span className="text-xs font-mono text-semantic-success bg-semantic-success/10 border border-semantic-success/20 px-2 py-1 rounded">1.2s extraction</span>
+            </div>
+            <div className="flex-1 bg-surface-base rounded-xl p-6 border border-surface-overlay font-mono text-sm overflow-x-auto text-content-secondary leading-loose shadow-inner relative group">
+              <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="bg-surface-overlay border border-surface-elevated px-2 py-1 rounded text-xs text-content-primary hover:bg-surface-elevated">Copy</button>
+              </div>
+              <span className="text-semantic-info">{"{"}</span>
+              <br/>
+              &nbsp;&nbsp;<span className="text-content-primary">"transcription"</span>: <span className="text-semantic-success">"Patient presents with severe migraines. Blood pressure 140/90."</span>,
+              <br/>
+              &nbsp;&nbsp;<span className="text-content-primary">"diagnoses"</span>: [
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-semantic-success">"Tension Headache"</span>
+              <br/>
+              &nbsp;&nbsp;],
+              <br/>
+              &nbsp;&nbsp;<span className="text-content-primary">"prescriptions"</span>: [
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-semantic-info">{"{"}</span>
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-content-primary">"medication"</span>: <span className="text-semantic-success">"Sumatriptan"</span>,
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-content-primary">"dosage"</span>: <span className="text-semantic-success">"50mg"</span>,
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-content-primary">"frequency"</span>: <span className="text-semantic-success">"As needed (PRN)"</span>
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-semantic-info">{"}"}</span>
+              <br/>
+              &nbsp;&nbsp;],
+              <br/>
+              &nbsp;&nbsp;<span className="text-content-primary">"instructions"</span>: [
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-semantic-success">"Follow up in 2 weeks."</span>
+              <br/>
+              &nbsp;&nbsp;]
+              <br/>
+              <span className="text-semantic-info">{"}"}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Pane: Context & Collaborative Annotation (Hidden on mobile, visible on XL screens) */}
-      <div className="hidden xl:flex w-1/4 flex-col h-full bg-surface-elevated border border-surface-overlay rounded-lg shadow-lg overflow-hidden shrink-0">
-        <div className="p-4 border-b border-surface-overlay bg-surface-base/30">
-          <h2 className="font-semibold text-content-primary flex items-center gap-2 text-sm">
-            <span>📝</span> Collaborative Context
-          </h2>
+        {/* Trust & Metrics Section */}
+        <div className="grid md:grid-cols-3 gap-8 py-12 border-t border-b border-surface-overlay mb-32 bg-surface-elevated/30 rounded-3xl">
+          <div className="text-center p-6">
+            <div className="text-5xl font-bold text-content-primary mb-3">10x</div>
+            <div className="text-sm text-content-secondary uppercase tracking-wider font-semibold">Faster Triage Routing</div>
+          </div>
+          <div className="text-center p-6 md:border-l md:border-r border-surface-overlay">
+            <div className="text-5xl font-bold text-semantic-success mb-3">99.9%</div>
+            <div className="text-sm text-content-secondary uppercase tracking-wider font-semibold">Diagnostic Accuracy</div>
+          </div>
+          <div className="text-center p-6">
+            <div className="text-5xl font-bold text-semantic-info mb-3">SOC-2</div>
+            <div className="text-sm text-content-secondary uppercase tracking-wider font-semibold">HIPAA Compliant Infrastructure</div>
+          </div>
         </div>
         
-        <div className="flex-1 flex flex-col p-4 bg-[#14171d]">
-          <div className="mb-2 flex justify-between items-end">
-            <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">Internal Scratchpad</span>
-            <span className="text-[10px] text-content-secondary flex items-center gap-1">Markdown supported</span>
-          </div>
-          <textarea 
-            value={scratchpad}
-            onChange={(e) => setScratchpad(e.target.value)}
-            className="flex-1 bg-surface-overlay border border-surface-base rounded p-3 text-[13px] text-content-primary font-mono resize-none focus:outline-none focus:ring-1 focus:ring-semantic-info shadow-inner leading-relaxed"
-            spellCheck={false}
-          />
-        </div>
-      </div>
-
+      </main>
     </div>
   );
 }

@@ -5,11 +5,11 @@ export const processMedicalNote = inngest.createFunction(
   { id: "process-medical-note" },
   { event: "medical/process.note" },
   async ({ event, step }) => {
-    const { bucket, fileName, userId } = event.data;
+    const { bucket, fileName, userId, recordId } = event.data;
 
     // Run the heavy OpenAI extraction asynchronously
     const insights = await step.run("extract-insights", async () => {
-      return await extractMedicalInsightsBackground(bucket, fileName, userId);
+      return await extractMedicalInsightsBackground(bucket, fileName, userId, recordId);
     });
 
     // Returning data here marks the job as successful in the Inngest dashboard

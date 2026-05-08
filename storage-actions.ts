@@ -23,13 +23,22 @@ export async function analyzeMedicalNoteAction(bucket: string, fileName: string)
 
     const safeFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
     
-    // Fire-and-forget background job
+    // 1. Create a pending record in Supabase to track the background job
+    const { data: record, error: dbError } = await supabase
+      .from('patient_insights')
+      .insert([{ user_id: user.id, file_name: safeFileName, status: 'processing' }])
+      .select()
+      .single();
+      
+    if (dbError) throw new Error(`Database error: ${dbError.message}`);
+
+    // 2. Fire-and-forget background job with the record ID
     await inngest.send({
       name: 'medical/process.note',
-      data: { bucket, fileName: safeFileName, userId: user.id }
+      data: { bucket, fileName: safeFileName, userId: user.id, recordId: record.id }
     });
 
-    return { success: true, message: 'Processing queued' };
+    return { success: true, recordId: record.id };
   } catch (error: any) {
     return { error: error.message || 'Failed to extract medical insights' };
   }
