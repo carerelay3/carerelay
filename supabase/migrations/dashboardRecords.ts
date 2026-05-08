@@ -1,6 +1,6 @@
-import { getSupabaseServer } from "../supabase/server";
-import { getDemoSnapshot } from "../demo/data";
-import { DemoSnapshot } from "../types";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { getDemoSnapshot } from "@/lib/demo/data";
+import { DemoSnapshot } from "@/lib/types";
 
 export async function getDashboardDataForCircle(careCircleId?: string): Promise<DemoSnapshot> {
   const supabase = getSupabaseServer();
