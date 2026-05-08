@@ -17,12 +17,11 @@ export function DisclaimerBanner({ compact }: Props) {
             CareRelay is for family coordination only.
           </p>
           <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            Do not use CareRelay for emergencies. Call 911 or your local emergency number.
+            It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services.
           </p>
           {!compact && (
             <div className="mt-3 space-y-1 text-xs font-medium" style={{ color: 'var(--text-subtle)' }}>
-              <p>CareRelay does not provide medical advice, diagnosis, treatment, or medication dosage recommendations.</p>
-              <p>CareRelay helps you see what the family has already shared, but it does not monitor health or guarantee safety.</p>
+              <p>In an emergency, call 911 or your local emergency number.</p>
             </div>
           )}
         </div>

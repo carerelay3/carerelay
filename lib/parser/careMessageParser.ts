@@ -1,4 +1,16 @@
-import type { ParsedCareMessage } from "@/lib/types";
+export type ParsedCareMessage = {
+  category: "medication" | "appointment" | "task" | "supply" | "general_update" | "concern";
+  confidence: number;
+  extractedTitle: string;
+  extractedDetails?: string;
+  concernFlag: boolean;
+  matchedKeywords: string[];
+  suggestedRecord: Record<string, unknown>;
+  command?: "complete_task" | "update_supply" | "assign_task" | "request_summary" | "request_help" | "opt_out" | "opt_in" | null;
+  commandTarget?: string;
+  commandAssignee?: string;
+  commandNewStatus?: string;
+};
 
 const concernKeywords = [
   "confused",
@@ -21,27 +33,39 @@ const concernKeywords = [
   "swelling",
   "emergency",
   "911",
+  "concerned",
+  "missed",
+  "unsafe",
+  "wandering"
 ];
 
 const medicationKeywords = [
   "meds:",
-  "medication:",
-  "took",
+  "medicine",
+  "medication",
   "pill",
   "dose",
+  "gave her",
+  "gave him",
+  "took meds",
+  "took medicine",
+  "morning meds",
+  "night meds",
+  "evening meds",
+  "took",
   "meds done",
   "medication taken",
-  "morning meds",
-  "evening meds",
 ];
 
 const appointmentKeywords = [
   "appointment:",
   "doctor",
-  "cardiology",
-  "dentist",
+  "visit",
+  "checkup",
   "therapy",
+  "dentist",
   "clinic",
+  "cardiology",
   "today",
   "tomorrow",
   "monday",
@@ -60,29 +84,38 @@ const appointmentKeywords = [
 const taskKeywords = [
   "task:",
   "can someone",
+  "please call",
+  "pick up",
+  "remind",
+  "check on",
+  "bring",
+  "take out",
   "please",
   "need someone",
   "who can",
-  "pick up",
   "call",
-  "check on",
   "drop off",
 ];
 
 const supplyKeywords = [
   "need:",
-  "supplies:",
-  "need",
+  "low on",
+  "out of",
+  "groceries",
+  "supplies",
+  "diapers",
   "milk",
-  "soup",
-  "bread",
   "wipes",
   "paper towels",
+  "food",
   "toilet paper",
+  "supplies:",
+  "need",
+  "soup",
+  "bread",
   "gloves",
   "prescription refill",
   "refill",
-  "groceries",
   "water",
   "pads",
   "batteries",
@@ -186,11 +219,14 @@ export function parseCareMessage(message: string): ParsedCareMessage {
     concernMatches.length > 0 &&
     !(
       concernMatches.length === 1 &&
+      (concernMatches[0] === "missed" && (text.includes("call") || text.includes("message")))
+    ) &&
+    !(
+      concernMatches.length === 1 &&
       concernMatches[0] === "dizzy" &&
-      (text.includes("pick up") || text.includes("prescription") || text.includes("meds") || text.includes("medication"))
+      (text.includes("pick up") || text.includes("prescription"))
     );
 
-  // If there is a command AND it's not a strong concern override, keep command context
   const hasCommand = !!commandData.command;
 
   if (strongConcern) {
@@ -219,7 +255,7 @@ export function parseCareMessage(message: string): ParsedCareMessage {
     };
   }
 
-  if (appointmentMatches.length > 0 && text.includes("appointment")) {
+  if (appointmentMatches.length > 0 && (text.includes("appointment") || text.includes("visit") || text.includes("checkup") || text.includes("doctor") || text.includes("therapy") || text.includes("dentist") || text.includes("clinic"))) {
     return {
       category: "appointment",
       confidence: 0.86,

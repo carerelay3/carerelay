@@ -1,5 +1,5 @@
 {
     "geminicodeassist.agentYoloMode": true,
-    "geminicodeassist.inlineSuggestions.nextEditPredictions": true,
-    "geminicodeassist.agentDebugMode": true
+    "geminicodeassist.agentDebugMode": true,
+    "geminicodeassist.inlineSuggestions.nextEditPredictions": true
 }

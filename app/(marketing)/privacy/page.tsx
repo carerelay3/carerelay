@@ -9,7 +9,10 @@ export default function PrivacyPage() {
         <p>Do not use CareRelay for emergencies. Call 911 or your local emergency number.</p>
         <p>CareRelay does not provide medical advice.</p>
         <p>Users can request deletion of their care circle data.</p>
-        <p>This MVP is not a HIPAA-covered clinical system unless separately configured and contracted appropriately.</p>
+        <p>This MVP is not a HIPAA-covered clinical system.</p>
+        <p className="mt-6 pt-4 border-t border-gray-200" style={{ borderColor: 'var(--glass-border)' }}>
+          <em>Note: This product is an MVP. Human legal review is required before public launch.</em>
+        </p>
       </div>
     </main>
   );

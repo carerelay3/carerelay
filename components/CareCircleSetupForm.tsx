@@ -2,25 +2,60 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
-import { formatUsPhoneDisplay } from "@/lib/utils/phone";
+import { formatUsPhoneDisplay, normalizePhone } from "@/lib/utils/phone";
 
 export function CareCircleSetupForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState("Linda");
+  const [keyword, setKeyword] = useState("LINDA");
+  
+  const [members, setMembers] = useState<{name: string, phone: string}[]>([]);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberPhone, setNewMemberPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const demoLine = formatUsPhoneDisplay(DEMO_SHARED_PHONE);
 
   const steps = [
     { num: 1, label: "Recipient" },
     { num: 2, label: "Family" },
-    { num: 3, label: "Schedule" },
+    { num: 3, label: "Keyword" },
     { num: 4, label: "Number" },
     { num: 5, label: "Review" },
   ];
 
+  const handleAddMember = () => {
+    const normalized = normalizePhone(newMemberPhone);
+    if (!normalized) {
+      setPhoneError("Please enter a valid phone number (e.g. 555-555-5555)");
+      return;
+    }
+    setPhoneError("");
+    setMembers([...members, { name: newMemberName, phone: normalized }]);
+    setNewMemberName("");
+    setNewMemberPhone("");
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await fetch("/api/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, keyword, members, sharedPhone: DEMO_SHARED_PHONE }),
+      });
+      router.push("/dashboard");
+    } catch (e) {
+      router.push("/dashboard");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="glass-elevated relative overflow-hidden mx-auto w-full max-w-2xl transition-all duration-500">
-      {/* Dynamic Background Glow based on Step */}
       <div 
         className="absolute -top-40 -right-40 h-80 w-80 rounded-full opacity-20 blur-3xl pointer-events-none transition-all duration-700" 
         style={{ 
@@ -30,12 +65,10 @@ export function CareCircleSetupForm() {
       />
 
       <div className="border-b p-8 sm:p-10 relative z-10" style={{ borderColor: 'var(--glass-border)' }}>
-        {/* Progress Steps (Neumorphic) */}
         <div className="flex items-center justify-between gap-2">
           {steps.map((s, i) => {
             const isCompleted = step > s.num;
             const isCurrent = step === s.num;
-            
             return (
               <div key={s.num} className="flex flex-1 items-center">
                 <div className="flex flex-col items-center gap-2 relative z-10 w-full group">
@@ -66,10 +99,7 @@ export function CareCircleSetupForm() {
                 </div>
                 {i < steps.length - 1 && (
                   <div className="h-1 flex-1 rounded-full mx-2 transition-colors duration-500 relative overflow-hidden" style={{ background: 'var(--bg-muted)' }}>
-                    <div 
-                      className="absolute top-0 left-0 h-full transition-all duration-500 ease-out" 
-                      style={{ width: isCompleted ? '100%' : '0%', background: 'var(--success)' }} 
-                    />
+                    <div className="absolute top-0 left-0 h-full transition-all duration-500 ease-out" style={{ width: isCompleted ? '100%' : '0%', background: 'var(--success)' }} />
                   </div>
                 )}
               </div>
@@ -89,7 +119,10 @@ export function CareCircleSetupForm() {
                   className="input-glass w-full text-lg font-medium"
                   style={{ padding: '16px 20px' }}
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    setKeyword(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''));
+                  }}
                   placeholder="e.g., Mom, Linda, Dad"
                   autoFocus
                 />
@@ -110,50 +143,63 @@ export function CareCircleSetupForm() {
               <div>
                 <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Add your care team</h2>
                 <p className="text-sm mt-2 font-medium" style={{ color: 'var(--text-muted)' }}>
-                  Add the people who coordinate care (names, roles, and phone numbers). They keep using normal
-                  SMS—no app install required.
+                  Add the people who coordinate care. They keep using normal SMS—no app install required.
                 </p>
               </div>
-              <button type="button" className="w-full rounded-2xl border-2 border-dashed p-8 text-center transition-all hover:bg-white/40 hover:border-solid group" style={{ borderColor: 'var(--glass-border)', background: 'var(--glass-bg)' }}>
-                <div className="mx-auto h-12 w-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 group-hover:shadow-md" style={{ background: 'var(--primary)', color: 'white' }}>
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                  </svg>
+
+              <div className="space-y-3">
+                {members.map((m, idx) => (
+                  <div key={idx} className="flex justify-between items-center p-3 border rounded-xl glass">
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{m.name}</span>
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{formatUsPhoneDisplay(m.phone)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-4 p-4 border rounded-2xl glass-elevated">
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    placeholder="Name"
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    className="input-glass text-sm"
+                  />
+                  <input
+                    placeholder="Phone number"
+                    value={newMemberPhone}
+                    onChange={(e) => setNewMemberPhone(e.target.value)}
+                    className="input-glass text-sm"
+                  />
                 </div>
-                <p className="text-base font-bold" style={{ color: 'var(--text)' }}>Invite family member</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>Up to 8 members</p>
-              </button>
+                {phoneError && <p className="text-xs text-red-500">{phoneError}</p>}
+                <button type="button" onClick={handleAddMember} disabled={!newMemberName || !newMemberPhone} className="btn btn-soft w-full text-sm">
+                  Add member
+                </button>
+              </div>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Choose summary time</h2>
+                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Set a care circle keyword</h2>
                 <p className="text-sm mt-2 font-medium" style={{ color: 'var(--text-muted)' }}>
-                  Select when you would like the system to generate a calm daily handoff summary.
+                  If a family member helps with more than one person, they can use this keyword so CareRelay knows which dashboard to update.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { id: 'morning', label: 'Morning', time: '8:00 AM', icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z' },
-                  { id: 'afternoon', label: 'Afternoon', time: '2:00 PM', icon: 'M3 15h18M12 3v12' }, // Abstract representation
-                  { id: 'evening', label: 'Evening', time: '8:00 PM', icon: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z' }
-                ].map((slot) => (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    className="glass-elevated p-5 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 hover:shadow-lg group"
-                  >
-                    <svg className="h-6 w-6 text-[var(--sage)] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={slot.icon} />
-                    </svg>
-                    <div className="text-center">
-                      <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{slot.label}</p>
-                      <p className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-subtle)' }}>{slot.time}</p>
-                    </div>
-                  </button>
-                ))}
+              <div>
+                <input
+                  className="input-glass w-full text-lg font-bold uppercase tracking-widest text-center"
+                  style={{ padding: '16px 20px' }}
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                  placeholder="e.g. GRANDMA"
+                />
+              </div>
+              <div className="rounded-2xl border p-5 glass">
+                <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  <strong>Example:</strong> If Aunt Sarah is in two care circles, she can text <em>&quot;{keyword || 'LINDA'} Meds: gave morning pills&quot;</em> and we will route it here automatically.
+                </p>
               </div>
             </div>
           )}
@@ -174,7 +220,7 @@ export function CareCircleSetupForm() {
               </div>
               
               <p className="text-xs font-medium max-w-sm mx-auto mt-6" style={{ color: 'var(--text-subtle)' }}>
-                In a live environment, Twilio provides this dedicated SMS line. Family members text it like any other contact; CareRelay organizes the chaos.
+                In a live environment, CareRelay uses one shared SMS line. Family members text it like any other contact from their own phones; CareRelay organizes the chaos using your linked phone numbers.
               </p>
             </div>
           )}
@@ -190,16 +236,20 @@ export function CareCircleSetupForm() {
               <p className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>
                 Your command center for <span className="font-bold" style={{ color: 'var(--text)' }}>{firstName}</span> is prepared.
               </p>
-              <div className="rounded-2xl border p-5 max-w-sm mx-auto text-left glass" style={{ borderColor: 'var(--glass-border)' }}>
-                <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You can refine details once you see real messages flowing in. The family will be notified with a welcome text from the shared number.
-                </p>
+              
+              <div className="rounded-2xl p-4 text-left border" style={{ background: 'var(--warning-soft)', borderColor: 'var(--warning)' }}>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" className="mt-1" required />
+                  <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, or emergency monitoring. For emergencies, call 911.
+                  </span>
+                </label>
               </div>
+
             </div>
           )}
         </div>
 
-        {/* Footer Actions */}
         <div className="mt-10 pt-6 border-t flex flex-wrap-reverse sm:flex-nowrap gap-4" style={{ borderColor: 'var(--glass-border)' }}>
           {step > 1 && (
             <button
@@ -223,11 +273,12 @@ export function CareCircleSetupForm() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push("/dashboard")}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
               className="btn btn-sage flex-1 w-full text-base font-bold shadow-lg"
               style={{ padding: '14px 24px' }}
             >
-              Enter Dashboard
+              {isSubmitting ? "Creating..." : "Enter Dashboard"}
             </button>
           )}
         </div>

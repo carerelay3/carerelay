@@ -1,20 +1,75 @@
 import { NextResponse } from "next/server";
 import { addDemoMessage, demoStore } from "@/lib/demo/data";
 import { smsMockSchema } from "@/lib/validation/schemas";
+import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFromSender";
+import { parseCareMessage } from "@/lib/parser/careMessageParser";
+import { createLinkedRecords } from "@/lib/messages/createLinkedRecords";
+import { appConfig } from "@/lib/config";
 
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}));
-  const parsed = smsMockSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  try {
+    const body = await req.json().catch(() => ({}));
+    const parsed = smsMockSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const { careCircleId, fromName, fromPhone, body: rawBody } = parsed.data;
+
+    // Simulate routing
+    const routing = await resolveCareCircleFromSender(
+      fromPhone, 
+      rawBody, 
+      undefined, 
+      { isDemo: appConfig.demoMode || careCircleId === demoStore.careCircleId, careCircleId }
+    );
+
+    // Parse message using the cleaned body (without the multi-circle keyword if any)
+    const parsedMessage = parseCareMessage(routing.cleanedBody);
+
+    // Linked records creation
+    let dbResult = null;
+    if (routing.routingStatus !== "invalid_phone") {
+      try {
+        dbResult = await createLinkedRecords(
+          parsedMessage,
+          routing,
+          rawBody,
+          fromName,
+          fromPhone
+        );
+      } catch (e) {
+        console.error("Error creating linked records:", e);
+        // Do not crash
+      }
+    }
+
+    // In demo mode or if it's the demo circle, update the local in-memory store so the UI updates
+    if (routing.demoMode || careCircleId === demoStore.careCircleId) {
+      addDemoMessage({
+        sender: fromName,
+        fromPhone: fromPhone,
+        body: routing.cleanedBody, // Save the cleaned body as the simulated received message
+      });
+    }
+
+    let displayMessage = "CareRelay logged your update.";
+    if (parsedMessage.concernFlag) {
+      displayMessage = "CareRelay logged this as a concern for the family to review. If this is an emergency, call 911 or your local emergency number.";
+    }
+    if (routing.routingStatus === "matched_multiple_needs_keyword" || routing.routingStatus === "unknown_sender" || routing.routingStatus === "invalid_phone") {
+      displayMessage = routing.safeReply || displayMessage;
+    }
+
+    return NextResponse.json({
+      success: true,
+      category: parsedMessage.category,
+      displayMessage,
+      routingStatus: routing.routingStatus,
+      dashboardUpdateData: dbResult,
+    });
+  } catch (error) {
+    console.error("Error in mock SMS endpoint:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-  if (parsed.data.careCircleId !== demoStore.careCircleId) {
-    return NextResponse.json({ error: "Unknown care circle." }, { status: 404 });
-  }
-  const result = addDemoMessage({
-    sender: parsed.data.fromName,
-    fromPhone: parsed.data.fromPhone,
-    body: parsed.data.body,
-  });
-  return NextResponse.json(result);
 }

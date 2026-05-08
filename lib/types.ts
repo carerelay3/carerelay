@@ -126,3 +126,13 @@ export type DemoPreferences = {
   notifyAppointments: boolean;
   notifySupplies: boolean;
 };
+
+export type DemoSnapshot = {
+  messages: DemoMessage[];
+  tasks: DemoTask[];
+  appointments: DemoAppointment[];
+  supplies: DemoSupply[];
+  concerns: DemoConcern[];
+  dailySummary?: string;
+  careCircleId?: string;
+};
