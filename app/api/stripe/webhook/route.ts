@@ -44,7 +44,8 @@ export async function POST(req: Request) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
-        const priceId = subscription.items.data[0]?.price.id;
+        const subscriptionItem = subscription.items.data[0];
+        const priceId = subscriptionItem?.price.id;
         const status = subscription.status;
 
         let plan = "starter";
@@ -58,8 +59,8 @@ export async function POST(req: Request) {
             stripe_price_id: priceId,
             plan: plan,
             status: status,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_start: subscriptionItem ? new Date(subscriptionItem.current_period_start * 1000).toISOString() : null,
+            current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
             cancel_at_period_end: subscription.cancel_at_period_end,
             updated_at: new Date().toISOString(),
           })

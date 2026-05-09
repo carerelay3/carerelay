@@ -26,7 +26,8 @@ export async function POST(req: Request) {
       accountSid = String(form.get("AccountSid") || "");
 
       // Validate Twilio Signature if configured
-      if (appConfig.twilioConfigured) {
+      const twilioAuthToken = appConfig.twilioAuthToken;
+      if (twilioAuthToken) {
         const signature = req.headers.get("x-twilio-signature");
         const url = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000") + "/api/sms/inbound";
         const params: Record<string, string> = {};
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
 
         if (signature) {
           const isValid = twilio.validateRequest(
-            process.env.TWILIO_AUTH_TOKEN,
+            twilioAuthToken,
             signature,
             url,
             params

@@ -31,6 +31,8 @@ export type EventName =
   | "summary_safety_filter_triggered"
   | "pricing_viewed"
   | "pricing_cta_clicked"
+  | "checkout_started"
+  | "checkout_failed"
   | "sign_in_started"
   | "signup_started"
   | "signup_completed"

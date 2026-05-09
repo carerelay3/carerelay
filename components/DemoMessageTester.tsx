@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CareCategory } from "@/lib/types";
 
-export function DemoMessageTester({ onSend }: { onSend: (msg: string, category: CareCategory, concern: boolean) => void }) {
+export function DemoMessageTester({ onSend }: { onSend?: (msg: string, category: CareCategory, concern: boolean) => void }) {
   const [text, setText] = useState("");
   const [category, setCategory] = useState<CareCategory>("general_update");
   const [concern, setConcern] = useState(false);
@@ -11,7 +11,7 @@ export function DemoMessageTester({ onSend }: { onSend: (msg: string, category: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
-    onSend(text, category, concern);
+    onSend?.(text, category, concern);
     setText("");
   };
 

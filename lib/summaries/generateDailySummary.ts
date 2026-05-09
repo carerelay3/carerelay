@@ -4,7 +4,10 @@ import { createOpenAiSummary } from "../openai/createSummary";
 import { isSummarySafe } from "./summarySafety";
 import { trackEvent } from "../analytics/track";
 
-export async function generateDailySummary(careCircleId?: string) {
+type SummaryInput = string | { careCircleId?: string };
+
+export async function generateDailySummary(input?: SummaryInput) {
+  const careCircleId = typeof input === "string" ? input : input?.careCircleId;
   // 1. Load Data
   const admin = getSupabaseAdmin();
   
@@ -14,9 +17,29 @@ export async function generateDailySummary(careCircleId?: string) {
   let tasksCount = 0;
   let suppliesCount = 0;
   let concernsCount = 0;
+  let openTasks: string[] = [];
+  let completed: string[] = [];
+  let upcoming: string[] = [];
+  let suppliesNeeded: string[] = [];
+  let medicationConfirmations: string[] = [];
+  let concernsMentioned: string[] = [];
   
   if (!admin || !careCircleId) {
     // Demo mode fallback
+    if (careCircleId && careCircleId !== "circle-demo-1") {
+      return {
+        summaryText: "No records were found for this care circle.",
+        source: "deterministic",
+        generatedBy: "fallback",
+        openTasks,
+        completed,
+        upcoming,
+        suppliesNeeded,
+        medicationConfirmations,
+        concernsMentioned,
+      };
+    }
+
     const demo = getDemoSnapshot();
     updatesCount = demo.messages.length;
     medsCount = demo.messages.filter(m => m.category === 'medication').length;
@@ -24,6 +47,12 @@ export async function generateDailySummary(careCircleId?: string) {
     tasksCount = demo.tasks.filter(t => t.status === 'open').length;
     suppliesCount = demo.supplies.filter(s => s.status === 'needed').length;
     concernsCount = demo.concerns.length;
+    openTasks = demo.tasks.filter(t => t.status === "open").map(t => t.title);
+    completed = demo.tasks.filter(t => t.status === "done").map(t => t.title);
+    upcoming = demo.appointments.map(a => a.title);
+    suppliesNeeded = demo.supplies.filter(s => s.status === "needed").map(s => s.item);
+    medicationConfirmations = demo.medicationLogs.map(m => m.text);
+    concernsMentioned = demo.concerns.filter(c => !c.acknowledged).map(c => c.text);
   } else {
     // Real DB - Today's records
     const today = new Date();
@@ -55,7 +84,15 @@ export async function generateDailySummary(careCircleId?: string) {
   }
 
   // 2. Deterministic Fallback
-  const deterministicText = `Today, the family logged ${updatesCount} updates. There were ${medsCount} medication confirmations, ${apptsCount} upcoming appointments, ${tasksCount} open tasks, and ${suppliesCount} supply needs. ${concernsCount} concerns were flagged for family review. This summary is based only on family-reported updates. CareRelay does not provide medical advice or emergency monitoring.`;
+  const deterministicText = [
+    `Today, the family logged ${updatesCount} updates.`,
+    `Open tasks: ${openTasks.length > 0 ? openTasks.join(", ") : `${tasksCount} open task(s)`}.`,
+    `Medication confirmations: ${medicationConfirmations.length > 0 ? medicationConfirmations.join(", ") : `${medsCount} confirmation(s)`}.`,
+    `Appointments: ${upcoming.length > 0 ? upcoming.join(", ") : `${apptsCount} upcoming appointment(s)`}.`,
+    `Supplies needed: ${suppliesNeeded.length > 0 ? suppliesNeeded.join(", ") : `${suppliesCount} supply need(s)`}.`,
+    `Concerns for family review: ${concernsMentioned.length > 0 ? concernsMentioned.join(", ") : `${concernsCount} concern(s)`}.`,
+    "This summary is based only on family-reported updates. CareRelay does not provide medical advice or emergency monitoring.",
+  ].join(" ");
 
   let finalSummary = deterministicText;
   let source = "deterministic";
@@ -93,6 +130,13 @@ export async function generateDailySummary(careCircleId?: string) {
 
   return {
     summaryText: finalSummary,
-    source
+    source,
+    generatedBy: source === "openai" ? "openai" : "fallback",
+    openTasks,
+    completed,
+    upcoming,
+    suppliesNeeded,
+    medicationConfirmations,
+    concernsMentioned,
   };
 }

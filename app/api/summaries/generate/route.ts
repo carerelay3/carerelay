@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { generateDailySummary } from "@/lib/summaries/generateDailySummary";
 import { generateWeeklySummary } from "@/lib/summaries/generateWeeklySummary";
+import { summaryGenerateSchema } from "@/lib/validation/schemas";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const careCircleId = body.careCircleId;
+    const parsed = summaryGenerateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const careCircleId = parsed.data.careCircleId;
     const type = body.type || "daily";
 
     let result;

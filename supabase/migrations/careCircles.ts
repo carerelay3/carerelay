@@ -1,7 +1,7 @@
-import { getSupabaseServer } from "../supabase/server";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export async function getCareCircleById(id: string) {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   if (!supabase) return null;
   
   const { data, error } = await supabase.from("care_circles").select("*").eq("id", id).single();
@@ -10,7 +10,7 @@ export async function getCareCircleById(id: string) {
 }
 
 export async function getCareCircleForUser() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   if (!supabase) return null;
   
   // Automatically scoped by RLS to the authenticated user
