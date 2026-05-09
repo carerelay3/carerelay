@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   if (!supabase) {
     return NextResponse.json({ error: "Database not configured" }, { status: 500 });
   }

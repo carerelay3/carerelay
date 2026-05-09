@@ -7,7 +7,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   let snapshot = getDemoSnapshot();
   let mode = relaySmsMode();
 
