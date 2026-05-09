@@ -13,22 +13,25 @@ export function DashboardOverviewCards({ snapshot }: { snapshot: DemoSnapshot })
   const openConcerns = snapshot.concerns.filter(c => !c.acknowledged).length;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-      <Card title="Today's Updates" count={todayUpdates} />
-      <Card title="Open Tasks" count={openTasks} />
-      <Card title="Appointments" count={upcomingAppts} />
-      <Card title="Needed Supplies" count={neededSupplies} />
-      <Card title="Med Confirmations" count={medConfirmations} />
-      <Card title="Open Concerns" count={openConcerns} color={openConcerns > 0 ? "var(--warning)" : undefined} />
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <Card title="Today's updates" count={todayUpdates} accent="var(--teal)" />
+      <Card title="Open tasks" count={openTasks} accent="var(--purple-soft)" />
+      <Card title="Appointments" count={upcomingAppts} accent="var(--blue-soft)" />
+      <Card title="Needed supplies" count={neededSupplies} accent="var(--warning)" />
+      <Card title="Med confirmations" count={medConfirmations} accent="var(--sage)" />
+      <Card title="Open concerns" count={openConcerns} accent={openConcerns > 0 ? "var(--warning)" : "var(--teal)"} />
     </div>
   );
 }
 
-function Card({ title, count, color }: { title: string; count: number; color?: string }) {
+function Card({ title, count, accent }: { title: string; count: number; accent: string }) {
   return (
-    <div className="glass-elevated p-4 rounded-2xl flex flex-col justify-center items-center text-center shadow-sm">
-      <div className="text-3xl font-bold mb-1" style={{ color: color || "var(--text)" }}>{count}</div>
-      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">{title}</div>
+    <div className="product-card p-4 text-left">
+      <div className="relative z-10">
+        <div className="mb-3 h-1 w-10 rounded-full" style={{ background: accent }} />
+        <div className="text-3xl font-bold" style={{ color: "var(--text)" }}>{count}</div>
+        <div className="mt-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-subtle)" }}>{title}</div>
+      </div>
     </div>
   );
 }

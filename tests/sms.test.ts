@@ -1,10 +1,8 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { POST as mockPost } from "@/app/api/sms/mock/route";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/openai/createSummary", () => ({
   createOpenAiSummary: vi.fn().mockResolvedValue(null)
 }));
-import { POST as inboundPost } from "@/app/api/sms/inbound/route";
 import { GET as seedGet } from "@/app/api/demo/seed/route";
 import { GET as healthGet } from "@/app/api/health/route";
 import { POST as parsePost } from "@/app/api/messages/parse/route";

@@ -91,7 +91,7 @@ export async function generateDailySummary(input?: SummaryInput) {
     `Appointments: ${upcoming.length > 0 ? upcoming.join(", ") : `${apptsCount} upcoming appointment(s)`}.`,
     `Supplies needed: ${suppliesNeeded.length > 0 ? suppliesNeeded.join(", ") : `${suppliesCount} supply need(s)`}.`,
     `Concerns for family review: ${concernsMentioned.length > 0 ? concernsMentioned.join(", ") : `${concernsCount} concern(s)`}.`,
-    "This summary is based only on family-reported updates. CareRelay does not provide medical advice or emergency monitoring.",
+    "This summary is based only on family-reported updates. CareRelay does not provide medical advice. CareRelay is for family coordination only and does not provide diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services.",
   ].join(" ");
 
   let finalSummary = deterministicText;

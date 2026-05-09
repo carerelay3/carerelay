@@ -47,7 +47,7 @@ export function CareCircleSetupForm() {
         body: JSON.stringify({ firstName, keyword, members, sharedPhone: DEMO_SHARED_PHONE }),
       });
       router.push("/dashboard");
-    } catch (e) {
+    } catch {
       router.push("/dashboard");
     } finally {
       setIsSubmitting(false);
@@ -208,7 +208,7 @@ export function CareCircleSetupForm() {
             <div className="space-y-6 text-center">
               <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Your shared number</h2>
               <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                This is the single number your entire care circle will text to log updates, tasks, and vitals.
+                This is the single number your entire care circle will text to log updates, tasks, appointments, supplies, medication confirmations, and concerns.
               </p>
               
               <div className="relative mx-auto max-w-sm mt-8">
@@ -241,7 +241,7 @@ export function CareCircleSetupForm() {
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" className="mt-1" required />
                   <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, or emergency monitoring. For emergencies, call 911.
+                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. For emergencies, call 911.
                   </span>
                 </label>
               </div>

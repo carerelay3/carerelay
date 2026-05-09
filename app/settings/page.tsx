@@ -2,6 +2,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { BillingSettings } from "@/components/BillingSettings";
 
+const demoCurrentPeriodEnd = "2026-06-08T00:00:00.000Z";
+
 export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
@@ -13,7 +15,7 @@ export default function SettingsPage() {
           planId="demo" 
           status="trialing" 
           cancelAtPeriodEnd={false} 
-          currentPeriodEnd={new Date(Date.now() + 86400000 * 30).toISOString()} 
+          currentPeriodEnd={demoCurrentPeriodEnd} 
           maxFamilyMembers={3} 
           currentFamilyMembers={1} 
         />

@@ -80,21 +80,9 @@ export default function SignUpPage() {
             </Link>
           </form>
 
-          {/* Social / Biometric */}
-          <div className="mt-8 flex items-center gap-3">
-            <div className="h-px flex-1 bg-[var(--border)]" />
-            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>Or register with</span>
-            <div className="h-px flex-1 bg-[var(--border)]" />
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <button className="btn btn-soft w-full flex items-center justify-center gap-3 py-3">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              Passkey
-            </button>
-          </div>
+          <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--blue-glow)", color: "var(--text-secondary)" }}>
+            Demo registration continues directly to the guided care circle setup.
+          </p>
 
           {!appConfig.supabaseConfigured && (
             <div className="mt-8 rounded-xl p-4 alert-warm text-center">

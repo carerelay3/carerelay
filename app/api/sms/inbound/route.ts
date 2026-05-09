@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFromSender";
 import { parseCareMessage } from "@/lib/parser/careMessageParser";
 import { createLinkedRecords } from "@/lib/messages/createLinkedRecords";

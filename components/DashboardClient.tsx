@@ -50,32 +50,31 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">CareRelay</h1>
+    <div className="min-h-screen pb-20 font-sans">
+      <header className="sticky top-[65px] z-40 border-y px-4 py-4 backdrop-blur-xl sm:px-6" style={{ background: "rgba(251,250,247,0.82)", borderColor: "var(--border)" }}>
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--text)" }}>Family command center</h1>
           <ModeBadge mode={initialMode} />
         </div>
-        <div className="text-sm font-medium text-slate-500">
-          Family Care Circle
+        <div className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
+          Shared line: +1 (555) 123-0000
+        </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6">
         <DisclaimerBanner />
         
         <DashboardOverviewCards snapshot={snapshot} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Feed & Tools */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
             <DemoMessageTester onSend={handleNewMockMessage} />
             <DailySummary snapshot={snapshot} />
             <MessageFeed messages={snapshot.messages} />
           </div>
 
-          {/* Right Column - Specialized Lists */}
           <div className="space-y-8">
             <ConcernPanel concerns={snapshot.concerns} />
             <MedicationLog messages={snapshot.messages} />

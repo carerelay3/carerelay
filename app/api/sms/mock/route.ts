@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addDemoMessage, demoStore } from "@/lib/demo/data";
+import { addDemoMessage, demoStore, getDemoSnapshot } from "@/lib/demo/data";
 import { smsMockSchema } from "@/lib/validation/schemas";
 import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFromSender";
 import { parseCareMessage } from "@/lib/parser/careMessageParser";
@@ -29,7 +29,11 @@ export async function POST(req: Request) {
 
     // Linked records creation
     let dbResult = null;
-    if (routing.routingStatus !== "invalid_phone") {
+    const canCreateRecords =
+      routing.routingStatus === "matched_single_circle" ||
+      routing.routingStatus === "matched_multiple_keyword_resolved";
+
+    if (canCreateRecords) {
       try {
         dbResult = await createLinkedRecords(
           parsedMessage,
@@ -49,7 +53,9 @@ export async function POST(req: Request) {
       addDemoMessage({
         sender: fromName,
         fromPhone: fromPhone,
-        body: routing.cleanedBody, // Save the cleaned body as the simulated received message
+        body: routing.cleanedBody,
+        category: parsedMessage.category,
+        concernFlag: parsedMessage.concernFlag,
       });
     }
 
@@ -67,6 +73,7 @@ export async function POST(req: Request) {
       displayMessage,
       routingStatus: routing.routingStatus,
       dashboardUpdateData: dbResult,
+      snapshot: getDemoSnapshot(),
     });
   } catch (error) {
     console.error("Error in mock SMS endpoint:", error);

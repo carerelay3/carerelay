@@ -53,9 +53,9 @@ export default function SignInPage() {
                   <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
                     Password
                   </label>
-                  <Link href="#" className="text-xs transition-colors hover:text-[var(--sage)]" style={{ color: 'var(--text-subtle)' }}>
-                    Forgot password?
-                  </Link>
+                  <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>
+                    Demo access
+                  </span>
                 </div>
                 <input 
                   type="password" 
@@ -73,21 +73,9 @@ export default function SignInPage() {
             </Link>
           </form>
 
-          {/* Social / Biometric */}
-          <div className="mt-8 flex items-center gap-3">
-            <div className="h-px flex-1 bg-[var(--border)]" />
-            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-subtle)' }}>Or continue with</span>
-            <div className="h-px flex-1 bg-[var(--border)]" />
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <button className="btn btn-soft w-full flex items-center justify-center gap-3 py-3">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              Passkey
-            </button>
-          </div>
+          <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>
+            In demo mode, use the sign in button to enter the dashboard.
+          </p>
 
           {!appConfig.supabaseConfigured && (
             <div className="mt-8 rounded-xl p-4 alert-warm text-center">

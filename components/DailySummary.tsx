@@ -28,27 +28,31 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
       } else {
         setError(true);
       }
-    } catch(e) {
+    } catch {
       setError(true);
     }
     setLoading(false);
   };
 
   return (
-    <div className="space-y-4 glass-elevated p-6 rounded-2xl shadow-sm bg-blue-50/30 border border-blue-100">
+    <div className="product-card p-5 sm:p-6">
+      <div className="relative z-10 space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-blue-800">Today's Family Summary</h2>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--teal)" }}>Daily summary</p>
+          <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Today&apos;s family summary</h2>
+        </div>
         <button 
           onClick={handleGenerate} 
           disabled={loading}
-          className="text-xs bg-white border border-blue-200 text-blue-700 px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-50 transition disabled:opacity-50"
+          className="btn btn-soft text-xs"
         >
-          {loading ? "Generating..." : "Generate AI Summary"}
+          {loading ? "Generating..." : "Generate summary"}
         </button>
       </div>
       
       <p className="text-xs text-slate-500 italic">
-        Based on family-reported updates. CareRelay organizes messages but does not provide medical advice or emergency monitoring.
+        Based on family-reported updates. CareRelay organizes messages for family coordination only and does not provide medical advice, monitoring, or emergency services.
       </p>
 
       {error && (
@@ -56,12 +60,12 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
       )}
 
       {summary ? (
-        <div className="prose prose-sm text-slate-700 mt-2 p-4 bg-white rounded-xl border border-blue-50 shadow-sm">
+        <div className="mt-2 rounded-3xl border bg-white/75 p-4 text-sm shadow-sm" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
           <p>{summary}</p>
         </div>
       ) : (
-        <div className="prose prose-sm text-slate-700">
-          <p>Today's organized notes:</p>
+        <div className="rounded-3xl border bg-white/75 p-4 text-sm shadow-sm" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+          <p className="font-semibold" style={{ color: "var(--text)" }}>Today&apos;s organized notes:</p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
             <li><strong>{medsCount}</strong> medication confirmation(s) logged</li>
             <li><strong>{openTasks}</strong> task(s) currently open</li>
@@ -74,6 +78,7 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(result);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Summary generation error:", err);
     return NextResponse.json({ error: "Failed to generate summary" }, { status: 500 });
   }

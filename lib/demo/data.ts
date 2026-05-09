@@ -142,17 +142,44 @@ export function getDemoSnapshot(): DemoSnapshot {
   return snapshot;
 }
 
-export function addDemoMessage(msg: { sender: string; fromPhone: string; body: string }) {
+export function addDemoMessage(msg: {
+  sender: string;
+  fromPhone: string;
+  body: string;
+  category?: DemoSnapshot["messages"][number]["category"];
+  concernFlag?: boolean;
+}) {
+  const id = `msg-${Date.now()}`;
   snapshot.messages.unshift({
-    id: `msg-${Date.now()}`,
+    id,
     sender: msg.sender,
     fromPhone: msg.fromPhone,
     toPhone: snapshot.sharedPhone,
     body: msg.body,
     createdAt: now(),
-    category: "general_update",
+    category: msg.category || "general_update",
     confidence: 0.75,
-    concernFlag: false,
+    concernFlag: !!msg.concernFlag,
+  });
+  if (msg.category === "medication") {
+    snapshot.medicationLogs.unshift({ id: `med-${Date.now()}`, text: msg.body, by: msg.sender, at: now() });
+  } else if (msg.category === "appointment") {
+    snapshot.appointments.unshift({ id: `appt-${Date.now()}`, title: msg.body, at: now(), transportationConfirmed: false });
+  } else if (msg.category === "task") {
+    snapshot.tasks.unshift({ id: `task-${Date.now()}`, title: msg.body, status: "open", createdAt: now() });
+  } else if (msg.category === "supply") {
+    snapshot.supplies.unshift({ id: `sup-${Date.now()}`, item: msg.body, status: "needed", requestedBy: msg.sender });
+  }
+  if (msg.category === "concern" || msg.concernFlag) {
+    snapshot.concerns.unshift({ id: `con-${Date.now()}`, text: msg.body, createdAt: now(), acknowledged: false });
+  }
+  snapshot.activity.unshift({
+    id: `activity-${Date.now()}`,
+    type: "message_logged",
+    description: `${msg.sender} sent a ${msg.category || "general"} update.`,
+    actor: msg.sender,
+    createdAt: now(),
+    metadata: { inboundMessageId: id },
   });
   return snapshot;
 }
