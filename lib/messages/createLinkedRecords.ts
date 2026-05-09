@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from "../supabase/admin";
 import type { ParsedCareMessage } from "../parser/careMessageParser";
 import type { RoutingResult } from "../routing/resolveCareCircleFromSender";
+import { normalizePhone } from "../phone/normalizePhone";
 
 export async function createLinkedRecords(
   parsed: ParsedCareMessage,
@@ -21,16 +22,13 @@ export async function createLinkedRecords(
   }
 
   const admin = getSupabaseAdmin()!;
-  
-  // 1. Save the inbound message first
-  const { data: inboundData, error: inboundError } = await admin
-    .from("inbound_messages")
-    .insert({
+  const normalizedSenderPhone = normalizePhone(senderPhone);
+  const payload = {
       care_circle_id: routing.careCircleId,
       family_member_id: routing.familyMemberId,
       sender_name: senderName,
       sender_phone: senderPhone,
-      sender_phone_normalized: routing.routingStatus !== "unknown_sender" ? senderPhone : null,
+      sender_phone_normalized: normalizedSenderPhone,
       raw_body: rawMessage,
       cleaned_body: routing.cleanedBody,
       sms_keyword_used: routing.smsKeywordUsed || null,
@@ -40,7 +38,28 @@ export async function createLinkedRecords(
       matched_keywords: parsed.matchedKeywords,
       parsed_payload: parsed.suggestedRecord,
       source,
-    })
+  };
+
+  const { data: rpcData, error: rpcError } = await admin.rpc("create_inbound_message_with_linked_record", { payload });
+
+  if (rpcError) {
+    console.error("Failed to save inbound message transaction", rpcError);
+    throw new Error("Failed to save inbound message");
+  }
+
+  if (rpcData) {
+    return {
+      inboundMessageId: rpcData.inboundMessageId,
+      linkedRecordId: rpcData.linkedRecordId || null,
+      category: parsed.category,
+      demoMode: false,
+    };
+  }
+
+  // Fallback for databases that have not applied the launch hardening RPC yet.
+  const { data: inboundData, error: inboundError } = await admin
+    .from("inbound_messages")
+    .insert(payload)
     .select("id")
     .single();
 

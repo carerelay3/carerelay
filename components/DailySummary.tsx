@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DemoSnapshot } from "@/lib/types";
+import { authFetch } from "@/lib/supabase/clientAuthFetch";
 
 export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
   const [summary, setSummary] = useState<string | null>(snapshot.dailySummary || null);
@@ -17,7 +18,7 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("/api/summaries/generate", {
+      const res = await authFetch("/api/summaries/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ careCircleId: snapshot.careCircleId, type: "daily" })

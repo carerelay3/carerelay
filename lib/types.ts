@@ -128,11 +128,18 @@ export type DemoPreferences = {
 };
 
 export type DemoSnapshot = {
+  careCircleId?: string;
+  careCircleName?: string;
+  recipientName?: string;
+  sharedPhone?: string;
+  members?: DemoMember[];
   messages: DemoMessage[];
   tasks: DemoTask[];
   appointments: DemoAppointment[];
   supplies: DemoSupply[];
   concerns: DemoConcern[];
+  activity?: DemoActivity[];
+  handoffs?: DemoHandoff[];
+  preferences?: DemoPreferences;
   dailySummary?: string;
-  careCircleId?: string;
 };

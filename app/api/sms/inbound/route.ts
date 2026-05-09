@@ -34,18 +34,24 @@ export async function POST(req: Request) {
           if (key !== "AccountSid" || value) params[key] = String(value); // Twilio includes all form keys in validation
         }
 
-        if (signature) {
-          const isValid = twilio.validateRequest(
-            twilioAuthToken,
-            signature,
-            url,
-            params
-          );
-          if (!isValid && process.env.NODE_ENV === "production") {
-            return new Response(generateTwiML("CareRelay could not log this update right now. Please try again later."), { 
-              status: 403, headers: { "Content-Type": "text/xml" } 
-            });
-          }
+        if (!signature) {
+          return new Response(generateTwiML("CareRelay could not log this update right now. Please try again later."), {
+            status: 403,
+            headers: { "Content-Type": "text/xml" },
+          });
+        }
+
+        const isValid = twilio.validateRequest(
+          twilioAuthToken,
+          signature,
+          url,
+          params
+        );
+        if (!isValid) {
+          return new Response(generateTwiML("CareRelay could not log this update right now. Please try again later."), {
+            status: 403,
+            headers: { "Content-Type": "text/xml" },
+          });
         }
       }
     } else {

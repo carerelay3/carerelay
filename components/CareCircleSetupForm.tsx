@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
 import { formatUsPhoneDisplay, normalizePhone } from "@/lib/utils/phone";
+import { authFetch } from "@/lib/supabase/clientAuthFetch";
 
 export function CareCircleSetupForm() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export function CareCircleSetupForm() {
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberPhone, setNewMemberPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const demoLine = formatUsPhoneDisplay(DEMO_SHARED_PHONE);
@@ -40,15 +42,21 @@ export function CareCircleSetupForm() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError("");
     try {
-      await fetch("/api/setup", {
+      const res = await authFetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, keyword, members, sharedPhone: DEMO_SHARED_PHONE }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSubmitError(data.error || "Could not create care circle. Please sign in and try again.");
+        return;
+      }
       router.push("/dashboard");
     } catch {
-      router.push("/dashboard");
+      setSubmitError("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -245,6 +253,9 @@ export function CareCircleSetupForm() {
                   </span>
                 </label>
               </div>
+              {submitError && (
+                <p className="rounded-2xl bg-red-50 p-3 text-sm font-medium text-red-700">{submitError}</p>
+              )}
 
             </div>
           )}

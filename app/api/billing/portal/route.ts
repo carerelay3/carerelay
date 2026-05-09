@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { appConfig } from "@/lib/config";
+import { authErrorResponse, requireUser } from "@/lib/supabase/auth";
 
-export async function POST() {
+export async function POST(req: Request) {
   if (!appConfig.stripeConfigured) {
     return NextResponse.json(
       {
@@ -12,10 +13,15 @@ export async function POST() {
     );
   }
 
-  return NextResponse.json(
-    {
-      error: "Billing portal sessions are not configured yet. Use the Stripe dashboard until customer lookup is connected.",
-    },
-    { status: 501 },
-  );
+  try {
+    await requireUser(req);
+    return NextResponse.json(
+      {
+        error: "Billing portal sessions are not configured yet. Use the Stripe dashboard until customer lookup is connected.",
+      },
+      { status: 501 },
+    );
+  } catch (error) {
+    return authErrorResponse(error);
+  }
 }

@@ -1,13 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-import { appConfig, hasSupabase } from "../config";
 
 // Safe browser client
 export function getSupabaseClient() {
-  if (!hasSupabase()) return null;
-  return createClient(appConfig.supabaseUrl!, appConfig.supabaseAnonKey!);
-}
-
-export function getSupabaseAdmin() {
-  if (!appConfig.supabaseUrl || !appConfig.supabaseServiceRole) return null;
-  return createClient(appConfig.supabaseUrl, appConfig.supabaseServiceRole);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
