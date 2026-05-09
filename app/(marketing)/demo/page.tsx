@@ -29,7 +29,7 @@ const commandSamples = [
 ];
 
 export default function DemoPage() {
-  const [snapshot, setSnapshot] = useState<DemoSnapshot>(getDemoSnapshot());
+  const [snapshot, setSnapshot] = useState<DemoSnapshot>(() => getDemoSnapshot());
   const [activeSample, setActiveSample] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
