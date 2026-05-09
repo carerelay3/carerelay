@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateDailySummary } from "@/lib/summaries/generateDailySummary";
 import { generateWeeklySummary } from "@/lib/summaries/generateWeeklySummary";
 import { summaryGenerateSchema } from "@/lib/validation/schemas";
-import { appConfig } from "@/lib/config";
+import { hasSupabase } from "@/lib/config";
 import { authErrorResponse, requireCareCircleMembership, requireUser } from "@/lib/supabase/auth";
 
 export async function POST(req: Request) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const careCircleId = parsed.data.careCircleId;
     const type = body.type || "daily";
 
-    if (!appConfig.demoMode && careCircleId !== "circle-demo-1") {
+    if (hasSupabase() && careCircleId !== "circle-demo-1") {
       const user = await requireUser(req);
       await requireCareCircleMembership(user.id, careCircleId);
     }

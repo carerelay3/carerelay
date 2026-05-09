@@ -9,9 +9,9 @@ Status key: Live = production path connected to Supabase/Auth or external servic
 | `/` | Live | Marketing page with real CTAs to `/demo` and `/setup`; uses public brand assets. |
 | `/demo` | Demo | Public demo, uses in-memory demo data and `/api/sms/mock`. |
 | `/pricing` | Live/Fallback | Pricing buttons call checkout; Stripe missing returns safe setup fallback. |
-| `/dashboard` | Live/Demo | Demo mode uses sample data; live mode loads Supabase records for authenticated member. |
-| `/setup` | Live/Demo | Guided form; live creation handled by authenticated `/api/setup`; demo fallback when Supabase is absent/demo mode. |
-| `/settings` | Fallback | Billing settings visible; portal unavailable unless customer lookup is connected. |
+| `/dashboard` | Live/Auth | Requires auth when Supabase is configured; shows configuration message when Supabase is absent. |
+| `/setup` | Live/Auth | Requires auth when Supabase is configured; shows configuration message when Supabase is absent. |
+| `/settings` | Live/Auth/Fallback | Requires auth when Supabase is configured; billing portal unavailable unless customer lookup is connected. |
 | `/sign-in` | Live/Demo | Supabase password auth when configured; demo redirects to dashboard. |
 | `/sign-up` | Live/Demo | Supabase signup when configured; demo redirects to setup. |
 | `/privacy` | Live | Static legal/privacy content. |
@@ -23,11 +23,11 @@ Status key: Live = production path connected to Supabase/Auth or external servic
 
 | Route | Status | Auth/Membership |
 | --- | --- | --- |
-| `/api/setup` | Locked/Fallback | Requires authenticated Supabase user in live mode; demo fallback otherwise. |
+| `/api/setup` | Locked/Fallback | Requires authenticated Supabase user when Supabase is configured; demo fallback only when Supabase is absent. |
 | `/api/auth/session` | Live | Validates Supabase access token and sets/clears HTTP-only server session cookie. |
 | `/api/summaries/generate` | Locked/Demo | Requires auth + care circle membership in live mode. |
 | `/api/sms/inbound` | Live | Requires Twilio signature when token exists; routes by normalized sender phone. |
-| `/api/sms/mock` | Demo | Public demo endpoint; routes only demo context and does not mutate live records. |
+| `/api/sms/mock` | Demo | Public demo endpoint; accepts only `circle-demo-1`, routes only demo context, and cannot mutate live records. |
 | `/api/tasks/status` | Locked/Demo | Updates Supabase only after record membership; demo store in demo mode. |
 | `/api/tasks/assign` | Locked/Demo | Updates Supabase only after record membership; demo store in demo mode. |
 | `/api/supplies/status` | Locked/Demo | Updates Supabase only after record membership; demo store in demo mode. |
@@ -61,7 +61,7 @@ Status key: Live = production path connected to Supabase/Auth or external servic
 
 - `lib/demo/data.ts`: canonical in-memory demo store.
 - `/demo`, `/api/sms/mock`, `/api/demo/seed`: public demo.
-- `/dashboard`: uses demo data only when `NEXT_PUBLIC_DEMO_MODE=true`; live mode uses Supabase loaders.
+- `/dashboard`: does not show fake live records; it renders authenticated Supabase records, empty states, or a configuration prompt.
 - `/founder`: marketing/demo narrative only.
 
 ## Service Role / Admin Usage

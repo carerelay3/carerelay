@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "A valid session token is required." }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = await getSupabaseServer();
   if (!supabase) {
     return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
   }

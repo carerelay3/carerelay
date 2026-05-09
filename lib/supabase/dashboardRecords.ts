@@ -235,6 +235,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     supplies,
     concerns,
     summary,
+    profileResult,
     recipientResult,
     membersResult,
   ] = await Promise.all([
@@ -245,6 +246,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     getSupplies(activeCircleId),
     getConcerns(activeCircleId),
     getLatestDailySummary(activeCircleId),
+    admin.from("profiles").select("id, full_name, email").eq("id", user.id).maybeSingle(),
     admin.from("care_recipients").select("first_name").eq("care_circle_id", activeCircleId).limit(1).maybeSingle(),
     admin
       .from("family_members")
@@ -269,6 +271,11 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     careCircleName: asString(selectedCircle.name, "Care Circle"),
     recipientName: asString(recipientResult.data?.first_name, asString(selectedCircle.name, "Loved one")),
     sharedPhone: asString(selectedCircle.shared_phone_number),
+    profile: {
+      id: user.id,
+      fullName: asString(profileResult.data?.full_name, user.user_metadata?.full_name || user.email || ""),
+      email: asString(profileResult.data?.email, user.email || ""),
+    },
     members,
     messages: [...messages, ...medicationMessages].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)),
     tasks,

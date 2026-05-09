@@ -132,6 +132,11 @@ export type DemoSnapshot = {
   careCircleName?: string;
   recipientName?: string;
   sharedPhone?: string;
+  profile?: {
+    id: string;
+    fullName?: string;
+    email?: string;
+  };
   members?: DemoMember[];
   messages: DemoMessage[];
   tasks: DemoTask[];

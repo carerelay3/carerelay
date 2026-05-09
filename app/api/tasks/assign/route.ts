@@ -13,10 +13,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const admin = getSupabaseAdmin();
-    if (admin && !appConfig.demoMode) {
+    const isLiveMode = appConfig.supabaseConfigured && !appConfig.demoMode;
+
+    if (isLiveMode) {
+      const admin = getSupabaseAdmin();
+      if (!admin) {
+        return NextResponse.json({ error: "Live data is not configured." }, { status: 503 });
+      }
+
       const user = await requireUser(req);
-      await requireRecordMembership(user.id, "tasks", parsed.data.taskId);
+      const task = await requireRecordMembership(user.id, "tasks", parsed.data.taskId);
+
+      if (parsed.data.memberId) {
+        const { data: assignee, error: assigneeError } = await admin
+          .from("family_members")
+          .select("id")
+          .eq("id", parsed.data.memberId)
+          .eq("care_circle_id", task.care_circle_id)
+          .maybeSingle();
+
+        if (assigneeError || !assignee) {
+          return NextResponse.json({ error: "Assignee must belong to this care circle." }, { status: 403 });
+        }
+      }
+
       const { error } = await admin
         .from("tasks")
         .update({

@@ -13,8 +13,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const admin = getSupabaseAdmin();
-    if (admin && !appConfig.demoMode) {
+    const isLiveMode = appConfig.supabaseConfigured && !appConfig.demoMode;
+
+    if (isLiveMode) {
+      const admin = getSupabaseAdmin();
+      if (!admin) {
+        return NextResponse.json({ error: "Live data is not configured." }, { status: 503 });
+      }
+
       const user = await requireUser(req);
       await requireRecordMembership(user.id, "supplies", parsed.data.supplyId);
       const { error } = await admin

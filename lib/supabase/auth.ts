@@ -64,13 +64,15 @@ export async function getAccessTokenFromRequest(req?: Request): Promise<string |
 }
 
 export async function getCurrentSupabaseUser(req?: Request): Promise<User | null> {
-  const supabase = getSupabaseServer();
+  const token = await getAccessTokenFromRequest(req);
+  if (!token && req) return null;
+
+  const supabase = await getSupabaseServer();
   if (!supabase) return null;
 
-  const token = await getAccessTokenFromRequest(req);
-  if (!token) return null;
-
-  const { data, error } = await supabase.auth.getUser(token);
+  const { data, error } = token
+    ? await supabase.auth.getUser(token)
+    : await supabase.auth.getUser();
   if (error || !data.user) return null;
   return data.user;
 }

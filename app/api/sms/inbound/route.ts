@@ -9,6 +9,16 @@ import { trackEvent } from "@/lib/analytics/track";
 export async function POST(req: Request) {
   try {
     const contentType = req.headers.get("content-type") || "";
+    const isFormEncoded = contentType.includes("application/x-www-form-urlencoded");
+    const twilioAuthToken = appConfig.twilioAuthToken;
+
+    if (twilioAuthToken && !isFormEncoded) {
+      return new Response(generateTwiML("CareRelay could not log this update right now. Please try again later."), {
+        status: 403,
+        headers: { "Content-Type": "text/xml" },
+      });
+    }
+
     let from = "";
     let to = "";
     let body = "";
@@ -16,7 +26,7 @@ export async function POST(req: Request) {
     let accountSid = "";
 
     // Parse payload
-    if (contentType.includes("application/x-www-form-urlencoded")) {
+    if (isFormEncoded) {
       const form = await req.formData();
       from = String(form.get("From") || "");
       to = String(form.get("To") || "");
@@ -25,7 +35,6 @@ export async function POST(req: Request) {
       accountSid = String(form.get("AccountSid") || "");
 
       // Validate Twilio Signature if configured
-      const twilioAuthToken = appConfig.twilioAuthToken;
       if (twilioAuthToken) {
         const signature = req.headers.get("x-twilio-signature");
         const url = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000") + "/api/sms/inbound";

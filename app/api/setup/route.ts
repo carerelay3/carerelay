@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { normalizePhone } from "@/lib/phone/normalizePhone";
-import { appConfig } from "@/lib/config";
+import { appConfig, hasSupabase } from "@/lib/config";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { authErrorResponse, requireUser } from "@/lib/supabase/auth";
 
@@ -33,8 +33,11 @@ export async function POST(req: Request) {
     }));
 
     const admin = getSupabaseAdmin();
-    if (admin && !appConfig.demoMode) {
+    if (hasSupabase()) {
       const user = await requireUser(req);
+      if (!admin) {
+        return NextResponse.json({ error: "Supabase service role is required for live setup." }, { status: 503 });
+      }
       await admin.from("profiles").upsert({
         id: user.id,
         email: user.email,
