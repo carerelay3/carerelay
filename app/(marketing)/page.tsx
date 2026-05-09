@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { PricingCard } from "@/components/PricingCard";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -17,6 +18,7 @@ const trackItems = [
   ["Tasks", "Who is handling what and what is still open."],
   ["Groceries and supplies", "Needed, purchased, and delivered items."],
   ["Concerns", "Calm flags for family review."],
+  ["Daily summaries", "A factual recap of what the family reported."],
 ];
 
 const faqs = [
@@ -25,54 +27,20 @@ const faqs = [
   ["Is this for emergencies?", "No. CareRelay is for family coordination only. In an emergency, call 911 or your local emergency number."],
 ];
 
-function PhoneToDashboardPreview() {
+function HeroVisual() {
   return (
-    <div className="relative mx-auto w-full max-w-xl">
-      <div className="absolute -inset-6 rounded-[3rem] opacity-60 blur-3xl" style={{ background: "linear-gradient(135deg, var(--teal-glow), var(--blue-glow))" }} />
-      <div className="relative grid gap-4 sm:grid-cols-[0.82fr_1fr]">
-        <div className="product-card p-4">
-          <div className="relative z-10 rounded-[2rem] bg-[#203a43] p-4 text-white shadow-xl">
-            <div className="mx-auto mb-4 h-1.5 w-16 rounded-full bg-white/25" />
-            <div className="space-y-3">
-              {[
-                ["Sarah", "Meds: Mom took her morning pills at 8am."],
-                ["Jake", "Need: low on wipes and milk."],
-                ["Mark", "Appointment: therapy Tuesday at 2pm."],
-              ].map(([sender, body]) => (
-                <div key={body} className="rounded-2xl bg-white/10 p-3">
-                  <p className="text-[11px] font-semibold text-white/65">{sender}</p>
-                  <p className="mt-1 text-sm leading-snug text-white">{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="product-card p-5">
-          <div className="relative z-10 space-y-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--teal)" }}>Family dashboard</p>
-              <h3 className="mt-1 text-xl font-bold" style={{ color: "var(--text)" }}>Today is organized</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                ["1", "Medication"],
-                ["2", "Supplies"],
-                ["1", "Appointment"],
-                ["0", "Open concerns"],
-              ].map(([count, label]) => (
-                <div key={label} className="rounded-2xl border border-slate-200/70 bg-white/70 p-4">
-                  <p className="text-2xl font-bold" style={{ color: "var(--text)" }}>{count}</p>
-                  <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--text-subtle)" }}>{label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-2xl p-4" style={{ background: "var(--teal-soft)" }}>
-              <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Daily summary</p>
-              <p className="mt-1 text-sm">Medication was confirmed. Wipes and milk are needed. Therapy is Tuesday at 2pm.</p>
-            </div>
-          </div>
-        </div>
+    <div className="relative mx-auto w-full max-w-2xl">
+      <div className="absolute -inset-6 rounded-[3rem] opacity-70 blur-3xl" style={{ background: "linear-gradient(135deg, var(--teal-glow), var(--amber-glow))" }} />
+      <div className="product-card p-2 sm:p-3">
+        <Image
+          src="/brand/heroes/carerelay-hero-main.png"
+          alt="CareRelay homepage hero showing family coordination dashboard"
+          width={1672}
+          height={941}
+          priority
+          sizes="(min-width: 1024px) 48vw, 92vw"
+          className="relative z-10 h-auto w-full rounded-[1.35rem] object-cover shadow-2xl"
+        />
       </div>
     </div>
   );
@@ -113,7 +81,7 @@ export default function HomePage() {
             Built for family coordination only. Not for medical advice or emergencies.
           </p>
         </div>
-        <PhoneToDashboardPreview />
+        <HeroVisual />
       </section>
 
       <section className="page-shell py-16 sm:py-20">
@@ -133,15 +101,29 @@ export default function HomePage() {
 
       <section className="py-16 sm:py-20" style={{ background: "linear-gradient(180deg, rgba(237,244,242,0.5), rgba(244,241,235,0.45))" }}>
         <div className="page-shell">
-          <SectionHeader eyebrow="How it works" title="Text normally. CareRelay handles the organization." />
-          <div className="mt-10 grid gap-4 lg:grid-cols-4">
-            {flowSteps.map((step, index) => (
-              <div key={step} className="surface-panel p-6">
-                <p className="text-sm font-bold" style={{ color: "var(--teal)" }}>0{index + 1}</p>
-                <h3 className="mt-3 text-lg font-bold" style={{ color: "var(--text)" }}>{step}</h3>
-                <p className="mt-2 text-sm">{index === 0 ? "A family member texts the shared number." : index === 1 ? "The sender phone number is matched." : index === 2 ? "A keyword is used only when needed." : "The right record appears for the family."}</p>
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <SectionHeader align="left" eyebrow="How it works" title="Text normally. CareRelay handles the organization." text="Family members keep using SMS. CareRelay recognizes the sender, routes the update to the right care circle, and turns the message into an organized dashboard item." />
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {flowSteps.map((step, index) => (
+                  <div key={step} className="surface-panel p-6">
+                    <p className="text-sm font-bold" style={{ color: "var(--teal)" }}>0{index + 1}</p>
+                    <h3 className="mt-3 text-lg font-bold" style={{ color: "var(--text)" }}>{step}</h3>
+                    <p className="mt-2 text-sm">{index === 0 ? "A family member texts the shared number." : index === 1 ? "The sender phone number is matched." : index === 2 ? "A keyword is used only when needed." : "The right record appears for the family."}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div className="product-card p-2 sm:p-3">
+              <Image
+                src="/brand/heroes/carerelay-hero-family.png"
+                alt="CareRelay family texting organization hero graphic"
+                width={1672}
+                height={941}
+                sizes="(min-width: 1024px) 42vw, 92vw"
+                className="relative z-10 h-auto w-full rounded-[1.35rem] object-cover shadow-xl"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -170,14 +152,28 @@ export default function HomePage() {
       </section>
 
       <section className="page-shell py-16 sm:py-20">
-        <SectionHeader eyebrow="What families track" title="A practical command center for the real work of caregiving." />
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {trackItems.map(([title, text]) => (
-            <div key={title} className="surface-panel p-6">
-              <h3 className="text-lg font-bold" style={{ color: "var(--text)" }}>{title}</h3>
-              <p className="mt-2 text-sm">{text}</p>
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="product-card p-2 sm:p-3">
+            <Image
+              src="/brand/ads/carerelay-feature-promo.png"
+              alt="CareRelay feature promo showing caregiver command center"
+              width={1122}
+              height={1402}
+              sizes="(min-width: 1024px) 40vw, 92vw"
+              className="relative z-10 h-auto w-full rounded-[1.35rem] object-cover shadow-xl"
+            />
+          </div>
+          <div>
+            <SectionHeader align="left" eyebrow="What families track" title="A practical command center for the real work of caregiving." text="CareRelay organizes the everyday family-reported updates that usually get scattered across calls and group texts." />
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {trackItems.map(([title, text]) => (
+                <div key={title} className="surface-panel p-5">
+                  <h3 className="text-base font-bold" style={{ color: "var(--text)" }}>{title}</h3>
+                  <p className="mt-2 text-sm">{text}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
@@ -220,13 +216,37 @@ export default function HomePage() {
       </section>
 
       <section className="page-shell pb-16 sm:pb-20">
-        <div className="product-card p-8 text-center sm:p-12">
-          <div className="relative z-10 mx-auto max-w-2xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--text)" }}>Bring a little order to the family group chat.</h2>
-            <p className="mt-4">Try the demo in under a minute, then create a care circle when you are ready.</p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
-              <Link href="/setup" className="btn btn-soft">Create a Care Circle</Link>
+        <div className="product-card overflow-hidden">
+          <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="relative z-10 p-8 sm:p-12">
+              <div className="section-kicker">Bring order to the family group chat</div>
+              <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--text)" }}>One shared number. One calmer place to see what happened.</h2>
+              <p className="mt-4">Try the demo in under a minute, then create a care circle when you are ready.</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
+                <Link href="/setup" className="btn btn-soft">Create a Care Circle</Link>
+              </div>
+            </div>
+            <Image
+              src="/brand/banners/carerelay-wide-banner.png"
+              alt="CareRelay wide banner for organizing family group chat"
+              width={2172}
+              height={724}
+              sizes="(min-width: 1024px) 45vw, 92vw"
+              className="relative z-10 h-full min-h-64 w-full object-cover"
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 surface-panel p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-base font-bold" style={{ color: "var(--text)" }}>Marketing assets</h3>
+              <p className="mt-1 text-sm">Social square and vertical caregiving graphics are organized for future campaign pages.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--teal)" }}>
+              <span className="rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-square.png</span>
+              <span className="rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-vertical-caregiving.png</span>
             </div>
           </div>
         </div>

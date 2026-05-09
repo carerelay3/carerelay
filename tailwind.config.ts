@@ -9,20 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          teal: "#0D6B63",
+          ink: "#0F1E32",
+          mint: "#E6F6F1",
+          amber: "#F4B247",
+        },
         surface: {
-          base: "#0F1115",     // Deep charcoal main background
-          elevated: "#1A1D24", // Data grids, panels, cards
-          overlay: "#262B36",  // Floating command bars, menus
+          base: "#FBFEFA",
+          elevated: "#FFFFFF",
+          overlay: "#E6F6F1",
         },
         semantic: {
-          success: "#10B981",  // Active, Resolved
-          alert: "#EF4444",    // Suspended, Critical
-          warning: "#F59E0B",  // Pending, SLA warning
-          info: "#3B82F6",     // Neutral telemetry
+          success: "#0D6B63",
+          alert: "#B45309",
+          warning: "#F4B247",
+          info: "#3B82F6",
         },
         content: {
-          primary: "#F8FAFC",  // Crisp white for vital data
-          secondary: "#94A3B8",// Cool gray for metadata
+          primary: "#0F1E32",
+          secondary: "#536173",
         }
       }
     },
