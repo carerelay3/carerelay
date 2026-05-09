@@ -1,7 +1,7 @@
 import { DashboardClient } from "@/components/DashboardClient";
 import { relaySmsMode } from "@/lib/config";
 import { getDemoSnapshot } from "@/lib/demo/data";
-import { getDashboardDataForCircle } from "@/lib/db/dashboardRecords";
+import { getDashboardDataForCircle } from "@/supabase/migrations/dashboardRecords";
 import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
