@@ -55,7 +55,7 @@ export async function generateWeeklySummary(careCircleId?: string) {
   }
 
   // 2. Deterministic Fallback
-  const deterministicText = `Over the past 7 days, the family logged ${updatesCount} total updates. We organized ${medsCount} medication confirmations and ${apptsCount} appointments. There are currently ${tasksCount} open tasks and ${suppliesCount} supply items needed. ${concernsCount} concerns were flagged for family review. This summary is based only on family-reported updates. CareRelay does not provide medical advice or emergency monitoring.`;
+  const deterministicText = `Over the past 7 days, the family logged ${updatesCount} total updates. We organized ${medsCount} medication confirmations and ${apptsCount} appointments. There are currently ${tasksCount} open tasks and ${suppliesCount} supply items needed. ${concernsCount} concerns were flagged for family review. This summary is based only on family-reported updates. CareRelay is for family coordination only and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services.`;
 
   let finalSummary = deterministicText;
   let source = "weekly_deterministic";

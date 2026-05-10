@@ -5,9 +5,9 @@ export function MedicationLog({ messages }: { messages: DemoMessage[] }) {
   const meds = messages.filter(m => m.category === "medication");
 
   return (
-    <div className="space-y-4 glass-elevated p-6 rounded-2xl shadow-sm">
-      <h2 className="text-xl font-semibold text-slate-800">Medication Log</h2>
-      <p className="text-xs text-slate-500 italic bg-slate-50 p-3 rounded-xl border border-slate-100">
+    <div className="surface-panel space-y-4 p-5 sm:p-6">
+      <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>Medication confirmations</h2>
+      <p className="rounded-2xl border bg-white/70 p-3 text-xs font-medium" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
         Medication confirmations are family-reported logs for organization only. Always follow instructions from licensed medical professionals.
       </p>
       
@@ -16,9 +16,9 @@ export function MedicationLog({ messages }: { messages: DemoMessage[] }) {
       ) : (
         <div className="space-y-3">
           {meds.map(m => (
-            <div key={m.id} className="p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-sm">
-              <div className="text-slate-700 font-medium mb-1">{m.body}</div>
-              <div className="text-slate-400 text-xs">Logged by {m.sender} at {new Date(m.createdAt).toLocaleTimeString()}</div>
+            <div key={m.id} className="rounded-2xl border bg-white/70 p-3 text-sm shadow-sm" style={{ borderColor: "var(--border)" }}>
+              <div className="mb-1 font-semibold" style={{ color: "var(--text)" }}>{m.body}</div>
+              <div className="text-xs" style={{ color: "var(--text-subtle)" }}>Logged by {m.sender} at {new Date(m.createdAt).toLocaleTimeString()}</div>
             </div>
           ))}
         </div>

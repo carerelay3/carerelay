@@ -4,12 +4,32 @@ export const parseMessageSchema = z.object({
   message: z.string().min(1, "Message is required"),
 });
 
-export const smsMockSchema = z.object({
-  careCircleId: z.string().min(1),
-  fromName: z.string().min(1),
-  fromPhone: z.string().min(7),
-  body: z.string().min(1),
-});
+export const smsMockSchema = z
+  .object({
+    careCircleId: z.string().min(1).optional(),
+    demoId: z.string().min(1).optional(),
+    fromName: z.string().min(1).optional(),
+    senderName: z.string().min(1).optional(),
+    fromPhone: z.string().min(7).optional(),
+    senderPhone: z.string().min(7).optional(),
+    body: z.string().min(1).optional(),
+    message: z.string().min(1).optional(),
+    smsKeyword: z.string().min(1).optional(),
+  })
+  .transform((value) => ({
+    careCircleId: value.careCircleId || value.demoId || "circle-demo-1",
+    fromName: value.fromName || value.senderName || "Demo User",
+    fromPhone: value.fromPhone || value.senderPhone || "",
+    body: [value.smsKeyword, value.body || value.message || ""].filter(Boolean).join(" "),
+  }))
+  .refine((value) => value.fromPhone.length >= 7, {
+    message: "Sender phone is required",
+    path: ["senderPhone"],
+  })
+  .refine((value) => value.body.trim().length > 0, {
+    message: "Message is required",
+    path: ["message"],
+  });
 
 export const summaryGenerateSchema = z.object({
   careCircleId: z.string().min(1),

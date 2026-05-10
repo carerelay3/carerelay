@@ -1,13 +1,12 @@
 import { normalizePhone } from "../phone/normalizePhone";
-import { getSupabaseAdmin } from "../supabase/client";
+import { getSupabaseAdmin } from "../supabase/admin";
 
 export type RoutingStatus =
   | "matched_single_circle"
   | "matched_multiple_needs_keyword"
   | "matched_multiple_keyword_resolved"
   | "unknown_sender"
-  | "invalid_phone"
-  | "demo_mode";
+  | "invalid_phone";
 
 export interface RoutingResult {
   routingStatus: RoutingStatus;
@@ -36,10 +35,7 @@ export async function resolveCareCircleFromSender(
     };
   }
 
-  // Handle Demo Mode explicitly
   if (demoContext?.isDemo) {
-    // If the message starts with a keyword just strip it for realism if we want,
-    // but typically demo mode just works straight through.
     let body = cleanMessage;
     const firstWord = cleanMessage.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     let keywordUsed;
@@ -49,7 +45,7 @@ export async function resolveCareCircleFromSender(
     }
     
     return {
-      routingStatus: "demo_mode",
+      routingStatus: "matched_single_circle",
       careCircleId: demoContext.careCircleId || "demo-circle-123",
       familyMemberId: demoContext.familyMemberId || "demo-member-123",
       cleanedBody: body,
@@ -60,13 +56,10 @@ export async function resolveCareCircleFromSender(
 
   const admin = getSupabaseAdmin();
   if (!admin) {
-    // Supabase isn't configured, fallback to demo logic if we have one or just return unknown
     return {
-      routingStatus: "demo_mode",
-      careCircleId: "demo-circle-123",
-      familyMemberId: "demo-member-123",
+      routingStatus: "unknown_sender",
       cleanedBody: cleanMessage,
-      demoMode: true,
+      safeReply: "CareRelay could not match this phone number to a care circle. Please ask the care circle owner to invite this number.",
     };
   }
 

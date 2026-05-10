@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFromSender";
 
 // Mock the Supabase client so we can test routing logic without a real DB
@@ -6,7 +6,7 @@ const mockEq = vi.fn();
 const mockSelect = vi.fn(() => ({ eq: mockEq }));
 const mockFrom = vi.fn(() => ({ select: mockSelect }));
 
-vi.mock("@/lib/supabase/client", () => ({
+vi.mock("@/lib/supabase/admin", () => ({
   getSupabaseAdmin: vi.fn(() => ({
     from: mockFrom,
   })),
@@ -24,7 +24,7 @@ describe("resolveCareCircleFromSender", () => {
 
   it("handles demo mode explicitly without DB lookup", async () => {
     const result = await resolveCareCircleFromSender("+15550000000", "Hello", undefined, { isDemo: true, careCircleId: "demo-1", familyMemberId: "fm-1" });
-    expect(result.routingStatus).toBe("demo_mode");
+    expect(result.routingStatus).toBe("matched_single_circle");
     expect(result.careCircleId).toBe("demo-1");
     expect(result.familyMemberId).toBe("fm-1");
     expect(result.cleanedBody).toBe("Hello");
@@ -33,7 +33,7 @@ describe("resolveCareCircleFromSender", () => {
 
   it("strips keyword in demo mode if present", async () => {
     const result = await resolveCareCircleFromSender("+15550000000", "GRANDMA I took meds", undefined, { isDemo: true });
-    expect(result.routingStatus).toBe("demo_mode");
+    expect(result.routingStatus).toBe("matched_single_circle");
     expect(result.cleanedBody).toBe("I took meds");
     expect(result.smsKeywordUsed).toBe("GRANDMA");
   });

@@ -76,7 +76,7 @@ export function FamilyPresencePanel({
       </div>
 
       <div className="p-4 bg-slate-100 border border-slate-200 rounded-xl text-sm flex items-center justify-between flex-wrap gap-4 mt-6">
-        <span className="text-slate-600 font-medium">Have a large family? You've used {members.length} member slots.</span>
+        <span className="text-slate-600 font-medium">Have a large family? You&apos;ve used {members.length} member slots.</span>
         <a href="/pricing" className="text-sage-600 font-bold hover:underline">View upgrade options</a>
       </div>
     </div>

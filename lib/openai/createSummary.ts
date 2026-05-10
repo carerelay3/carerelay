@@ -1,7 +1,19 @@
 import { appConfig } from "../config";
 
-export async function createOpenAiSummary(promptData: string): Promise<string | null> {
+type SummaryPromptData = string | { notes?: string[]; concerns?: string[]; context?: string };
+
+export async function createOpenAiSummary(promptData: SummaryPromptData): Promise<string | null> {
   if (!appConfig.openAiConfigured) return null;
+  const prompt =
+    typeof promptData === "string"
+      ? promptData
+      : [
+          promptData.context,
+          promptData.notes?.length ? `Notes: ${promptData.notes.join("; ")}` : undefined,
+          promptData.concerns?.length ? `Concerns for family review: ${promptData.concerns.join("; ")}` : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n");
   
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -15,11 +27,11 @@ export async function createOpenAiSummary(promptData: string): Promise<string | 
         messages: [
           {
             role: "system",
-            content: "You summarize family-reported care coordination updates. You do not provide medical advice, diagnosis, treatment recommendations, medication dosage guidance, emergency triage, symptom interpretation, clinical interpretation, monitoring claims, or safety guarantees. Only organize what family members reported. Label concerns as items for family review. Keep it short and factual. If emergency-like language appears, only include: 'If this is an emergency, call 911 or your local emergency number.'"
+            content: "Summarize these family-reported care coordination updates. Do not provide medical advice, diagnosis, treatment recommendations, medication dosage guidance, emergency triage, symptom interpretation, clinical interpretation, monitoring claims, or safety guarantees. Only organize what family members reported. Label concerns as items for family review. If emergency-like language appears, only include: 'If this is an emergency, call 911 or your local emergency number.'"
           },
           {
             role: "user",
-            content: promptData
+            content: prompt
           }
         ],
         temperature: 0.2,
@@ -28,7 +40,7 @@ export async function createOpenAiSummary(promptData: string): Promise<string | 
     if (!res.ok) return null;
     const data = await res.json();
     return data.choices[0]?.message?.content || null;
-  } catch (e) {
+  } catch {
     return null;
   }
 }

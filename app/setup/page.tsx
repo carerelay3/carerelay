@@ -1,5 +1,9 @@
 import { CareCircleSetupForm } from "@/components/CareCircleSetupForm";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import { hasSupabase } from "@/lib/config";
+import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 function AmbientBackground() {
   return (
@@ -16,7 +20,32 @@ function AmbientBackground() {
   );
 }
 
-export default function SetupPage() {
+export default async function SetupPage() {
+  if (!hasSupabase()) {
+    return (
+      <>
+        <AmbientBackground />
+        <main className="page-shell py-16">
+          <div className="product-card mx-auto max-w-2xl p-8 text-center">
+            <h1 className="text-3xl font-bold" style={{ color: "var(--text)" }}>Live setup is not configured</h1>
+            <p className="mt-4">
+              Add Supabase environment variables to create live care circles. You can still explore CareRelay in demo mode.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
+              <Link href="/sign-in" className="btn btn-soft">Sign in</Link>
+            </div>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  const user = await getCurrentSupabaseUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   return (
     <>
       <AmbientBackground />

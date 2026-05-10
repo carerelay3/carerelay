@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { addDemoMessage, demoStore } from "@/lib/demo/data";
+import { addDemoMessage, demoStore, getDemoSnapshot } from "@/lib/demo/data";
 import { smsMockSchema } from "@/lib/validation/schemas";
 import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFromSender";
 import { parseCareMessage } from "@/lib/parser/careMessageParser";
 import { createLinkedRecords } from "@/lib/messages/createLinkedRecords";
-import { appConfig } from "@/lib/config";
 
 export async function POST(req: Request) {
   try {
@@ -16,12 +15,21 @@ export async function POST(req: Request) {
 
     const { careCircleId, fromName, fromPhone, body: rawBody } = parsed.data;
 
+    if (careCircleId !== demoStore.careCircleId) {
+      return NextResponse.json(
+        {
+          error: "Mock SMS is demo-only. Use the Twilio inbound webhook for live care circles.",
+        },
+        { status: 403 },
+      );
+    }
+
     // Simulate routing
     const routing = await resolveCareCircleFromSender(
       fromPhone, 
       rawBody, 
       undefined, 
-      { isDemo: appConfig.demoMode || careCircleId === demoStore.careCircleId, careCircleId }
+      { isDemo: true, careCircleId: demoStore.careCircleId }
     );
 
     // Parse message using the cleaned body (without the multi-circle keyword if any)
@@ -29,7 +37,11 @@ export async function POST(req: Request) {
 
     // Linked records creation
     let dbResult = null;
-    if (routing.routingStatus !== "invalid_phone") {
+    const canCreateRecords =
+      routing.routingStatus === "matched_single_circle" ||
+      routing.routingStatus === "matched_multiple_keyword_resolved";
+
+    if (canCreateRecords) {
       try {
         dbResult = await createLinkedRecords(
           parsedMessage,
@@ -45,11 +57,13 @@ export async function POST(req: Request) {
     }
 
     // In demo mode or if it's the demo circle, update the local in-memory store so the UI updates
-    if (routing.demoMode || careCircleId === demoStore.careCircleId) {
+    if (routing.demoMode) {
       addDemoMessage({
         sender: fromName,
         fromPhone: fromPhone,
-        body: routing.cleanedBody, // Save the cleaned body as the simulated received message
+        body: routing.cleanedBody,
+        category: parsedMessage.category,
+        concernFlag: parsedMessage.concernFlag,
       });
     }
 
@@ -67,6 +81,7 @@ export async function POST(req: Request) {
       displayMessage,
       routingStatus: routing.routingStatus,
       dashboardUpdateData: dbResult,
+      snapshot: getDemoSnapshot(),
     });
   } catch (error) {
     console.error("Error in mock SMS endpoint:", error);

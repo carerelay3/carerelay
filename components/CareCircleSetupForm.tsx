@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
 import { formatUsPhoneDisplay, normalizePhone } from "@/lib/utils/phone";
+import { authFetch } from "@/lib/supabase/clientAuthFetch";
 
 export function CareCircleSetupForm() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export function CareCircleSetupForm() {
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberPhone, setNewMemberPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const demoLine = formatUsPhoneDisplay(DEMO_SHARED_PHONE);
@@ -40,15 +42,21 @@ export function CareCircleSetupForm() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError("");
     try {
-      await fetch("/api/setup", {
+      const res = await authFetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, keyword, members, sharedPhone: DEMO_SHARED_PHONE }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSubmitError(data.error || "Could not create care circle. Please sign in and try again.");
+        return;
+      }
       router.push("/dashboard");
-    } catch (e) {
-      router.push("/dashboard");
+    } catch {
+      setSubmitError("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -208,7 +216,7 @@ export function CareCircleSetupForm() {
             <div className="space-y-6 text-center">
               <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Your shared number</h2>
               <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                This is the single number your entire care circle will text to log updates, tasks, and vitals.
+                This is the single number your entire care circle will text to log updates, tasks, appointments, supplies, medication confirmations, and concerns.
               </p>
               
               <div className="relative mx-auto max-w-sm mt-8">
@@ -241,10 +249,13 @@ export function CareCircleSetupForm() {
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" className="mt-1" required />
                   <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, or emergency monitoring. For emergencies, call 911.
+                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. For emergencies, call 911.
                   </span>
                 </label>
               </div>
+              {submitError && (
+                <p className="rounded-2xl bg-red-50 p-3 text-sm font-medium text-red-700">{submitError}</p>
+              )}
 
             </div>
           )}

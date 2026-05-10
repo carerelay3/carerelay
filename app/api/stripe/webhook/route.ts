@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe/client";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import Stripe from "stripe";
 import { STRIPE_PRICE_IDS } from "@/lib/stripe/plans";
 
@@ -25,12 +25,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.text();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown webhook error";
+    console.error("Webhook signature verification failed:", message);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const supabase = getSupabaseServer();
+  const supabase = getSupabaseAdmin();
   if (!supabase) {
     return NextResponse.json({ error: "Database not configured" }, { status: 500 });
   }
@@ -44,7 +45,8 @@ export async function POST(req: Request) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
-        const priceId = subscription.items.data[0]?.price.id;
+        const subscriptionItem = subscription.items.data[0];
+        const priceId = subscriptionItem?.price.id;
         const status = subscription.status;
 
         let plan = "starter";
@@ -58,8 +60,8 @@ export async function POST(req: Request) {
             stripe_price_id: priceId,
             plan: plan,
             status: status,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_start: subscriptionItem ? new Date(subscriptionItem.current_period_start * 1000).toISOString() : null,
+            current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
             cancel_at_period_end: subscription.cancel_at_period_end,
             updated_at: new Date().toISOString(),
           })

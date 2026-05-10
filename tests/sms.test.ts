@@ -1,10 +1,8 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { POST as mockPost } from "@/app/api/sms/mock/route";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/openai/createSummary", () => ({
   createOpenAiSummary: vi.fn().mockResolvedValue(null)
 }));
-import { POST as inboundPost } from "@/app/api/sms/inbound/route";
 import { GET as seedGet } from "@/app/api/demo/seed/route";
 import { GET as healthGet } from "@/app/api/health/route";
 import { POST as parsePost } from "@/app/api/messages/parse/route";
@@ -19,6 +17,7 @@ import { POST as handoffReviewPost } from "@/app/api/handoffs/review/route";
 import { POST as exportPost } from "@/app/api/export/timeline/route";
 import { POST as invitePost } from "@/app/api/members/invite/route";
 import { POST as prefsPost } from "@/app/api/preferences/update/route";
+import { POST as smsMockPost } from "@/app/api/sms/mock/route";
 
 describe("sms routes", () => { it("passes", () => { expect(true).toBe(true); }); });
 
@@ -94,6 +93,41 @@ describe("POST /api/messages/parse", () => {
     const json = await res.json();
     expect(json.result.command).toBe("complete_task");
     expect(json.result.commandTarget).toBe("pick up prescription");
+  });
+});
+
+describe("POST /api/sms/mock", () => {
+  it("accepts demo-circle messages", async () => {
+    const req = new Request("http://localhost/api/sms/mock", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        careCircleId: "circle-demo-1",
+        fromPhone: "+15550001111",
+        fromName: "Sarah",
+        message: "Need: wipes and milk",
+      }),
+    });
+    const res = await smsMockPost(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.routingStatus).toBe("matched_single_circle");
+    expect(json.snapshot).toBeDefined();
+  });
+
+  it("rejects non-demo careCircleId so it cannot mutate live records", async () => {
+    const req = new Request("http://localhost/api/sms/mock", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        careCircleId: "live-circle",
+        fromPhone: "+15550001111",
+        fromName: "Sarah",
+        message: "Task: pick up groceries",
+      }),
+    });
+    const res = await smsMockPost(req);
+    expect(res.status).toBe(403);
   });
 });
 
