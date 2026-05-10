@@ -16,7 +16,7 @@ export default function PricingPage() {
       <section className="grid gap-6 md:grid-cols-3">
         <PricingCard
           title="Starter"
-          price="$9/month"
+          price="$5"
           planId="starter"
           features={[
             "1 care circle",
@@ -29,7 +29,7 @@ export default function PricingPage() {
         />
         <PricingCard
           title="Family"
-          price="$19/month"
+          price="$10"
           planId="family"
           features={[
             "1 care circle",
@@ -43,7 +43,7 @@ export default function PricingPage() {
         />
         <PricingCard
           title="Family Plus"
-          price="$39/month"
+          price="$20"
           planId="family_plus"
           features={[
             "Multiple care circles",

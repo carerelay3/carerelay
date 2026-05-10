@@ -39,6 +39,36 @@ export async function POST(req: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const customerId = session.customer as string;
+        const subscriptionId = session.subscription as string;
+
+        if (customerId && subscriptionId) {
+          // Retrieve the subscription to get price ID and status
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const subscriptionItem = subscription.items.data[0];
+          const priceId = subscriptionItem?.price.id;
+          const status = subscription.status;
+
+          let plan = "starter";
+          if (priceId === STRIPE_PRICE_IDS.family) plan = "family";
+          else if (priceId === STRIPE_PRICE_IDS.family_plus) plan = "family_plus";
+
+          await supabase
+            .from("subscriptions")
+            .upsert({
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: priceId,
+              plan: plan,
+              status: status,
+              current_period_start: subscriptionItem ? new Date(subscriptionItem.current_period_start * 1000).toISOString() : null,
+              current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("stripe_customer_id", customerId);
+        }
         break;
       }
       case "customer.subscription.created":

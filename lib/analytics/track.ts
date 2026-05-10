@@ -1,5 +1,3 @@
-import { appConfig } from "@/lib/config";
-
 export type EventName =
   | "demo_message_submitted"
   | "demo_started"
@@ -44,7 +42,7 @@ export type EventName =
   | "setup_completed";
 
 export function trackEvent(name: EventName, properties?: Record<string, unknown>) {
-  if (!appConfig.analyticsEnabled) {
+  if (process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !== "true") {
     // Fail silently when disabled or unconfigured
     return;
   }

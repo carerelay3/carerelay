@@ -195,9 +195,9 @@ export default function HomePage() {
       <section className="page-shell py-16 sm:py-20">
         <SectionHeader eyebrow="Pricing" title="Simple plans for families." text="Start in demo mode. If Stripe is configured, checkout can create a live subscription." />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          <PricingCard title="Starter" price="$9/month" planId="starter" features={["1 care circle", "Up to 3 family members", "Shared SMS update feed", "Daily summary", "Tasks, supplies, appointments, medication confirmations, and concern flags"]} accent="var(--text-subtle)" />
-          <PricingCard title="Family" price="$19/month" planId="family" features={["1 care circle", "Up to 8 family members", "Everything in Starter", "Daily and weekly summaries", "More dashboard history and family activity tracking"]} accent="var(--teal)" popular />
-          <PricingCard title="Family Plus" price="$39/month" planId="family_plus" features={["Multiple care circles", "Higher practical family member limits", "Exportable timeline", "Priority setup support", "Future option for a dedicated family number if supported later"]} accent="var(--blue-soft)" />
+          <PricingCard title="Starter" price="$5" planId="starter" features={["1 care circle", "Up to 3 family members", "Shared SMS update feed", "Daily summary", "Tasks, supplies, appointments, medication confirmations, and concern flags"]} accent="var(--text-subtle)" />
+          <PricingCard title="Family" price="$10" planId="family" features={["1 care circle", "Up to 8 family members", "Everything in Starter", "Daily and weekly summaries", "More dashboard history and family activity tracking"]} accent="var(--teal)" popular />
+          <PricingCard title="Family Plus" price="$20" planId="family_plus" features={["Multiple care circles", "Higher practical family member limits", "Exportable timeline", "Priority setup support", "Future option for a dedicated family number if supported later"]} accent="var(--blue-soft)" />
         </div>
       </section>
 
