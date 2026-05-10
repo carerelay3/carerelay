@@ -1,9 +1,27 @@
-import { createClient } from "@supabase/supabase-js";
+import "server-only";
+
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { appConfig, hasSupabase } from "../config";
 
-// Server-side standard client (Subject to RLS).
-// In a full Auth build, cookies would be injected here via @supabase/ssr.
-export function getSupabaseServer() {
+export async function getSupabaseServer() {
   if (!hasSupabase()) return null;
-  return createClient(appConfig.supabaseUrl!, appConfig.supabaseAnonKey!);
+  const cookieStore = await cookies();
+
+  return createServerClient(appConfig.supabaseUrl!, (appConfig.supabasePublishableKey || appConfig.supabaseAnonKey)!, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Called from a Server Component. Proxy refreshes sessions.
+        }
+      },
+    },
+  });
 }

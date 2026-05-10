@@ -58,7 +58,7 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
           <ModeBadge mode={initialMode} />
         </div>
         <div className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
-          Shared line: +1 (555) 123-0000
+          Shared line: {snapshot.sharedPhone || "Connect Twilio to enable live SMS"}
         </div>
         </div>
       </header>
@@ -70,7 +70,7 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
-            <DemoMessageTester onSend={handleNewMockMessage} />
+            {initialMode === "demo" && <DemoMessageTester onSend={handleNewMockMessage} />}
             <DailySummary snapshot={snapshot} />
             <MessageFeed messages={snapshot.messages} />
           </div>
