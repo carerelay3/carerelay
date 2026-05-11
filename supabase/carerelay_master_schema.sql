@@ -58,6 +58,7 @@ as $$
   from public.family_members fm
   where fm.user_id = user_uuid
     and fm.care_circle_id is not null
+    and coalesce(fm.status, 'active') <> 'removed'
 $$;
 
 revoke all on function app_private.care_circle_ids_for_user(uuid) from public;
@@ -117,6 +118,7 @@ as $$
     from public.family_members fm
     where fm.care_circle_id = circle_uuid
       and fm.user_id = auth.uid()
+      and coalesce(fm.status, 'active') <> 'removed'
       and (
         fm.permission_level = 'admin'
         or fm.role in ('owner', 'admin')
@@ -191,11 +193,15 @@ create table if not exists public.family_members (
   name text not null,
   phone text,
   phone_normalized text,
+  email text,
   role text default 'member',
+  status text default 'active',
   invite_status text default 'pending',
   permission_level text default 'contributor',
+  invited_by uuid references auth.users(id) on delete set null,
   joined_at timestamptz,
   opted_out_at timestamptz,
+  removed_at timestamptz,
   last_active_at timestamptz,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -381,12 +387,16 @@ select public.ensure_column('public.family_members', 'care_circle_id', 'uuid ref
 select public.ensure_column('public.family_members', 'user_id', 'uuid references auth.users(id) on delete set null');
 select public.ensure_column('public.family_members', 'phone', 'text');
 select public.ensure_column('public.family_members', 'phone_normalized', 'text');
+select public.ensure_column('public.family_members', 'email', 'text');
 select public.ensure_column('public.family_members', 'role', 'text default ''member''');
+select public.ensure_column('public.family_members', 'status', 'text default ''active''');
 select public.ensure_column('public.family_members', 'invite_status', 'text default ''pending''');
 select public.ensure_column('public.family_members', 'permission_level', 'text default ''contributor''');
+select public.ensure_column('public.family_members', 'invited_by', 'uuid references auth.users(id) on delete set null');
 select public.ensure_column('public.family_members', 'created_at', 'timestamptz default now()');
 select public.ensure_column('public.family_members', 'joined_at', 'timestamptz');
 select public.ensure_column('public.family_members', 'opted_out_at', 'timestamptz');
+select public.ensure_column('public.family_members', 'removed_at', 'timestamptz');
 select public.ensure_column('public.family_members', 'last_active_at', 'timestamptz');
 select public.ensure_column('public.family_members', 'updated_at', 'timestamptz default now()');
 
@@ -510,6 +520,7 @@ alter table public.care_circles
 alter table public.family_members
   alter column id set default gen_random_uuid(),
   alter column role set default 'member',
+  alter column status set default 'active',
   alter column invite_status set default 'pending',
   alter column permission_level set default 'contributor',
   alter column created_at set default now(),
@@ -604,6 +615,8 @@ begin
     add constraint family_members_name_not_blank_chk check (length(trim(name)) > 0) not valid,
     drop constraint if exists family_members_role_chk,
     add constraint family_members_role_chk check (role in ('owner', 'member', 'caregiver', 'admin')) not valid,
+    drop constraint if exists family_members_status_chk,
+    add constraint family_members_status_chk check (status in ('active', 'invited', 'removed')) not valid,
     drop constraint if exists family_members_invite_status_chk,
     add constraint family_members_invite_status_chk
       check (invite_status in ('pending', 'not_invited', 'invited', 'joined', 'opted_out')) not valid,
@@ -784,19 +797,20 @@ begin
       where owner_id is not null and sms_keyword is not null;
   end if;
 
+  drop index if exists public.idx_family_members_circle_phone_unique;
+  drop index if exists public.family_members_circle_phone_unique_idx;
   if not exists (
-    select 1 from pg_indexes
-    where schemaname = 'public' and indexname = 'family_members_circle_phone_unique_idx'
-  ) and not exists (
     select care_circle_id, phone_normalized
     from public.family_members
     where phone_normalized is not null
+      and coalesce(status, 'active') <> 'removed'
     group by care_circle_id, phone_normalized
     having count(*) > 1
   ) then
     create unique index family_members_circle_phone_unique_idx
       on public.family_members(care_circle_id, phone_normalized)
-      where phone_normalized is not null;
+      where phone_normalized is not null
+        and coalesce(status, 'active') <> 'removed';
   end if;
 
   if not exists (
@@ -843,6 +857,9 @@ create index if not exists care_recipients_circle_idx on public.care_recipients(
 create index if not exists family_members_circle_idx on public.family_members(care_circle_id);
 create index if not exists family_members_user_id_idx on public.family_members(user_id);
 create index if not exists family_members_phone_normalized_idx on public.family_members(phone_normalized);
+create index if not exists family_members_role_idx on public.family_members(role);
+create index if not exists family_members_status_idx on public.family_members(status);
+create index if not exists family_members_circle_status_idx on public.family_members(care_circle_id, status);
 create index if not exists family_members_circle_permission_idx on public.family_members(care_circle_id, permission_level);
 
 create index if not exists inbound_messages_circle_created_idx on public.inbound_messages(care_circle_id, created_at desc);
@@ -1103,19 +1120,6 @@ create policy care_recipients_delete_owner
 create policy family_members_select_member
   on public.family_members for select to authenticated
   using (app_private.is_care_circle_member(care_circle_id));
-
-create policy family_members_insert_owner
-  on public.family_members for insert to authenticated
-  with check (app_private.is_care_circle_admin(care_circle_id));
-
-create policy family_members_update_owner_or_self
-  on public.family_members for update to authenticated
-  using (app_private.is_care_circle_admin(care_circle_id) or user_id = auth.uid())
-  with check (app_private.is_care_circle_admin(care_circle_id) or user_id = auth.uid());
-
-create policy family_members_delete_owner
-  on public.family_members for delete to authenticated
-  using (app_private.is_care_circle_owner(care_circle_id));
 
 create policy inbound_messages_select_member
   on public.inbound_messages for select to authenticated

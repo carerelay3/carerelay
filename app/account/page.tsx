@@ -53,8 +53,9 @@ async function getCircleAccess(userId: string): Promise<CircleAccess[]> {
 
   const { data: memberships } = await admin
     .from("family_members")
-    .select("care_circle_id, role, permission_level")
-    .eq("user_id", userId);
+    .select("care_circle_id, role, permission_level, status")
+    .eq("user_id", userId)
+    .neq("status", "removed");
 
   const ownedCircles = ((owned || []) as Array<{ id: string; name: string }>).map((circle) => ({
     id: circle.id,

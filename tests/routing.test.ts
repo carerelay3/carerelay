@@ -3,6 +3,7 @@ import { resolveCareCircleFromSender } from "@/lib/routing/resolveCareCircleFrom
 
 // Mock the Supabase client so we can test routing logic without a real DB
 const mockEq = vi.fn();
+const mockNeq = vi.fn();
 const mockSelect = vi.fn(() => ({ eq: mockEq }));
 const mockFrom = vi.fn(() => ({ select: mockSelect }));
 
@@ -15,6 +16,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 describe("resolveCareCircleFromSender", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEq.mockReturnValue({ neq: mockNeq });
   });
 
   it("handles invalid phone numbers", async () => {
@@ -39,13 +41,13 @@ describe("resolveCareCircleFromSender", () => {
   });
 
   it("handles unknown sender (no match in DB)", async () => {
-    mockEq.mockResolvedValue({ data: [], error: null });
+    mockNeq.mockResolvedValue({ data: [], error: null });
     const result = await resolveCareCircleFromSender("+15551234567", "Hello");
     expect(result.routingStatus).toBe("unknown_sender");
   });
 
   it("routes automatically for a single matched circle", async () => {
-    mockEq.mockResolvedValue({
+    mockNeq.mockResolvedValue({
       data: [{ id: "fm-1", care_circle_id: "circle-1", care_circles: { id: "circle-1", sms_keyword: "DAD" } }],
       error: null,
     });
@@ -57,7 +59,7 @@ describe("resolveCareCircleFromSender", () => {
   });
 
   it("requests keyword if multiple circles match and no keyword provided", async () => {
-    mockEq.mockResolvedValue({
+    mockNeq.mockResolvedValue({
       data: [
         { id: "fm-1", care_circle_id: "circle-1", care_circles: { id: "circle-1", sms_keyword: "DAD" } },
         { id: "fm-2", care_circle_id: "circle-2", care_circles: { id: "circle-2", sms_keyword: "MOM" } }
@@ -69,7 +71,7 @@ describe("resolveCareCircleFromSender", () => {
   });
 
   it("resolves multiple circles if valid keyword is provided, stripping keyword", async () => {
-    mockEq.mockResolvedValue({
+    mockNeq.mockResolvedValue({
       data: [
         { id: "fm-1", care_circle_id: "circle-1", care_circles: { id: "circle-1", sms_keyword: "DAD" } },
         { id: "fm-2", care_circle_id: "circle-2", care_circles: { id: "circle-2", sms_keyword: "MOM" } }
@@ -85,7 +87,7 @@ describe("resolveCareCircleFromSender", () => {
   });
 
   it("handles keyword in brackets", async () => {
-    mockEq.mockResolvedValue({
+    mockNeq.mockResolvedValue({
       data: [
         { id: "fm-1", care_circle_id: "circle-1", care_circles: { id: "circle-1", sms_keyword: "DAD" } },
         { id: "fm-2", care_circle_id: "circle-2", care_circles: { id: "circle-2", sms_keyword: "MOM" } }

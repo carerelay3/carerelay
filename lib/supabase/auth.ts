@@ -5,6 +5,9 @@ import type { User } from "@supabase/supabase-js";
 import { getSupabaseAdmin } from "./admin";
 import { getSupabaseServer } from "./server";
 
+export type CareCircleRole = "owner" | "admin" | "member";
+export type TeamAction = "view" | "add" | "remove" | "change_role" | "transfer_owner";
+
 export class AuthError extends Error {
   status: number;
 
@@ -83,7 +86,13 @@ export async function requireUser(req?: Request): Promise<User> {
   return user;
 }
 
-export async function requireCareCircleMembership(userId: string, careCircleId: string) {
+function normalizeCareCircleRole(role?: string | null, permissionLevel?: string | null): CareCircleRole {
+  if (role === "owner") return "owner";
+  if (role === "admin" || permissionLevel === "admin") return "admin";
+  return "member";
+}
+
+export async function getUserCareCircleRole(userId: string, careCircleId: string): Promise<CareCircleRole | null> {
   const admin = getSupabaseAdmin();
   if (!admin) throw new AuthError("Database admin client is not configured", 503);
 
@@ -94,32 +103,82 @@ export async function requireCareCircleMembership(userId: string, careCircleId: 
     .maybeSingle();
 
   if (circleError || !circle) throw new AuthError("Care circle not found", 404);
-  if (circle.owner_id === userId) return { role: "owner" as const, careCircleId };
+  if (circle.owner_id === userId) return "owner";
 
   const { data: member, error: memberError } = await admin
     .from("family_members")
-    .select("id, role, permission_level")
+    .select("id, role, permission_level, status")
     .eq("care_circle_id", careCircleId)
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (memberError || !member) throw new AuthError("Care circle access denied", 403);
-  return { role: "member" as const, careCircleId, familyMemberId: member.id };
+  if (memberError || !member || member.status === "removed") return null;
+  return normalizeCareCircleRole(member.role, member.permission_level);
 }
 
-export async function requireCareCircleOwner(userId: string, careCircleId: string) {
+export async function requireCareCircleMembership(userId: string, careCircleId: string) {
   const admin = getSupabaseAdmin();
   if (!admin) throw new AuthError("Database admin client is not configured", 503);
 
-  const { data, error } = await admin
-    .from("care_circles")
+  const role = await getUserCareCircleRole(userId, careCircleId);
+  if (!role) throw new AuthError("Care circle access denied", 403);
+
+  const { data: member } = await admin
+    .from("family_members")
     .select("id")
-    .eq("id", careCircleId)
-    .eq("owner_id", userId)
+    .eq("care_circle_id", careCircleId)
+    .eq("user_id", userId)
     .maybeSingle();
 
-  if (error || !data) throw new AuthError("Care circle owner access required", 403);
-  return { role: "owner" as const, careCircleId };
+  return { role, careCircleId, familyMemberId: member?.id };
+}
+
+export async function requireCareCircleOwner(userId: string, careCircleId: string) {
+  const role = await getUserCareCircleRole(userId, careCircleId);
+  if (role !== "owner") throw new AuthError("Care circle owner access required", 403);
+  return { role, careCircleId };
+}
+
+export async function requireCareCircleAdminOrOwner(userId: string, careCircleId: string) {
+  const role = await getUserCareCircleRole(userId, careCircleId);
+  if (role !== "owner" && role !== "admin") {
+    throw new AuthError("Care circle admin access required", 403);
+  }
+  return { role, careCircleId };
+}
+
+export function canPerformAction(role: CareCircleRole | null | undefined, action: TeamAction): boolean {
+  if (action === "view") return role === "owner" || role === "admin" || role === "member";
+  if (action === "add" || action === "remove") return role === "owner" || role === "admin";
+  if (action === "change_role" || action === "transfer_owner") return role === "owner";
+  return false;
+}
+
+export function assertCanManageMember(
+  actorRole: CareCircleRole,
+  targetRole: CareCircleRole,
+  action: Exclude<TeamAction, "view">,
+) {
+  if (!canPerformAction(actorRole, action)) {
+    throw new AuthError("You do not have permission to manage this team.", 403);
+  }
+
+  if (actorRole === "admin") {
+    if (targetRole !== "member") {
+      throw new AuthError("Admins can only manage normal members.", 403);
+    }
+    if (action === "change_role" || action === "transfer_owner") {
+      throw new AuthError("Only owners can change roles or transfer ownership.", 403);
+    }
+  }
+
+  if (action === "add" && targetRole === "owner") {
+    throw new AuthError("Use owner transfer to make someone an owner.", 400);
+  }
+
+  if (action === "change_role" && targetRole === "owner") {
+    throw new AuthError("Use owner transfer to make someone an owner.", 400);
+  }
 }
 
 export async function requireRecordMembership(

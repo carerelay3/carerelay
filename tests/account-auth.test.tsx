@@ -130,6 +130,7 @@ describe("account auth foundation", () => {
       const builder: Record<string, unknown> = {};
       builder.select = vi.fn(() => builder);
       builder.eq = vi.fn(() => builder);
+      builder.neq = vi.fn(async () => ({ data: [], error: null }));
       builder.order = vi.fn(async () => {
         if (table === "care_circles") return { data: [{ id: "circle-1", name: "Mom's Care Circle" }], error: null };
         return { data: [], error: null };

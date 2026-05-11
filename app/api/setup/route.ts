@@ -131,6 +131,7 @@ export async function POST(req: Request) {
         phone: null,
         phone_normalized: null,
         role: "owner",
+        status: "active",
         invite_status: "joined",
         permission_level: "admin",
       });
@@ -149,6 +150,7 @@ export async function POST(req: Request) {
             phone: member.phone,
             phone_normalized: member.phoneNormalized,
             role: "member",
+            status: "invited",
             invite_status: "invited",
             permission_level: "contributor",
           })),

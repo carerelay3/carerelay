@@ -51,8 +51,9 @@ export async function getUserCareCircles(userId: string) {
 
   const { data: memberships } = await admin
     .from("family_members")
-    .select("care_circle_id, care_circles(id, name, shared_phone_number, sms_keyword)")
-    .eq("user_id", userId);
+    .select("care_circle_id, status, care_circles(id, name, shared_phone_number, sms_keyword)")
+    .eq("user_id", userId)
+    .neq("status", "removed");
 
   const circles = new Map<string, DbRecord>();
   for (const circle of owned || []) circles.set(circle.id, circle);
@@ -245,8 +246,9 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     admin.from("care_recipients").select("first_name").eq("care_circle_id", activeCircleId).limit(1).maybeSingle(),
     admin
       .from("family_members")
-      .select("id, name, role, phone, invite_status, permission_level, created_at")
+      .select("id, name, role, phone, invite_status, permission_level, status, created_at")
       .eq("care_circle_id", activeCircleId)
+      .neq("status", "removed")
       .order("created_at", { ascending: true }),
   ]);
 

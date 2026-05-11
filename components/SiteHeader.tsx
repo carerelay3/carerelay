@@ -13,6 +13,7 @@ export function SiteHeader({ user = null }: SiteHeaderProps) {
   const links = user
     ? [
         { href: "/dashboard", label: "Dashboard" },
+        { href: "/team", label: "Team" },
         { href: "/account", label: "Account" },
         { href: "/settings", label: "Settings" },
       ]
