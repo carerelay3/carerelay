@@ -1,6 +1,5 @@
 import "server-only";
 
-import { getDemoSnapshot } from "@/lib/demo/data";
 import type {
   CareCategory,
   DemoAppointment,
@@ -21,6 +20,24 @@ const asCategory = (value: unknown): CareCategory =>
   ["medication", "appointment", "task", "supply", "concern", "general_update"].includes(String(value))
     ? (value as CareCategory)
     : "general_update";
+
+function emptyLiveSnapshot(message: string): DemoSnapshot {
+  return {
+    careCircleId: undefined,
+    careCircleName: "No care circle yet",
+    recipientName: "Create a care circle",
+    sharedPhone: "",
+    members: [],
+    messages: [],
+    tasks: [],
+    appointments: [],
+    supplies: [],
+    concerns: [],
+    activity: [],
+    handoffs: [],
+    dailySummary: message,
+  };
+}
 
 export async function getUserCareCircles(userId: string) {
   const admin = getSupabaseAdmin();
@@ -186,20 +203,11 @@ export async function getLatestDailySummary(careCircleId: string) {
 }
 
 export async function getDashboardSnapshotForUser(careCircleId?: string): Promise<DemoSnapshot> {
-  const fallback = getDemoSnapshot();
   const user = await getCurrentSupabaseUser();
   const admin = getSupabaseAdmin();
 
   if (!user || !admin) {
-    return {
-      ...fallback,
-      messages: [],
-      tasks: [],
-      appointments: [],
-      supplies: [],
-      concerns: [],
-      dailySummary: "Sign in and create a care circle to load live dashboard records.",
-    };
+    return emptyLiveSnapshot("Sign in and create a care circle to load live dashboard records.");
   }
 
   const circles = await getUserCareCircles(user.id);
@@ -208,20 +216,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     : circles[0];
 
   if (!selectedCircle?.id) {
-    return {
-      ...fallback,
-      careCircleId: undefined,
-      careCircleName: "No care circle yet",
-      recipientName: "Create a care circle",
-      sharedPhone: "",
-      members: [],
-      messages: [],
-      tasks: [],
-      appointments: [],
-      supplies: [],
-      concerns: [],
-      dailySummary: "Create a care circle to begin using live CareRelay records.",
-    };
+    return emptyLiveSnapshot("Create a care circle to begin using live CareRelay records.");
   }
 
   const activeCircleId = asString(selectedCircle.id);
@@ -266,7 +261,6 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
   }));
 
   return {
-    ...fallback,
     careCircleId: activeCircleId,
     careCircleName: asString(selectedCircle.name, "Care Circle"),
     recipientName: asString(recipientResult.data?.first_name, asString(selectedCircle.name, "Loved one")),
@@ -282,6 +276,8 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     appointments,
     supplies,
     concerns,
+    activity: [],
+    handoffs: [],
     dailySummary: summary || undefined,
   };
 }

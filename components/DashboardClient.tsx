@@ -72,7 +72,7 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
           <div className="lg:col-span-2 space-y-8">
             {initialMode === "demo" && <DemoMessageTester onSend={handleNewMockMessage} />}
             <DailySummary snapshot={snapshot} />
-            <MessageFeed messages={snapshot.messages} />
+            <MessageFeed messages={snapshot.messages} mode={initialMode} />
           </div>
 
           <div className="space-y-8">

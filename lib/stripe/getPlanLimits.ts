@@ -1,4 +1,4 @@
-import { PlanId } from "@/lib/stripe/plans";
+import { AccountPlanId, PlanId } from "@/lib/stripe/plans";
 
 export interface PlanLimits {
   maxCareCircles: number;
@@ -9,7 +9,7 @@ export interface PlanLimits {
   multipleCareCircles: boolean;
 }
 
-export function getPlanLimits(planId: PlanId | null | undefined): PlanLimits {
+export function getPlanLimits(planId: PlanId | AccountPlanId | null | undefined): PlanLimits {
   switch (planId) {
     case "family_plus":
       return {
@@ -30,11 +30,20 @@ export function getPlanLimits(planId: PlanId | null | undefined): PlanLimits {
         multipleCareCircles: false,
       };
     case "starter":
+      return {
+        maxCareCircles: 1,
+        maxFamilyMembers: 3,
+        dailySummaries: true,
+        weeklySummaries: false,
+        exportTimeline: false,
+        multipleCareCircles: false,
+      };
+    case "free":
     case "demo":
     default:
       return {
         maxCareCircles: 1,
-        maxFamilyMembers: 3,
+        maxFamilyMembers: 2,
         dailySummaries: true,
         weeklySummaries: false,
         exportTimeline: false,

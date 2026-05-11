@@ -5,6 +5,26 @@ import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
 import { formatUsPhoneDisplay, normalizePhone } from "@/lib/utils/phone";
 import { authFetch } from "@/lib/supabase/clientAuthFetch";
 
+const setupErrorLabels: Record<string, string> = {
+  auth_missing: "Please sign in again before creating a care circle.",
+  service_role_missing: "Live setup is missing the server database key. Add the Supabase service role key in your deployment settings.",
+  validation_failed: "Please check the setup fields and try again.",
+  profile_upsert_failed: "We could not create your account profile. Please try again.",
+  care_circle_insert_failed: "We could not create your care circle. Please try again.",
+  care_recipient_insert_failed: "Your care circle was created, but the care recipient could not be added.",
+  owner_member_insert_failed: "Your care circle was created, but owner access could not be added.",
+  invited_member_insert_failed: "Your care circle was created, but invited family members could not be added.",
+  plan_limit_reached: "Your current plan limit has been reached.",
+};
+
+function setupErrorMessage(data: { code?: unknown; error?: unknown }) {
+  const code = typeof data.code === "string" ? data.code : "";
+  const error = typeof data.error === "string" ? data.error : "";
+  if (code && error) return `${setupErrorLabels[code] || "Setup could not be completed"} ${error}`;
+  if (code) return setupErrorLabels[code] || "Setup could not be completed.";
+  return error || "Could not create care circle. Please sign in and try again.";
+}
+
 export function CareCircleSetupForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -51,7 +71,7 @@ export function CareCircleSetupForm() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setSubmitError(data.error || "Could not create care circle. Please sign in and try again.");
+        setSubmitError(setupErrorMessage(data));
         return;
       }
       router.push("/dashboard");

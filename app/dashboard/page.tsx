@@ -1,5 +1,5 @@
 import { DashboardClient } from "@/components/DashboardClient";
-import { appConfig, hasSupabase, relaySmsMode } from "@/lib/config";
+import { hasSupabase } from "@/lib/config";
 import { getDashboardSnapshotForUser } from "@/lib/supabase/dashboardRecords";
 import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
 import type { DemoSnapshot } from "@/lib/types";
@@ -32,5 +32,21 @@ export default async function DashboardPage() {
   }
 
   const snapshot: DemoSnapshot = await getDashboardSnapshotForUser();
-  return <DashboardClient initialSnapshot={snapshot} initialMode={appConfig.demoMode ? "demo" : relaySmsMode()} />;
+  if (!snapshot.careCircleId) {
+    return (
+      <main className="page-shell py-16">
+        <div className="product-card mx-auto max-w-2xl p-8 text-center">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text)" }}>Create your first care circle</h1>
+          <p className="mt-4">
+            Your account is ready. Set up a care circle to start loading live CareRelay records.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/setup" className="btn btn-sage">Start setup</Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return <DashboardClient initialSnapshot={snapshot} initialMode="live" />;
 }
