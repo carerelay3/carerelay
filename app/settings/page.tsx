@@ -8,6 +8,7 @@ import { getCurrentUserPlan } from "@/lib/stripe/getCurrentUserPlan";
 import { getPlanLimits } from "@/lib/stripe/getPlanLimits";
 import { redirect } from "next/navigation";
 import { CareCircleSwitcher } from "@/components/CareCircleSwitcher";
+import { DedicatedFamilyNumberComingSoon, PushNotificationsComingSoon } from "@/components/MobileFeatureScaffolds";
 
 export const dynamic = "force-dynamic";
 
@@ -141,6 +142,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps =
         portalAvailable={portalAvailable}
         portalUnavailableReason={portalUnavailableReason}
       />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <PushNotificationsComingSoon />
+        <DedicatedFamilyNumberComingSoon />
+      </div>
     </main>
   );
 }

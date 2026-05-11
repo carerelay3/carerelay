@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { UserProvider } from "./user-provider";
@@ -17,8 +17,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  applicationName: "CareRelay",
   title: "CareRelay",
   description: "One shared number to keep the whole family on the same page.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "CareRelay",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/brand/ads/carerelay-social-square.png",
+    icon: "/brand/ads/carerelay-social-square.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#38645f",
+  colorScheme: "light",
 };
 
 export default async function RootLayout({
