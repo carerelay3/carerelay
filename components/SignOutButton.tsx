@@ -22,7 +22,7 @@ export function SignOutButton() {
       type="button"
       onClick={signOut}
       disabled={isSigningOut}
-      className="tap-target flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60"
+      className="tap-target flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60"
       style={{ background: "var(--primary-soft)", color: "var(--text-secondary)" }}
     >
       {isSigningOut ? "Signing out..." : "Sign out"}

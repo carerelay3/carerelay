@@ -66,7 +66,7 @@ export default function HomePage() {
                 <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-subtle)" }}>Text</p>
                 <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>Need: wipes and milk</p>
               </div>
-              <div className="text-lg font-bold" style={{ color: "var(--teal)" }}>→</div>
+              <div className="text-lg font-bold" style={{ color: "var(--teal)" }}>-&gt;</div>
               <div className="rounded-2xl p-3" style={{ background: "var(--teal-soft)" }}>
                 <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--teal)" }}>Dashboard</p>
                 <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>Supply item</p>
@@ -244,9 +244,9 @@ export default function HomePage() {
               <h3 className="text-base font-bold" style={{ color: "var(--text)" }}>Marketing assets</h3>
               <p className="mt-1 text-sm">Social square and vertical caregiving graphics are organized for future campaign pages.</p>
             </div>
-            <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--teal)" }}>
-              <span className="rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-square.png</span>
-              <span className="rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-vertical-caregiving.png</span>
+            <div className="flex min-w-0 flex-wrap gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: "var(--teal)" }}>
+              <span className="max-w-full break-all rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-square.png</span>
+              <span className="max-w-full break-all rounded-full px-3 py-2" style={{ background: "var(--teal-soft)" }}>/brand/ads/carerelay-social-vertical-caregiving.png</span>
             </div>
           </div>
         </div>

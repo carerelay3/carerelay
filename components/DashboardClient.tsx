@@ -62,9 +62,9 @@ export function DashboardClient({
 
   return (
     <div className="min-h-screen pb-20 font-sans">
-      <header className="sticky top-[65px] z-40 border-y px-4 py-4 backdrop-blur-xl sm:px-6" style={{ background: "rgba(251,250,247,0.82)", borderColor: "var(--border)" }}>
+      <header className="border-y px-3 py-4 backdrop-blur-xl sm:sticky sm:top-[65px] sm:z-40 sm:px-6" style={{ background: "rgba(251,250,247,0.82)", borderColor: "var(--border)" }}>
         <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-start gap-3">
             <div>
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--text)" }}>Family command center</h1>
               <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
@@ -73,36 +73,53 @@ export function DashboardClient({
             </div>
             <ModeBadge mode={initialMode} />
           </div>
-          <div className="flex flex-col gap-3 sm:items-end">
+          <div className="flex min-w-0 flex-col gap-3 sm:items-end">
             <CareCircleSwitcher circles={careCircles} selectedCareCircleId={snapshot.careCircleId} />
-            <div className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
+            <div className="w-full rounded-2xl px-4 py-3 text-sm font-semibold sm:w-auto sm:rounded-full sm:py-2" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
               Shared line: {snapshot.sharedPhone || "Connect Twilio to enable live SMS"}
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-7xl space-y-6 px-3 py-6 sm:space-y-8 sm:px-6 sm:py-8">
         <DisclaimerBanner />
         {initialMode === "live" && <MultipleRecipientsNotice />}
         
         <DashboardOverviewCards snapshot={snapshot} />
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-8">
-            {initialMode === "demo" && <DemoMessageTester onSend={handleNewMockMessage} />}
-            <DailySummary snapshot={snapshot} />
-            {initialMode === "live" && <WeeklySummaryBetaPanel careCircleId={snapshot.careCircleId} />}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
+          {initialMode === "demo" && (
+            <section className="lg:col-span-2">
+              <DemoMessageTester onSend={handleNewMockMessage} />
+            </section>
+          )}
+          <section className="lg:col-span-2">
             <MessageFeed messages={snapshot.messages} mode={initialMode} />
-          </div>
-
-          <div className="space-y-8">
-            <ConcernPanel concerns={snapshot.concerns} />
-            <MedicationLog messages={snapshot.messages} />
+          </section>
+          <section>
             <TaskList tasks={snapshot.tasks} />
+          </section>
+          <section>
             <SupplyList supplies={snapshot.supplies} />
+          </section>
+          <section>
             <AppointmentList appointments={snapshot.appointments} />
-          </div>
+          </section>
+          <section>
+            <MedicationLog messages={snapshot.messages} />
+          </section>
+          <section>
+            <ConcernPanel concerns={snapshot.concerns} />
+          </section>
+          <section className="lg:col-span-2">
+            <DailySummary snapshot={snapshot} />
+          </section>
+          {initialMode === "live" && (
+            <section className="lg:col-span-2">
+              <WeeklySummaryBetaPanel careCircleId={snapshot.careCircleId} />
+            </section>
+          )}
         </div>
       </main>
     </div>

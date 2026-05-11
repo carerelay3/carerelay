@@ -13,7 +13,7 @@ export default async function SignUpPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-20">
+    <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-12 sm:py-20">
       <div className="mb-10 flex flex-col items-center justify-center space-y-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--teal)] shadow-lg">
           <span className="text-xl font-bold text-white">C</span>
@@ -22,7 +22,7 @@ export default async function SignUpPage() {
         <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>Start a care circle in under five minutes</p>
       </div>
 
-      <div className="w-full glass-elevated p-8 sm:p-10">
+      <div className="w-full glass-elevated p-6 sm:p-10">
         <AuthForm mode="sign-up" supabaseConfigured={appConfig.supabaseConfigured} />
 
         <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>

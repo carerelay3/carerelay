@@ -38,7 +38,7 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
   return (
     <div className="product-card p-5 sm:p-6">
       <div className="relative z-10 space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--teal)" }}>Daily summary</p>
           <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Today&apos;s family summary</h2>
@@ -46,7 +46,7 @@ export function DailySummary({ snapshot }: { snapshot: DemoSnapshot }) {
         <button 
           onClick={handleGenerate} 
           disabled={loading}
-          className="btn btn-soft text-xs"
+          className="btn btn-soft w-full text-xs sm:w-auto"
         >
           {loading ? "Generating..." : "Generate summary"}
         </button>

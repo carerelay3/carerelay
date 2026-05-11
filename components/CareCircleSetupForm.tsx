@@ -92,7 +92,7 @@ export function CareCircleSetupForm() {
         }} 
       />
 
-      <div className="border-b p-8 sm:p-10 relative z-10" style={{ borderColor: 'var(--glass-border)' }}>
+      <div className="border-b p-5 sm:p-10 relative z-10" style={{ borderColor: 'var(--glass-border)' }}>
         <div className="flex items-center justify-between gap-2">
           {steps.map((s, i) => {
             const isCompleted = step > s.num;
@@ -101,7 +101,7 @@ export function CareCircleSetupForm() {
               <div key={s.num} className="flex flex-1 items-center">
                 <div className="flex flex-col items-center gap-2 relative z-10 w-full group">
                   <div
-                    className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300"
+                    className="flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300"
                     style={{
                       background: isCompleted ? 'var(--success)' : isCurrent ? 'var(--primary)' : 'var(--glass-bg)',
                       color: isCompleted || isCurrent ? 'white' : 'var(--text-subtle)',
@@ -136,7 +136,7 @@ export function CareCircleSetupForm() {
         </div>
       </div>
 
-      <div className="p-8 sm:p-10 relative z-10 min-h-[340px] flex flex-col justify-between">
+      <div className="p-5 sm:p-10 relative z-10 min-h-[340px] flex flex-col justify-between">
         <div className="animate-fade-in-up">
           {step === 1 && (
             <div className="space-y-6">
@@ -152,6 +152,7 @@ export function CareCircleSetupForm() {
                     setKeyword(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''));
                   }}
                   placeholder="e.g., Mom, Linda, Dad"
+                  autoComplete="given-name"
                   autoFocus
                 />
               </div>
@@ -177,7 +178,7 @@ export function CareCircleSetupForm() {
 
               <div className="space-y-3">
                 {members.map((m, idx) => (
-                  <div key={idx} className="flex justify-between items-center p-3 border rounded-xl glass">
+                  <div key={idx} className="flex flex-col gap-1 p-3 border rounded-xl glass min-[390px]:flex-row min-[390px]:items-center min-[390px]:justify-between">
                     <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{m.name}</span>
                     <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{formatUsPhoneDisplay(m.phone)}</span>
                   </div>
@@ -185,18 +186,21 @@ export function CareCircleSetupForm() {
               </div>
 
               <div className="space-y-4 p-4 border rounded-2xl glass-elevated">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     placeholder="Name"
                     value={newMemberName}
                     onChange={(e) => setNewMemberName(e.target.value)}
                     className="input-glass text-sm"
+                    autoComplete="name"
                   />
                   <input
                     placeholder="Phone number"
                     value={newMemberPhone}
                     onChange={(e) => setNewMemberPhone(e.target.value)}
                     className="input-glass text-sm"
+                    inputMode="tel"
+                    autoComplete="tel"
                   />
                 </div>
                 {phoneError && <p className="text-xs text-red-500">{phoneError}</p>}
@@ -241,9 +245,9 @@ export function CareCircleSetupForm() {
               
               <div className="relative mx-auto max-w-sm mt-8">
                 <div className="absolute inset-0 bg-[var(--sage)] blur-2xl opacity-20 rounded-full animate-pulse-soft" />
-                <div className="glass-elevated rounded-[2rem] p-8 relative z-10 border-2" style={{ borderColor: 'var(--sage-soft)' }}>
+                <div className="glass-elevated rounded-[2rem] p-5 sm:p-8 relative z-10 border-2" style={{ borderColor: 'var(--sage-soft)' }}>
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--sage)' }}>Demo Line Active</p>
-                  <p className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>{demoLine}</p>
+                  <p className="text-2xl sm:text-4xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>{demoLine}</p>
                 </div>
               </div>
               

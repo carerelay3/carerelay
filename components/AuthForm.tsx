@@ -88,6 +88,7 @@ export function AuthForm({ mode, supabaseConfigured }: AuthFormProps) {
               onChange={(event) => setFullName(event.target.value)}
               placeholder="Sarah Jenkins"
               className="input-glass"
+              autoComplete="name"
               required
             />
           </div>
@@ -104,6 +105,8 @@ export function AuthForm({ mode, supabaseConfigured }: AuthFormProps) {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="name@example.com"
             className="input-glass"
+            autoComplete="email"
+            inputMode="email"
             required
           />
         </div>
@@ -119,6 +122,7 @@ export function AuthForm({ mode, supabaseConfigured }: AuthFormProps) {
             onChange={(event) => setPassword(event.target.value)}
             placeholder={mode === "sign-in" ? "Enter your password" : "Create a strong password"}
             className="input-glass"
+            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
             required
             minLength={6}
           />

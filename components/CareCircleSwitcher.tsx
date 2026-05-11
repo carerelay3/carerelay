@@ -26,12 +26,12 @@ export function CareCircleSwitcher({ circles, selectedCareCircleId }: CareCircle
   }
 
   return (
-    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-subtle)" }}>
+    <label className="flex w-full min-w-0 flex-col gap-2 text-xs font-semibold uppercase tracking-wider sm:w-auto" style={{ color: "var(--text-subtle)" }}>
       Care circle switcher
       <select
         value={selectedCareCircleId || ""}
         onChange={(event) => switchCircle(event.target.value)}
-        className="rounded-2xl border bg-white/90 px-4 py-3 text-sm font-semibold normal-case tracking-normal"
+        className="min-h-12 w-full rounded-2xl border bg-white/90 px-4 py-3 text-sm font-semibold normal-case tracking-normal sm:w-auto"
         style={{ borderColor: "var(--border)", color: "var(--text)" }}
         aria-label="Selected care circle"
       >

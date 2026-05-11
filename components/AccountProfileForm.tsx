@@ -51,18 +51,18 @@ export function AccountProfileForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-2">
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Full name</span>
-          <input className="input-glass" value={fullName} onChange={(event) => setFullName(event.target.value)} />
+          <input className="input-glass" value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" />
         </label>
 
         <label className="space-y-2">
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Phone number</span>
-          <input className="input-glass" value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" />
+          <input className="input-glass" value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" />
         </label>
       </div>
 
       <label className="block space-y-2">
         <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Timezone</span>
-        <input className="input-glass" value={timezone} onChange={(event) => setTimezone(event.target.value)} placeholder="America/Chicago" />
+        <input className="input-glass" value={timezone} onChange={(event) => setTimezone(event.target.value)} placeholder="America/Chicago" autoComplete="off" />
       </label>
 
       {message && (
@@ -74,7 +74,7 @@ export function AccountProfileForm({
         </p>
       )}
 
-      <button type="submit" disabled={status === "saving"} className="btn btn-sage">
+      <button type="submit" disabled={status === "saving"} className="btn btn-sage w-full sm:w-auto">
         {status === "saving" ? "Saving..." : "Save profile"}
       </button>
     </form>
