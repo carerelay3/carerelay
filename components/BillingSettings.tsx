@@ -10,23 +10,41 @@ type BillingSettingsProps = {
   currentPeriodEnd?: string;
   maxFamilyMembers: number;
   currentFamilyMembers: number;
+  portalAvailable: boolean;
+  portalUnavailableReason?: string;
 };
 
-export function BillingSettings({ planId, status, cancelAtPeriodEnd, currentPeriodEnd, maxFamilyMembers, currentFamilyMembers }: BillingSettingsProps) {
+export function BillingSettings({
+  planId,
+  status,
+  cancelAtPeriodEnd,
+  currentPeriodEnd,
+  maxFamilyMembers,
+  currentFamilyMembers,
+  portalAvailable,
+  portalUnavailableReason,
+}: BillingSettingsProps) {
   const [busy, setBusy] = useState(false);
+  const [portalMessage, setPortalMessage] = useState("");
 
   const onManageBilling = async () => {
+    if (!portalAvailable) {
+      setPortalMessage(portalUnavailableReason || "Billing portal is not available for this account yet.");
+      return;
+    }
+
     setBusy(true);
+    setPortalMessage("");
     try {
       const res = await fetch("/api/billing/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        window.alert(data.error || "Billing portal is not available in demo mode.");
+        setPortalMessage(data.error || "Billing portal is not available for this account yet.");
       }
     } catch {
-      window.alert("Network error.");
+      setPortalMessage("Network error. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -104,6 +122,14 @@ export function BillingSettings({ planId, status, cancelAtPeriodEnd, currentPeri
         {isDemo && (
           <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
             <p className="text-sm text-blue-700 font-medium">You are in Demo Mode. Billing features are inactive. Connect Stripe keys to enable live subscriptions.</p>
+          </div>
+        )}
+
+        {(portalMessage || (!portalAvailable && portalUnavailableReason)) && (
+          <div className="rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--primary-soft)" }}>
+            <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+              {portalMessage || portalUnavailableReason}
+            </p>
           </div>
         )}
       </div>

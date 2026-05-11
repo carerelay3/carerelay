@@ -31,7 +31,7 @@ export function AuthForm({ mode, supabaseConfigured }: AuthFormProps) {
 
     const supabase = getSupabaseClient();
     if (!supabase) {
-      setError("Supabase is not configured. Use demo mode or add Supabase environment variables.");
+      setError("Account access is not configured. Add Supabase environment variables and try again.");
       setLoading(false);
       return;
     }

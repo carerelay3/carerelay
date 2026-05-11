@@ -13,8 +13,19 @@ import { SupplyList } from "./SupplyList";
 import { ConcernPanel } from "./ConcernPanel";
 import { DailySummary } from "./DailySummary";
 import { DemoMessageTester } from "./DemoMessageTester";
+import { CareCircleSwitcher } from "./CareCircleSwitcher";
+import { MultipleRecipientsNotice } from "./MultipleRecipientsNotice";
+import { WeeklySummaryBetaPanel } from "./WeeklySummaryBetaPanel";
 
-export function DashboardClient({ initialSnapshot, initialMode }: { initialSnapshot: DemoSnapshot, initialMode: "demo" | "live" }) {
+export function DashboardClient({
+  initialSnapshot,
+  initialMode,
+  careCircles = [],
+}: {
+  initialSnapshot: DemoSnapshot;
+  initialMode: "demo" | "live";
+  careCircles?: Array<{ id: string; name: string }>;
+}) {
   const [snapshot, setSnapshot] = useState<DemoSnapshot>(initialSnapshot);
 
   const handleNewMockMessage = (body: string, category: CareCategory, concernFlag: boolean) => {
@@ -54,17 +65,26 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
       <header className="sticky top-[65px] z-40 border-y px-4 py-4 backdrop-blur-xl sm:px-6" style={{ background: "rgba(251,250,247,0.82)", borderColor: "var(--border)" }}>
         <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--text)" }}>Family command center</h1>
-          <ModeBadge mode={initialMode} />
-        </div>
-        <div className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
-          Shared line: {snapshot.sharedPhone || "Connect Twilio to enable live SMS"}
-        </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--text)" }}>Family command center</h1>
+              <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
+                Selected care circle: <span style={{ color: "var(--text)" }}>{snapshot.careCircleName || "Care circle"}</span>
+              </p>
+            </div>
+            <ModeBadge mode={initialMode} />
+          </div>
+          <div className="flex flex-col gap-3 sm:items-end">
+            <CareCircleSwitcher circles={careCircles} selectedCareCircleId={snapshot.careCircleId} />
+            <div className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--teal-soft)", color: "var(--teal)" }}>
+              Shared line: {snapshot.sharedPhone || "Connect Twilio to enable live SMS"}
+            </div>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6">
         <DisclaimerBanner />
+        {initialMode === "live" && <MultipleRecipientsNotice />}
         
         <DashboardOverviewCards snapshot={snapshot} />
 
@@ -72,7 +92,8 @@ export function DashboardClient({ initialSnapshot, initialMode }: { initialSnaps
           <div className="lg:col-span-2 space-y-8">
             {initialMode === "demo" && <DemoMessageTester onSend={handleNewMockMessage} />}
             <DailySummary snapshot={snapshot} />
-            <MessageFeed messages={snapshot.messages} />
+            {initialMode === "live" && <WeeklySummaryBetaPanel careCircleId={snapshot.careCircleId} />}
+            <MessageFeed messages={snapshot.messages} mode={initialMode} />
           </div>
 
           <div className="space-y-8">

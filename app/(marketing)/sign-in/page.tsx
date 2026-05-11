@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/AuthForm";
 import { appConfig } from "@/lib/config";
+import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
+import { redirect } from "next/navigation";
 
-export default function SignInPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SignInPage() {
+  const user = await getCurrentSupabaseUser();
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-20">
       <div className="mb-10 flex flex-col items-center justify-center space-y-3">
@@ -16,10 +25,16 @@ export default function SignInPage() {
       <div className="w-full glass-elevated p-8 sm:p-10">
         <AuthForm mode="sign-in" supabaseConfigured={appConfig.supabaseConfigured} />
 
+        <div className="mt-5 text-center text-sm">
+          <Link href="/forgot-password" className="font-semibold transition-colors hover:text-[var(--teal)]" style={{ color: "var(--text)" }}>
+            Forgot password?
+          </Link>
+        </div>
+
         <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>
           {appConfig.supabaseConfigured
             ? "Use your CareRelay account credentials. Live dashboard access is checked against your care circle membership."
-            : "Demo mode active. The sign in button opens the demo dashboard without storing credentials."}
+            : "Account sign in is unavailable until Supabase environment variables are configured."}
         </p>
       </div>
 

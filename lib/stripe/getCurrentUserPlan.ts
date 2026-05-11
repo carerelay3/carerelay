@@ -38,9 +38,12 @@ export async function getCurrentUserPlan(userId: string): Promise<CurrentUserPla
 
   if (error || !data) return DEFAULT_PLAN;
 
+  const status = data.status || DEFAULT_PLAN.status;
+  const paidPlanIsUsable = status === "active" || status === "trialing";
+
   return {
-    planId: normalizePlanId(data.plan_id),
-    status: data.status || DEFAULT_PLAN.status,
+    planId: paidPlanIsUsable ? normalizePlanId(data.plan_id) : "free",
+    status,
     currentPeriodEnd: data.current_period_end,
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end),
   };

@@ -8,9 +8,11 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ format: string; content: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const runExport = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/export/timeline", {
         method: "POST",
@@ -18,8 +20,15 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
         body: JSON.stringify({ careCircleId, format, fromDate: fromDate || undefined, toDate: toDate || undefined }),
       });
       const data = await res.json();
-      if (res.ok) { setResult(data); onExport(); }
-    } catch { /* ignore */ } finally { setLoading(false); }
+      if (res.ok) {
+        setResult(data);
+        onExport();
+      } else {
+        setError(data.error || "Timeline export is not available for this care circle.");
+      }
+    } catch {
+      setError("Timeline export could not be generated.");
+    } finally { setLoading(false); }
   };
 
   const download = () => {
@@ -38,7 +47,7 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
       <div className="glass p-5">
         <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Export timeline</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Download a record of messages, tasks, appointments, and more.</p>
-        <p className="mt-2 text-xs" style={{ color: 'var(--warning)' }}>This export is a family coordination record, not a medical record.</p>
+        <p className="mt-2 text-xs" style={{ color: 'var(--warning)' }}>CareRelay is for family coordination only and does not provide medical advice.</p>
 
         <div className="mt-4 flex flex-wrap gap-3">
           <div className="flex gap-1 rounded-xl p-1" style={{ background: 'var(--bg-subtle)' }}>
@@ -51,6 +60,7 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
             {loading ? "Generating…" : "Generate export"}
           </button>
         </div>
+        {error && <p className="mt-4 text-sm font-semibold" style={{ color: "var(--warning)" }}>{error}</p>}
       </div>
 
       {result && (

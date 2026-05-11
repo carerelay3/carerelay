@@ -2,9 +2,14 @@ import { DemoMessage } from "@/lib/types";
 import { EmptyState } from "./EmptyState";
 import { CategoryBadge } from "./CategoryBadge";
 
-export function MessageFeed({ messages }: { messages: DemoMessage[] }) {
+export function MessageFeed({ messages, mode = "live" }: { messages: DemoMessage[]; mode?: "demo" | "live" }) {
   if (messages.length === 0) {
-    return <EmptyState title="No updates yet" text="Text the CareRelay number or try the demo message tester to see how updates get organized." />;
+    return (
+      <EmptyState
+        title="No updates yet"
+        text={mode === "demo" ? "Try the demo message tester to see how updates get organized." : "Text the CareRelay number to see live family updates here."}
+      />
+    );
   }
 
   const sorted = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -31,7 +36,7 @@ export function MessageFeed({ messages }: { messages: DemoMessage[] }) {
               <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>{msg.body}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <CategoryBadge category={msg.category} />
-                <span className="badge-pill badge-teal">Demo SMS</span>
+                <span className="badge-pill badge-teal">{mode === "demo" ? "Demo SMS" : "SMS"}</span>
                 {msg.concernFlag && <span className="badge-pill badge-warm">For family review</span>}
               </div>
             </div>

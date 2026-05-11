@@ -1,6 +1,5 @@
 import "server-only";
 
-import { getDemoSnapshot } from "@/lib/demo/data";
 import type {
   CareCategory,
   DemoAppointment,
@@ -22,20 +21,39 @@ const asCategory = (value: unknown): CareCategory =>
     ? (value as CareCategory)
     : "general_update";
 
+function emptyLiveSnapshot(message: string): DemoSnapshot {
+  return {
+    careCircleId: undefined,
+    careCircleName: "No care circle yet",
+    recipientName: "Create a care circle",
+    sharedPhone: "",
+    members: [],
+    messages: [],
+    tasks: [],
+    appointments: [],
+    supplies: [],
+    concerns: [],
+    activity: [],
+    handoffs: [],
+    dailySummary: message,
+  };
+}
+
 export async function getUserCareCircles(userId: string) {
   const admin = getSupabaseAdmin();
   if (!admin) return [];
 
   const { data: owned } = await admin
     .from("care_circles")
-    .select("id, name, shared_phone_number, sms_keyword")
+    .select("id, name, owner_id, shared_phone_number, sms_keyword")
     .eq("owner_id", userId)
     .order("created_at", { ascending: true });
 
   const { data: memberships } = await admin
     .from("family_members")
-    .select("care_circle_id, care_circles(id, name, shared_phone_number, sms_keyword)")
-    .eq("user_id", userId);
+    .select("care_circle_id, status, care_circles(id, name, owner_id, shared_phone_number, sms_keyword)")
+    .eq("user_id", userId)
+    .neq("status", "removed");
 
   const circles = new Map<string, DbRecord>();
   for (const circle of owned || []) circles.set(circle.id, circle);
@@ -186,20 +204,11 @@ export async function getLatestDailySummary(careCircleId: string) {
 }
 
 export async function getDashboardSnapshotForUser(careCircleId?: string): Promise<DemoSnapshot> {
-  const fallback = getDemoSnapshot();
   const user = await getCurrentSupabaseUser();
   const admin = getSupabaseAdmin();
 
   if (!user || !admin) {
-    return {
-      ...fallback,
-      messages: [],
-      tasks: [],
-      appointments: [],
-      supplies: [],
-      concerns: [],
-      dailySummary: "Sign in and create a care circle to load live dashboard records.",
-    };
+    return emptyLiveSnapshot("Sign in and create a care circle to load live dashboard records.");
   }
 
   const circles = await getUserCareCircles(user.id);
@@ -208,20 +217,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     : circles[0];
 
   if (!selectedCircle?.id) {
-    return {
-      ...fallback,
-      careCircleId: undefined,
-      careCircleName: "No care circle yet",
-      recipientName: "Create a care circle",
-      sharedPhone: "",
-      members: [],
-      messages: [],
-      tasks: [],
-      appointments: [],
-      supplies: [],
-      concerns: [],
-      dailySummary: "Create a care circle to begin using live CareRelay records.",
-    };
+    return emptyLiveSnapshot("Create a care circle to begin using live CareRelay records.");
   }
 
   const activeCircleId = asString(selectedCircle.id);
@@ -250,8 +246,9 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     admin.from("care_recipients").select("first_name").eq("care_circle_id", activeCircleId).limit(1).maybeSingle(),
     admin
       .from("family_members")
-      .select("id, name, role, phone, invite_status, permission_level, created_at")
+      .select("id, name, role, phone, invite_status, permission_level, status, created_at")
       .eq("care_circle_id", activeCircleId)
+      .neq("status", "removed")
       .order("created_at", { ascending: true }),
   ]);
 
@@ -266,7 +263,6 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
   }));
 
   return {
-    ...fallback,
     careCircleId: activeCircleId,
     careCircleName: asString(selectedCircle.name, "Care Circle"),
     recipientName: asString(recipientResult.data?.first_name, asString(selectedCircle.name, "Loved one")),
@@ -282,6 +278,8 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     appointments,
     supplies,
     concerns,
+    activity: [],
+    handoffs: [],
     dailySummary: summary || undefined,
   };
 }

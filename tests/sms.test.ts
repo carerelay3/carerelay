@@ -346,7 +346,7 @@ describe("POST /api/export/timeline", () => {
     const json = await res.json();
     expect(json.format).toBe("json");
     expect(json.content).toContain("careCircleName");
-    expect(json.content).toContain("This export is a family coordination record, not a medical record.");
+    expect(json.content).toContain("CareRelay is for family coordination only and does not provide medical advice.");
   });
 
   it("exports CSV timeline", async () => {
@@ -360,6 +360,7 @@ describe("POST /api/export/timeline", () => {
     const json = await res.json();
     expect(json.format).toBe("csv");
     expect(json.content).toContain("Type,ID,Date,Actor,Details");
+    expect(json.content).toContain("CareRelay is for family coordination only and does not provide medical advice.");
   });
 });
 

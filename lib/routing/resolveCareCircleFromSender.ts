@@ -67,7 +67,8 @@ export async function resolveCareCircleFromSender(
   const { data: members, error } = await admin
     .from("family_members")
     .select("id, care_circle_id, care_circles(id, sms_keyword)")
-    .eq("phone_normalized", normalized);
+    .eq("phone_normalized", normalized)
+    .neq("status", "removed");
 
   if (error || !members || members.length === 0) {
     return {
