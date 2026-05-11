@@ -186,6 +186,7 @@ CREATE POLICY care_circles_insert_owner
 
 DROP POLICY IF EXISTS "Family members insertable by circle owner" ON public.family_members;
 DROP POLICY IF EXISTS family_members_insert_owner ON public.family_members;
+DROP POLICY IF EXISTS family_members_insert_admin ON public.family_members;
 CREATE POLICY family_members_insert_admin
   ON public.family_members FOR INSERT
   TO authenticated
@@ -193,6 +194,7 @@ CREATE POLICY family_members_insert_admin
 
 DROP POLICY IF EXISTS "Family members updateable by circle owner" ON public.family_members;
 DROP POLICY IF EXISTS family_members_update_owner_or_self ON public.family_members;
+DROP POLICY IF EXISTS family_members_update_admin_or_self ON public.family_members;
 CREATE POLICY family_members_update_admin_or_self
   ON public.family_members FOR UPDATE
   TO authenticated
