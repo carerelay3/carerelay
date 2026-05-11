@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/AuthForm";
 import { appConfig } from "@/lib/config";
+import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
+import { redirect } from "next/navigation";
 
-export default function SignUpPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SignUpPage() {
+  const user = await getCurrentSupabaseUser();
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-20">
       <div className="mb-10 flex flex-col items-center justify-center space-y-3">
@@ -19,7 +28,7 @@ export default function SignUpPage() {
         <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>
           {appConfig.supabaseConfigured
             ? "After account creation, setup will create a live care circle owned by your authenticated user."
-            : "Demo mode active. Registration is simulated and continues to guided setup."}
+            : "Account creation is unavailable until Supabase environment variables are configured."}
         </p>
       </div>
 

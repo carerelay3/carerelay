@@ -158,6 +158,7 @@ create table if not exists public.profiles (
   full_name text,
   phone text,
   phone_normalized text,
+  timezone text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -365,6 +366,7 @@ select public.ensure_column('public.profiles', 'email', 'text');
 select public.ensure_column('public.profiles', 'full_name', 'text');
 select public.ensure_column('public.profiles', 'phone', 'text');
 select public.ensure_column('public.profiles', 'phone_normalized', 'text');
+select public.ensure_column('public.profiles', 'timezone', 'text');
 select public.ensure_column('public.profiles', 'created_at', 'timestamptz default now()');
 select public.ensure_column('public.profiles', 'updated_at', 'timestamptz default now()');
 

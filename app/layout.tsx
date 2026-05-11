@@ -21,14 +21,13 @@ export const metadata: Metadata = {
   description: "One shared number to keep the whole family on the same page.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Start fetching user data on the server, but do NOT await it.
-  // This allows the server to stream the initial HTML shell immediately.
-  const userPromise = getCurrentUser();
+  const user = await getCurrentUser();
+  const userPromise = Promise.resolve(user);
 
   return (
     <html
@@ -40,7 +39,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
         <UserProvider userPromise={userPromise}>
-          <SiteHeader />
+          <SiteHeader user={user} />
           <div className="flex-1">{children}</div>
         </UserProvider>
         <footer className="py-10 text-center" style={{ borderTop: '1px solid var(--border)' }}>

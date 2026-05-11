@@ -1,9 +1,26 @@
 import Link from "next/link";
 import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
 import { formatUsPhoneDisplay } from "@/lib/utils/phone";
+import type { User } from "@/app/user-data";
+import { SignOutButton } from "@/components/SignOutButton";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  user?: User | null;
+};
+
+export function SiteHeader({ user = null }: SiteHeaderProps) {
   const phone = formatUsPhoneDisplay(DEMO_SHARED_PHONE);
+  const links = user
+    ? [
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/account", label: "Account" },
+        { href: "/settings", label: "Settings" },
+      ]
+    : [
+        { href: "/demo", label: "Demo" },
+        { href: "/pricing", label: "Pricing" },
+      ];
+
   return (
     <header className="sticky top-0 z-50" style={{ background: 'rgba(251, 250, 247, 0.86)', backdropFilter: 'blur(22px) saturate(1.4)', borderBottom: '1px solid rgba(32,58,67,0.08)' }}>
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 md:px-8">
@@ -22,19 +39,23 @@ export function SiteHeader() {
         </p>
 
         <nav className="flex flex-wrap items-center gap-1 text-sm">
-          {[
-            { href: "/demo", label: "Demo" },
-            { href: "/pricing", label: "Pricing" },
-            { href: "/dashboard", label: "Dashboard" },
-            { href: "/setup", label: "Setup" },
-          ].map((link) => (
+          {links.map((link) => (
             <Link key={link.href} href={link.href} className="tap-target flex items-center gap-2 rounded-full px-3 py-2 transition-colors hover:bg-white/70" style={{ color: 'var(--text-muted)' }}>
               {link.label}
             </Link>
           ))}
-          <Link href="/sign-in" className="tap-target flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors" style={{ background: 'var(--primary-soft)', color: 'var(--text-secondary)' }}>
-            Sign in
-          </Link>
+          {user ? (
+            <SignOutButton />
+          ) : (
+            <>
+              <Link href="/sign-in" className="tap-target flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors" style={{ background: 'var(--primary-soft)', color: 'var(--text-secondary)' }}>
+                Sign in
+              </Link>
+              <Link href="/sign-up" className="tap-target flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors" style={{ background: 'var(--teal)' }}>
+                Create account
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>
