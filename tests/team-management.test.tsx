@@ -4,9 +4,12 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
   }),
+  usePathname: () => "/team",
   useRouter: () => ({
+    push: vi.fn(),
     refresh: vi.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const circleId = "11111111-1111-4111-8111-111111111111";

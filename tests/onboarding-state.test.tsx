@@ -5,10 +5,12 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
   }),
+  usePathname: () => "/dashboard",
   useRouter: () => ({
     push: vi.fn(),
     refresh: vi.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const liveSnapshot = {
@@ -169,6 +171,13 @@ describe("onboarding and live account state", () => {
     vi.doMock("@/lib/supabase/dashboardRecords", () => ({
       getDashboardSnapshotForUser: vi.fn(async () => liveSnapshot),
     }));
+    vi.doMock("@/lib/supabase/careCircleSelection", () => ({
+      getSelectedCareCircleForUser: vi.fn(async () => ({
+        circles: [{ id: "circle-1", name: "Mom's Care Circle" }],
+        selectedCircle: { id: "circle-1", name: "Mom's Care Circle" },
+        requestedCareCircleDenied: false,
+      })),
+    }));
 
     const { default: DashboardPage } = await import("@/app/dashboard/page");
     const html = renderToStaticMarkup(await DashboardPage());
@@ -178,9 +187,17 @@ describe("onboarding and live account state", () => {
   });
 
   it("settings shows current plan and billing status", async () => {
-    vi.doMock("@/lib/config", () => ({ hasSupabase: () => true }));
+    vi.doMock("@/lib/config", () => ({ appConfig: { stripeConfigured: false }, hasSupabase: () => true }));
     vi.doMock("@/lib/supabase/auth", () => ({
       getCurrentSupabaseUser: vi.fn(async () => ({ id: "user-1", email: "care@example.com" })),
+    }));
+    vi.doMock("@/lib/supabase/admin", () => ({ getSupabaseAdmin: () => null }));
+    vi.doMock("@/lib/supabase/careCircleSelection", () => ({
+      getSelectedCareCircleForUser: vi.fn(async () => ({
+        circles: [],
+        selectedCircle: null,
+        requestedCareCircleDenied: false,
+      })),
     }));
     vi.doMock("@/lib/stripe/getCurrentUserPlan", () => ({
       getCurrentUserPlan: vi.fn(async () => ({

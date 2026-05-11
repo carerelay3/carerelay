@@ -45,13 +45,13 @@ export async function getUserCareCircles(userId: string) {
 
   const { data: owned } = await admin
     .from("care_circles")
-    .select("id, name, shared_phone_number, sms_keyword")
+    .select("id, name, owner_id, shared_phone_number, sms_keyword")
     .eq("owner_id", userId)
     .order("created_at", { ascending: true });
 
   const { data: memberships } = await admin
     .from("family_members")
-    .select("care_circle_id, status, care_circles(id, name, shared_phone_number, sms_keyword)")
+    .select("care_circle_id, status, care_circles(id, name, owner_id, shared_phone_number, sms_keyword)")
     .eq("user_id", userId)
     .neq("status", "removed");
 

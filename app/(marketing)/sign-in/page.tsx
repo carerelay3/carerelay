@@ -25,6 +25,12 @@ export default async function SignInPage() {
       <div className="w-full glass-elevated p-8 sm:p-10">
         <AuthForm mode="sign-in" supabaseConfigured={appConfig.supabaseConfigured} />
 
+        <div className="mt-5 text-center text-sm">
+          <Link href="/forgot-password" className="font-semibold transition-colors hover:text-[var(--teal)]" style={{ color: "var(--text)" }}>
+            Forgot password?
+          </Link>
+        </div>
+
         <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>
           {appConfig.supabaseConfigured
             ? "Use your CareRelay account credentials. Live dashboard access is checked against your care circle membership."

@@ -2,13 +2,18 @@ import { DashboardClient } from "@/components/DashboardClient";
 import { hasSupabase } from "@/lib/config";
 import { getDashboardSnapshotForUser } from "@/lib/supabase/dashboardRecords";
 import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
+import { getSelectedCareCircleForUser } from "@/lib/supabase/careCircleSelection";
 import type { DemoSnapshot } from "@/lib/types";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: Promise<{ careCircleId?: string }>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps = {}) {
   if (!hasSupabase()) {
     return (
       <main className="page-shell py-16">
@@ -31,7 +36,9 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const snapshot: DemoSnapshot = await getDashboardSnapshotForUser();
+  const params = searchParams ? await searchParams : {};
+  const { circles, selectedCircle } = await getSelectedCareCircleForUser(user.id, params.careCircleId);
+  const snapshot: DemoSnapshot = await getDashboardSnapshotForUser(selectedCircle?.id);
   if (!snapshot.careCircleId) {
     return (
       <main className="page-shell py-16">
@@ -48,5 +55,5 @@ export default async function DashboardPage() {
     );
   }
 
-  return <DashboardClient initialSnapshot={snapshot} initialMode="live" />;
+  return <DashboardClient initialSnapshot={snapshot} initialMode="live" careCircles={circles} />;
 }

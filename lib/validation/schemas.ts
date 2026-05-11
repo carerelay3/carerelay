@@ -73,9 +73,13 @@ export const reviewHandoffSchema = z.object({
 
 export const exportTimelineSchema = z.object({
   careCircleId: z.string().min(1),
-  format: z.enum(["json", "csv"]),
+  format: z.enum(["json", "csv"]).default("json"),
   fromDate: z.string().optional(),
   toDate: z.string().optional(),
+});
+
+export const weeklySummarySchema = z.object({
+  careCircleId: z.string().min(1),
 });
 
 export const inviteMemberSchema = z.object({

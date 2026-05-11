@@ -27,6 +27,7 @@ export const appConfig = {
   openAiConfigured: !!process.env.OPENAI_API_KEY,
   stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   stripeConfigured: !!process.env.STRIPE_SECRET_KEY,
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL,
 };
 
 export function hasSupabase() {

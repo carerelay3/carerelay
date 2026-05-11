@@ -6,10 +6,12 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
   }),
+  usePathname: () => "/account",
   useRouter: () => ({
     push: vi.fn(),
     refresh: vi.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe("account auth foundation", () => {
@@ -165,6 +167,13 @@ describe("account auth foundation", () => {
         status: "active",
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
+      })),
+    }));
+    vi.doMock("@/lib/supabase/careCircleSelection", () => ({
+      getSelectedCareCircleForUser: vi.fn(async () => ({
+        circles: [{ id: "circle-1", name: "Mom's Care Circle" }],
+        selectedCircle: { id: "circle-1", name: "Mom's Care Circle" },
+        requestedCareCircleDenied: false,
       })),
     }));
 

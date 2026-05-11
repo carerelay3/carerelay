@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AccountProfileForm } from "@/components/AccountProfileForm";
+import { CareCircleSwitcher } from "@/components/CareCircleSwitcher";
 import { hasSupabase } from "@/lib/config";
 import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSelectedCareCircleForUser } from "@/lib/supabase/careCircleSelection";
 import { getCurrentUserPlan } from "@/lib/stripe/getCurrentUserPlan";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +22,10 @@ type CircleAccess = {
   id: string;
   name: string;
   role: string;
+};
+
+type AccountPageProps = {
+  searchParams?: Promise<{ careCircleId?: string }>;
 };
 
 function formatDate(value?: string | null) {
@@ -97,7 +104,7 @@ async function getCircleAccess(userId: string): Promise<CircleAccess[]> {
   return [...ownedCircles, ...memberAccess];
 }
 
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: AccountPageProps = {}) {
   if (!hasSupabase()) {
     redirect("/sign-in");
   }
@@ -107,11 +114,14 @@ export default async function AccountPage() {
     redirect("/sign-in");
   }
 
-  const [profile, plan, circles] = await Promise.all([
+  const params = searchParams ? await searchParams : {};
+  const [profile, plan, circles, selected] = await Promise.all([
     getProfile(user.id),
     getCurrentUserPlan(user.id),
     getCircleAccess(user.id),
+    getSelectedCareCircleForUser(user.id, params.careCircleId),
   ]);
+  const { circles: selectableCircles, selectedCircle } = selected;
 
   const email = profile?.email || user.email || "Unavailable";
   const fullName = profile?.full_name || user.user_metadata?.full_name || "";
@@ -126,6 +136,25 @@ export default async function AccountPage() {
         <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>Profile</h1>
         <p className="mt-2">Manage the account details tied to your CareRelay sign-in.</p>
       </div>
+
+      {selectedCircle ? (
+        <section className="product-card mb-6 flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="section-kicker">Selected care circle</p>
+            <h2 className="mt-2 text-xl font-bold" style={{ color: "var(--text)" }}>{selectedCircle.name}</h2>
+            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+              Account links and team access will stay focused on this care circle.
+            </p>
+          </div>
+          <CareCircleSwitcher circles={selectableCircles} selectedCareCircleId={selectedCircle.id} />
+        </section>
+      ) : (
+        <section className="product-card mb-6 p-6 text-center">
+          <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Create your first care circle</h2>
+          <p className="mt-2" style={{ color: "var(--text-muted)" }}>Your profile is ready. Setup creates the live care circle your family will use.</p>
+          <Link href="/setup" className="btn btn-sage mt-5">Start setup</Link>
+        </section>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <section className="product-card space-y-5 p-6">
@@ -167,7 +196,14 @@ export default async function AccountPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {circles.map((circle) => (
               <div key={`${circle.id}-${circle.role}`} className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "rgba(255,255,255,0.55)" }}>
-                <p className="font-semibold" style={{ color: "var(--text)" }}>{circle.name}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-semibold" style={{ color: "var(--text)" }}>{circle.name}</p>
+                  {circle.id === selectedCircle?.id && (
+                    <span className="rounded-full px-2 py-1 text-xs font-semibold" style={{ background: "var(--sage-soft)", color: "var(--sage)" }}>
+                      Selected
+                    </span>
+                  )}
+                </div>
                 <p className="mt-1 text-sm capitalize" style={{ color: "var(--text-muted)" }}>{circle.role}</p>
               </div>
             ))}

@@ -16,6 +16,9 @@ export function SiteHeader({ user = null }: SiteHeaderProps) {
         { href: "/team", label: "Team" },
         { href: "/account", label: "Account" },
         { href: "/settings", label: "Settings" },
+        ...(user.platformRole === "founder" || user.platformRole === "admin"
+          ? [{ href: "/admin", label: "Admin" }]
+          : []),
       ]
     : [
         { href: "/demo", label: "Demo" },

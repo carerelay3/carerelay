@@ -4,21 +4,16 @@ import { TeamManagement, type TeamMemberView } from "@/components/TeamManagement
 import { hasSupabase } from "@/lib/config";
 import { getCurrentSupabaseUser, getUserCareCircleRole } from "@/lib/supabase/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getUserCareCircles } from "@/lib/supabase/dashboardRecords";
+import { getSelectedCareCircleForUser } from "@/lib/supabase/careCircleSelection";
 import { getCurrentUserPlan } from "@/lib/stripe/getCurrentUserPlan";
 import { getPlanLimits } from "@/lib/stripe/getPlanLimits";
 import { memberStatus, normalizeTeamRole } from "@/lib/team/server";
+import { CareCircleSwitcher } from "@/components/CareCircleSwitcher";
 
 export const dynamic = "force-dynamic";
 
 type TeamPageProps = {
   searchParams?: Promise<{ careCircleId?: string }>;
-};
-
-type CircleRow = {
-  id?: string | null;
-  name?: string | null;
-  owner_id?: string | null;
 };
 
 function asString(value: unknown, fallback = "") {
@@ -51,10 +46,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps = {}) {
   }
 
   const params = searchParams ? await searchParams : {};
-  const circles = (await getUserCareCircles(user.id)) as CircleRow[];
-  const selectedCircle = params.careCircleId
-    ? circles.find((circle) => circle.id === params.careCircleId)
-    : circles[0];
+  const { circles, selectedCircle } = await getSelectedCareCircleForUser(user.id, params.careCircleId);
 
   if (!selectedCircle?.id) {
     return (
@@ -126,23 +118,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps = {}) {
             Selected care circle: <span className="font-semibold" style={{ color: "var(--text)" }}>{selectedName}</span>
           </p>
         </div>
-        {circles.length > 1 && (
-          <div className="flex flex-wrap gap-2">
-            {circles.map((circle) => (
-              <Link
-                key={asString(circle.id)}
-                href={`/team?careCircleId=${asString(circle.id)}`}
-                className="rounded-full px-3 py-2 text-sm font-semibold"
-                style={{
-                  background: circle.id === careCircleId ? "var(--teal)" : "var(--primary-soft)",
-                  color: circle.id === careCircleId ? "white" : "var(--text-secondary)",
-                }}
-              >
-                {asString(circle.name, "Care circle")}
-              </Link>
-            ))}
-          </div>
-        )}
+        <CareCircleSwitcher circles={circles} selectedCareCircleId={careCircleId} />
       </div>
 
       <TeamManagement

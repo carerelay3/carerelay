@@ -221,6 +221,7 @@ export function exportTimeline(format: "json" | "csv", from?: string, to?: strin
       "Type,ID,Date,Actor,Details",
       ...snapshot.messages.map((message) => `Message,${message.id},${message.createdAt},${message.sender},"${message.body}"`),
       ...snapshot.activity.map((item) => `Activity,${item.id},${item.createdAt},${item.actor ?? ""},"${item.description}"`),
+      `Disclaimer,,${exportedAt},CareRelay,"CareRelay is for family coordination only and does not provide medical advice."`,
     ];
     return { format, from, to, exportedAt, content: rows.join("\n") };
   }
@@ -233,7 +234,7 @@ export function exportTimeline(format: "json" | "csv", from?: string, to?: strin
     content: JSON.stringify(
       {
         careCircleName: snapshot.careCircleName,
-        disclaimer: "This export is a family coordination record, not a medical record.",
+        disclaimer: "CareRelay is for family coordination only and does not provide medical advice.",
         snapshot,
       },
       null,

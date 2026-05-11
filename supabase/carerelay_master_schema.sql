@@ -161,6 +161,7 @@ create table if not exists public.profiles (
   phone text,
   phone_normalized text,
   timezone text,
+  platform_role text default 'user',
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -373,6 +374,7 @@ select public.ensure_column('public.profiles', 'full_name', 'text');
 select public.ensure_column('public.profiles', 'phone', 'text');
 select public.ensure_column('public.profiles', 'phone_normalized', 'text');
 select public.ensure_column('public.profiles', 'timezone', 'text');
+select public.ensure_column('public.profiles', 'platform_role', 'text default ''user''');
 select public.ensure_column('public.profiles', 'created_at', 'timestamptz default now()');
 select public.ensure_column('public.profiles', 'updated_at', 'timestamptz default now()');
 
@@ -508,6 +510,7 @@ $$;
 -- =============================================================================
 
 alter table public.profiles
+  alter column platform_role set default 'user',
   alter column created_at set default now(),
   alter column updated_at set default now();
 
@@ -602,6 +605,11 @@ begin
     drop constraint if exists profiles_email_format_chk,
     add constraint profiles_email_format_chk
       check (email is null or email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$') not valid;
+
+  alter table public.profiles
+    drop constraint if exists profiles_platform_role_chk,
+    add constraint profiles_platform_role_chk
+      check (platform_role in ('user', 'admin', 'founder')) not valid;
 
   alter table public.care_circles
     drop constraint if exists care_circles_name_not_blank_chk,
@@ -848,6 +856,7 @@ $$;
 -- =============================================================================
 
 create index if not exists profiles_phone_normalized_idx on public.profiles(phone_normalized);
+create index if not exists profiles_platform_role_idx on public.profiles(platform_role);
 create index if not exists care_circles_owner_id_idx on public.care_circles(owner_id);
 create index if not exists care_circles_sms_keyword_idx on public.care_circles(sms_keyword);
 create index if not exists care_circles_shared_phone_idx on public.care_circles(shared_phone_number);
