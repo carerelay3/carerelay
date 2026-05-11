@@ -113,3 +113,13 @@ If a family member row already exists, update it instead of inserting a duplicat
 - Do not use user-editable metadata for platform authorization.
 - `/admin` does not expose hard-delete user actions.
 - Only a current `founder` can make another user a platform admin from the admin UI.
+
+## Launch Audit Checklist
+
+- Confirm `/admin` redirects normal authenticated users to `/dashboard`.
+- Confirm admin nav appears only for `platform_role in ('founder', 'admin')`.
+- Confirm `profiles.platform_role` defaults to `user`.
+- Confirm service role key exists only in server environment variables.
+- Confirm admin actions do not hard-delete users.
+- Confirm owner/admin/member care circle role changes are scoped to a selected care circle.
+- Confirm founder-only actions, such as making a platform admin, are unavailable to non-founder platform admins.
