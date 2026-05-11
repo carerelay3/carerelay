@@ -1,4 +1,5 @@
-export type PlanId = "starter" | "family" | "family_plus" | "demo";
+export type AccountPlanId = "free" | "starter" | "family" | "family_plus";
+export type PlanId = AccountPlanId | "demo";
 
 export const STRIPE_PRICE_IDS = {
   starter: process.env.STRIPE_STARTER_PRICE_ID || "price_starter",
@@ -7,6 +8,11 @@ export const STRIPE_PRICE_IDS = {
 };
 
 export const PLANS = {
+  free: {
+    id: "free" as PlanId,
+    name: "Free",
+    priceId: "",
+  },
   starter: {
     id: "starter" as PlanId,
     name: "Starter",

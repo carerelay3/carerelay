@@ -158,7 +158,7 @@ describe("POST /api/summaries/generate", () => {
 });
 
 describe("POST /api/stripe/checkout", () => {
-  it("returns demo checkout when stripe is not configured", async () => {
+  it("returns safe JSON when stripe is not configured", async () => {
     const orig = process.env.STRIPE_SECRET_KEY;
     process.env.STRIPE_SECRET_KEY = "";
 
@@ -171,10 +171,9 @@ describe("POST /api/stripe/checkout", () => {
     
     process.env.STRIPE_SECRET_KEY = orig;
     
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(503);
     const json = await res.json();
-    expect(json.mode).toBe("demo");
-    expect(json.redirectUrl).toBe("/setup?demoCheckout=1");
+    expect(json.error).toBe("Stripe is not configured for checkout.");
   });
 
   it("rejects invalid planId", async () => {

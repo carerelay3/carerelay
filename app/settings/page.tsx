@@ -2,9 +2,9 @@ import Link from "next/link";
 import { BillingSettings } from "@/components/BillingSettings";
 import { hasSupabase } from "@/lib/config";
 import { getCurrentSupabaseUser } from "@/lib/supabase/auth";
+import { getCurrentUserPlan } from "@/lib/stripe/getCurrentUserPlan";
+import { getPlanLimits } from "@/lib/stripe/getPlanLimits";
 import { redirect } from "next/navigation";
-
-const demoCurrentPeriodEnd = "2026-06-08T00:00:00.000Z";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +31,9 @@ export default async function SettingsPage() {
     redirect("/sign-in");
   }
 
+  const currentPlan = await getCurrentUserPlan(user.id);
+  const planLimits = getPlanLimits(currentPlan.planId);
+
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-12">
       <div className="mb-8">
@@ -40,11 +43,11 @@ export default async function SettingsPage() {
       </div>
 
       <BillingSettings
-        planId="demo"
-        status="trialing"
-        cancelAtPeriodEnd={false}
-        currentPeriodEnd={demoCurrentPeriodEnd}
-        maxFamilyMembers={3}
+        planId={currentPlan.planId}
+        status={currentPlan.status}
+        cancelAtPeriodEnd={currentPlan.cancelAtPeriodEnd}
+        currentPeriodEnd={currentPlan.currentPeriodEnd || undefined}
+        maxFamilyMembers={planLimits.maxFamilyMembers}
         currentFamilyMembers={1}
       />
     </main>

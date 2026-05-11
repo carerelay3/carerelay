@@ -2,7 +2,28 @@ import { NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe/client";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import Stripe from "stripe";
-import { STRIPE_PRICE_IDS } from "@/lib/stripe/plans";
+import { AccountPlanId, STRIPE_PRICE_IDS } from "@/lib/stripe/plans";
+
+function planIdFromPriceId(priceId: string | undefined | null): AccountPlanId {
+  if (priceId === STRIPE_PRICE_IDS.starter) return "starter";
+  if (priceId === STRIPE_PRICE_IDS.family) return "family";
+  if (priceId === STRIPE_PRICE_IDS.family_plus) return "family_plus";
+  return "free";
+}
+
+function normalizePlanId(planId: string | undefined | null, priceId: string | undefined | null): AccountPlanId {
+  if (planId === "starter" || planId === "family" || planId === "family_plus") return planId;
+  return planIdFromPriceId(priceId);
+}
+
+function subscriptionPeriod(subscriptionItem: Stripe.SubscriptionItem | undefined) {
+  return {
+    current_period_start: subscriptionItem
+      ? new Date(subscriptionItem.current_period_start * 1000).toISOString()
+      : null,
+    current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
+  };
+}
 
 export async function POST(req: Request) {
   const stripe = getStripeClient();
@@ -44,30 +65,30 @@ export async function POST(req: Request) {
         const subscriptionId = session.subscription as string;
 
         if (customerId && subscriptionId) {
-          // Retrieve the subscription to get price ID and status
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const subscriptionItem = subscription.items.data[0];
           const priceId = subscriptionItem?.price.id;
-          const status = subscription.status;
-
-          let plan = "starter";
-          if (priceId === STRIPE_PRICE_IDS.family) plan = "family";
-          else if (priceId === STRIPE_PRICE_IDS.family_plus) plan = "family_plus";
+          const userId =
+            session.metadata?.user_id ||
+            session.client_reference_id ||
+            subscription.metadata?.user_id ||
+            null;
+          const planId = normalizePlanId(session.metadata?.plan_id || subscription.metadata?.plan_id, priceId);
+          const period = subscriptionPeriod(subscriptionItem);
 
           await supabase
-            .from("subscriptions")
+            .from("billing_subscriptions")
             .upsert({
+              user_id: userId,
               stripe_customer_id: customerId,
               stripe_subscription_id: subscription.id,
               stripe_price_id: priceId,
-              plan: plan,
-              status: status,
-              current_period_start: subscriptionItem ? new Date(subscriptionItem.current_period_start * 1000).toISOString() : null,
-              current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
+              plan_id: planId,
+              status: subscription.status,
+              ...period,
               cancel_at_period_end: subscription.cancel_at_period_end,
               updated_at: new Date().toISOString(),
-            })
-            .eq("stripe_customer_id", customerId);
+            }, { onConflict: "stripe_subscription_id" });
         }
         break;
       }
@@ -77,39 +98,58 @@ export async function POST(req: Request) {
         const customerId = subscription.customer as string;
         const subscriptionItem = subscription.items.data[0];
         const priceId = subscriptionItem?.price.id;
-        const status = subscription.status;
+        const userId = subscription.metadata?.user_id || null;
+        const planId = normalizePlanId(subscription.metadata?.plan_id, priceId);
+        const period = subscriptionPeriod(subscriptionItem);
 
-        let plan = "starter";
-        if (priceId === STRIPE_PRICE_IDS.family) plan = "family";
-        else if (priceId === STRIPE_PRICE_IDS.family_plus) plan = "family_plus";
-
-        await supabase
-          .from("subscriptions")
-          .update({
-            stripe_subscription_id: subscription.id,
-            stripe_price_id: priceId,
-            plan: plan,
-            status: status,
-            current_period_start: subscriptionItem ? new Date(subscriptionItem.current_period_start * 1000).toISOString() : null,
-            current_period_end: subscriptionItem ? new Date(subscriptionItem.current_period_end * 1000).toISOString() : null,
-            cancel_at_period_end: subscription.cancel_at_period_end,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_customer_id", customerId);
+        if (userId) {
+          await supabase
+            .from("billing_subscriptions")
+            .upsert({
+              user_id: userId,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: priceId,
+              plan_id: planId,
+              status: subscription.status,
+              ...period,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: "stripe_subscription_id" });
+        } else {
+          await supabase
+            .from("billing_subscriptions")
+            .update({
+              stripe_customer_id: customerId,
+              stripe_price_id: priceId,
+              plan_id: planId,
+              status: subscription.status,
+              ...period,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("stripe_subscription_id", subscription.id);
+        }
         break;
       }
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
+        const subscriptionItem = subscription.items.data[0];
+        const priceId = subscriptionItem?.price.id;
+        const period = subscriptionPeriod(subscriptionItem);
 
         await supabase
-          .from("subscriptions")
+          .from("billing_subscriptions")
           .update({
+            stripe_subscription_id: subscription.id,
+            stripe_price_id: priceId,
+            plan_id: normalizePlanId(subscription.metadata?.plan_id, priceId),
             status: "canceled",
+            ...period,
             cancel_at_period_end: false,
             updated_at: new Date().toISOString(),
           })
-          .eq("stripe_customer_id", customerId);
+          .eq("stripe_subscription_id", subscription.id);
         break;
       }
     }

@@ -33,6 +33,7 @@ export function BillingSettings({ planId, status, cancelAtPeriodEnd, currentPeri
   };
 
   const planNames: Record<string, string> = {
+    free: "Free",
     starter: "Starter",
     family: "Family",
     family_plus: "Family Plus",
@@ -50,14 +51,16 @@ export function BillingSettings({ planId, status, cancelAtPeriodEnd, currentPeri
         </div>
         <div className="flex flex-col items-start sm:items-end">
           <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Current plan</span>
             <span className="text-sm font-semibold uppercase tracking-wider text-slate-800">{planNames[planId] || "Unknown"}</span>
             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${status === 'active' || status === 'trialing' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
               {status}
             </span>
           </div>
+          <span className="text-xs text-slate-500 mt-1">Billing status: {status}</span>
           {currentPeriodEnd && !isDemo && (
             <span className="text-xs text-slate-500 mt-1">
-              {cancelAtPeriodEnd ? "Ends on " : "Renews on "}{new Date(currentPeriodEnd).toLocaleDateString()}
+              {cancelAtPeriodEnd ? "Ends on " : "Renewal date: "}{new Date(currentPeriodEnd).toLocaleDateString()}
             </span>
           )}
         </div>
