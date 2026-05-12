@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PwaRegistrar } from "@/components/PwaRegistrar";
 import { UserProvider } from "./user-provider";
 import { getCurrentUser } from "./user-data";
 import Link from "next/link";
@@ -25,18 +26,25 @@ export const metadata: Metadata = {
     capable: true,
     title: "CareRelay",
     statusBarStyle: "default",
+    startupImage: "/brand/ads/carerelay-social-square.png",
   },
   formatDetection: {
     telephone: false,
   },
   icons: {
-    apple: "/brand/ads/carerelay-social-square.png",
-    icon: "/brand/ads/carerelay-social-square.png",
+    apple: [{ url: "/brand/ads/carerelay-social-square.png", sizes: "1254x1254", type: "image/png" }],
+    icon: [
+      { url: "/brand/ads/carerelay-social-square.png", sizes: "1254x1254", type: "image/png" },
+      { url: "/brand/logos/carerelay-logo-system.png", sizes: "1448x1086", type: "image/png" },
+    ],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#38645f",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0D6B63",
   colorScheme: "light",
 };
 
@@ -57,6 +65,7 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+        <PwaRegistrar />
         <UserProvider userPromise={userPromise}>
           <SiteHeader user={user} />
           <div className="flex-1">{children}</div>
