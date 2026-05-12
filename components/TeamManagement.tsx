@@ -159,8 +159,9 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 required
-                className="mt-2 w-full rounded-2xl border bg-white/80 px-4 py-3"
+                className="mt-2 min-h-12 w-full rounded-2xl border bg-white/80 px-4 py-3"
                 style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                autoComplete="name"
               />
             </label>
             <label className="block text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
@@ -168,9 +169,11 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
               <input
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                className="mt-2 w-full rounded-2xl border bg-white/80 px-4 py-3"
+                className="mt-2 min-h-12 w-full rounded-2xl border bg-white/80 px-4 py-3"
                 style={{ borderColor: "var(--border)", color: "var(--text)" }}
                 placeholder="(555) 123-4567"
+                inputMode="tel"
+                autoComplete="tel"
               />
             </label>
             <label className="block text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
@@ -178,9 +181,11 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
               <input
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="mt-2 w-full rounded-2xl border bg-white/80 px-4 py-3"
+                className="mt-2 min-h-12 w-full rounded-2xl border bg-white/80 px-4 py-3"
                 style={{ borderColor: "var(--border)", color: "var(--text)" }}
                 type="email"
+                inputMode="email"
+                autoComplete="email"
               />
             </label>
             {actorRole === "owner" && (
@@ -189,7 +194,7 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
                 <select
                   value={role}
                   onChange={(event) => setRole(event.target.value as "admin" | "member")}
-                  className="mt-2 w-full rounded-2xl border bg-white/80 px-4 py-3"
+                  className="mt-2 min-h-12 w-full rounded-2xl border bg-white/80 px-4 py-3"
                   style={{ borderColor: "var(--border)", color: "var(--text)" }}
                 >
                   <option value="member">Member</option>
@@ -234,13 +239,13 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
                 </div>
 
                 {member.status !== "removed" && (
-                  <div className="flex flex-wrap gap-2 md:justify-end">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap md:justify-end">
                     {canChangeRoles && member.role !== "owner" && (
                       <select
                         value={member.role}
                         onChange={(event) => changeRole(member, event.target.value as "admin" | "member")}
                         disabled={status === "saving"}
-                        className="rounded-xl border bg-white px-3 py-2 text-sm"
+                        className="min-h-11 rounded-xl border bg-white px-3 py-2 text-sm"
                         style={{ borderColor: "var(--border)", color: "var(--text)" }}
                       >
                         <option value="member">Member</option>
@@ -248,12 +253,12 @@ export function TeamManagement({ careCircleId, actorRole, members, maxFamilyMemb
                       </select>
                     )}
                     {actorRole === "owner" && member.role !== "owner" && member.userId && (
-                      <button type="button" onClick={() => void transferOwner(member)} disabled={status === "saving"} className="btn btn-soft text-sm">
+                      <button type="button" onClick={() => void transferOwner(member)} disabled={status === "saving"} className="btn btn-soft w-full text-sm sm:w-auto">
                         Transfer owner
                       </button>
                     )}
                     {manageable && (
-                      <button type="button" onClick={() => void removeMember(member)} disabled={status === "saving"} className="btn btn-soft text-sm">
+                      <button type="button" onClick={() => void removeMember(member)} disabled={status === "saving"} className="btn btn-soft w-full text-sm sm:w-auto">
                         Remove
                       </button>
                     )}

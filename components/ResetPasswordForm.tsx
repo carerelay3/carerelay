@@ -123,6 +123,7 @@ export function ResetPasswordForm({ supabaseConfigured }: ResetPasswordFormProps
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             className="input-glass mt-2"
+            autoComplete="new-password"
             disabled={!ready || status === "saving" || status === "success"}
             required
             minLength={6}
@@ -136,6 +137,7 @@ export function ResetPasswordForm({ supabaseConfigured }: ResetPasswordFormProps
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             className="input-glass mt-2"
+            autoComplete="new-password"
             disabled={!ready || status === "saving" || status === "success"}
             required
             minLength={6}

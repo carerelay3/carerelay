@@ -11,7 +11,7 @@ export function TaskList({ tasks }: { tasks: DemoTask[] }) {
       ) : (
         <div className="space-y-3">
           {tasks.map(t => (
-            <div key={t.id} className="flex items-center gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm" style={{ borderColor: "var(--border)" }}>
+            <div key={t.id} className="flex flex-col gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm min-[390px]:flex-row min-[390px]:items-center" style={{ borderColor: "var(--border)" }}>
               <span className="flex h-5 w-5 items-center justify-center rounded-full border" style={{ borderColor: t.status === "done" ? "var(--success)" : "var(--border)" }}>
                 {t.status === "done" && <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--success)" }} />}
               </span>
@@ -19,7 +19,7 @@ export function TaskList({ tasks }: { tasks: DemoTask[] }) {
                 <div className={`font-semibold ${t.status === 'done' ? 'line-through opacity-50' : ''}`} style={{ color: "var(--text)" }}>{t.title}</div>
                 {t.assignedToName && <div className="text-xs" style={{ color: "var(--text-subtle)" }}>Assigned to: {t.assignedToName}</div>}
               </div>
-              <div className="badge-pill badge-purple">{t.status.replace('_', ' ')}</div>
+              <div className="badge-pill badge-purple self-start min-[390px]:self-auto">{t.status.replace('_', ' ')}</div>
             </div>
           ))}
         </div>

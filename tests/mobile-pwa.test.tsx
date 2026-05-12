@@ -26,7 +26,7 @@ describe("mobile and PWA foundation", () => {
     expect(metadata.applicationName).toBe("CareRelay");
     expect(metadata.manifest).toBe("/manifest.webmanifest");
     expect(metadata.appleWebApp).toMatchObject({ capable: true, title: "CareRelay" });
-    expect(viewport.themeColor).toBe("#38645f");
+    expect(viewport.themeColor).toBe("#0D6B63");
   });
 
   it("push notification disabled state is clear", () => {

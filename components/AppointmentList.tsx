@@ -11,8 +11,8 @@ export function AppointmentList({ appointments }: { appointments: DemoAppointmen
       ) : (
         <div className="space-y-3">
           {appointments.map(a => (
-            <div key={a.id} className="flex items-center justify-between rounded-2xl border bg-white/70 p-3 text-sm shadow-sm" style={{ borderColor: "var(--border)" }}>
-              <div>
+            <div key={a.id} className="rounded-2xl border bg-white/70 p-3 text-sm shadow-sm" style={{ borderColor: "var(--border)" }}>
+              <div className="min-w-0">
                 <div className="font-semibold" style={{ color: "var(--text)" }}>{a.title}</div>
                 {a.at && <div className="text-xs" style={{ color: "var(--text-subtle)" }}>{new Date(a.at).toLocaleString()}</div>}
               </div>

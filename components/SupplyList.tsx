@@ -11,12 +11,12 @@ export function SupplyList({ supplies }: { supplies: DemoSupply[] }) {
       ) : (
         <div className="space-y-3">
           {supplies.map(s => (
-            <div key={s.id} className="flex items-center gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm" style={{ borderColor: "var(--border)" }}>
+            <div key={s.id} className="flex flex-col gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm min-[390px]:flex-row min-[390px]:items-center" style={{ borderColor: "var(--border)" }}>
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.status === "needed" ? "var(--warning)" : "var(--success)" }} />
               <div className={`flex-1 font-semibold ${s.status !== 'needed' ? 'line-through opacity-50' : ''}`} style={{ color: "var(--text)" }}>
                 {s.item}
               </div>
-              <span className="badge-pill badge-warm">{s.status}</span>
+              <span className="badge-pill badge-warm self-start min-[390px]:self-auto">{s.status}</span>
             </div>
           ))}
         </div>

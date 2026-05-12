@@ -31,13 +31,13 @@ export function DemoMessageTester({ onSend }: { onSend?: (msg: string, category:
             placeholder="E.g., I just took my afternoon meds."
           />
         </div>
-        <div className="flex flex-wrap gap-4 items-center">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="min-w-0 flex-1">
             <label className="mb-1 block text-xs font-bold uppercase tracking-wide" style={{ color: "var(--text-subtle)" }}>Category</label>
             <select 
               value={category} 
               onChange={e => setCategory(e.target.value as CareCategory)}
-              className="input-glass min-w-44"
+              className="input-glass w-full sm:min-w-44"
             >
               <option value="general_update">General Update</option>
               <option value="medication">Medication</option>
@@ -47,7 +47,7 @@ export function DemoMessageTester({ onSend }: { onSend?: (msg: string, category:
               <option value="concern">Concern</option>
             </select>
           </div>
-          <div className="flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-2 sm:mt-4">
             <input 
               type="checkbox" 
               id="concernFlag" 

@@ -56,6 +56,8 @@ export function ForgotPasswordForm({ supabaseConfigured, resetRedirectUrl }: For
           onChange={(event) => setEmail(event.target.value)}
           placeholder="name@example.com"
           className="input-glass mt-2"
+          autoComplete="email"
+          inputMode="email"
           required
         />
       </label>

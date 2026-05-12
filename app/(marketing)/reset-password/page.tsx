@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default function ResetPasswordPage() {
   return (
-    <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-20">
+    <main className="mx-auto flex min-h-[85vh] w-full max-w-md flex-col items-center justify-center px-4 py-12 sm:py-20">
       <div className="mb-10 flex flex-col items-center justify-center space-y-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--teal)] shadow-lg">
           <span className="text-xl font-bold text-white">C</span>
@@ -17,7 +17,7 @@ export default function ResetPasswordPage() {
         </p>
       </div>
 
-      <div className="w-full glass-elevated p-8 sm:p-10">
+      <div className="w-full glass-elevated p-6 sm:p-10">
         <ResetPasswordForm supabaseConfigured={appConfig.supabaseConfigured} />
       </div>
 

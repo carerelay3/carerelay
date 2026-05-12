@@ -103,18 +103,18 @@ export function BillingSettings({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button 
             type="button" 
             onClick={onManageBilling} 
             disabled={busy}
             aria-busy={busy}
-            className="btn btn-soft text-sm px-4 py-2"
+            className="btn btn-soft w-full text-sm px-4 py-2 sm:w-auto"
           >
             {busy ? "Please wait..." : "Manage Billing & Invoices"}
           </button>
           
-          <a href="/pricing" className="btn btn-sage text-sm px-4 py-2 shadow-sm">
+          <a href="/pricing" className="btn btn-sage w-full text-sm px-4 py-2 shadow-sm sm:w-auto">
             Upgrade Plan
           </a>
         </div>

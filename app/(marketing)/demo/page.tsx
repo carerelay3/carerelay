@@ -145,14 +145,14 @@ export default function DemoPage() {
               <button type="button" onClick={() => void submit()} disabled={processing || !message.trim()} className="btn btn-sage flex-1">
                 {processing ? "Organizing..." : "Send demo text"}
               </button>
-              <button type="button" onClick={() => window.location.reload()} className="btn btn-soft">
+              <button type="button" onClick={() => window.location.reload()} className="btn btn-soft flex-1">
                 Reset
               </button>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
               {examples.map((example) => (
-                <button key={example.body} type="button" onClick={() => void submit(example.body, example.sender)} className="rounded-2xl border bg-white/60 p-3 text-left text-sm transition hover:-translate-y-0.5 hover:bg-white" style={{ borderColor: "var(--border)" }}>
+                <button key={example.body} type="button" onClick={() => void submit(example.body, example.sender)} className="min-h-20 rounded-2xl border bg-white/60 p-3 text-left text-sm transition hover:-translate-y-0.5 hover:bg-white" style={{ borderColor: "var(--border)" }}>
                   <span className="block text-xs font-bold uppercase tracking-wide" style={{ color: "var(--teal)" }}>{example.label}</span>
                   <span className="mt-1 line-clamp-2 block" style={{ color: "var(--text-muted)" }}>{example.body}</span>
                 </button>
