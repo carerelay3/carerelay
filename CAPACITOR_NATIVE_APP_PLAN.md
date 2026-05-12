@@ -1,200 +1,192 @@
 # CareRelay Capacitor Native App Plan
 
-CareRelay should use Capacitor as a native wrapper around the hosted web app first, not as a fully bundled offline native app yet.
+Date reviewed: 2026-05-12
 
-## Readiness Assessment
+CareRelay should treat Capacitor as a hosted native wrapper around the deployed web app first. It should not be converted into a static bundled native app yet, and the generated `ios/` and `android/` projects should not be committed until the team explicitly chooses that release workflow.
 
-CareRelay is close to being ready for a safe Capacitor wrapper, but it is not ready to generate and commit native projects as part of normal web development yet.
+## 1. Readiness Assessment
 
-Recommended status: **plan and prototype only**.
+Status: ready for a planning/prototype branch, not ready for store submission.
+
+CareRelay is not ready for a full native build-and-submit cycle today. It is close enough to prototype a safe hosted Capacitor shell after the required checks below are handled.
 
 Why:
 
-- The app is a Next.js 16 App Router SaaS app with dynamic routes, server-rendered pages, and API routes.
-- Auth depends on Supabase sessions plus a server-set `sb-access-token` cookie from `/api/auth/session`.
-- Product-critical flows use Vercel-hosted API routes for setup, dashboard records, team management, summaries, billing, Stripe checkout/portal, SMS parsing, and exports.
-- The current PWA foundation is a good mobile web bridge, but it does not replace native push, deep links, app store privacy declarations, or native build signing.
-- Static Capacitor bundling would not be safe today because CareRelay is not a static export and should keep live server behavior on Vercel.
+- `package.json` is a Next.js 16 / React 19 SaaS app with `next build`, `next start`, route handlers, Supabase, Stripe, Twilio, and OpenAI integrations.
+- `next.config.ts` does not use `output: "export"` and defines app-wide headers/CSP for a server-hosted deployment.
+- The app has many dynamic `app/api/**/route.ts` endpoints for auth, setup, dashboard mutations, summaries, handoffs, team management, Stripe, SMS, and exports.
+- Auth is not a purely local browser-only flow. It uses Supabase client auth plus `/api/auth/session` to set an HTTP-only `sb-access-token` cookie for server-rendered pages and route handlers.
+- PWA support exists in `app/manifest.ts`, `app/layout.tsx`, `public/sw.js`, `MOBILE_APP_PLAN.md`, and `MOBILE_AND_NOTIFICATIONS_PLAN.md`, but it is intentionally web-only and does not implement native push or background behavior.
+- Vercel deployment assumptions remain central: server routes, secure environment variables, Stripe webhooks, Twilio inbound webhooks, and `NEXT_PUBLIC_APP_URL`.
 
-The safest first native architecture is a Capacitor shell that loads the production web app URL, with strict allowlists and no fake native features.
+Recommendation: use a hosted Capacitor wrapper that loads `https://carerelay.xyz`. Do not attempt a static Capacitor bundle until CareRelay has a separate static/mobile client architecture.
 
-## App Identity
+## 2. Required Changes Before Wrapping
+
+Required before creating native projects:
+
+- Confirm production `NEXT_PUBLIC_APP_URL=https://carerelay.xyz` in Vercel.
+- Confirm Supabase Auth redirect allowlist includes `https://carerelay.xyz/reset-password` and local development URLs from `docs/supabase-auth-redirects.md`.
+- Decide whether the first native wrapper uses only HTTPS universal links/app links or also registers a fallback custom scheme.
+- Add production native icon and splash assets sized for iOS and Android. Current PWA icons reuse brand assets and are not sufficient for store submission.
+- Verify mobile safe areas for dashboard, setup, settings, account, team, reset password, Stripe redirects, and error states inside iOS and Android WebViews.
+- Review CSP and Capacitor navigation allowlists so the hosted WebView can reach CareRelay, Supabase, and Stripe without widening web security unnecessarily.
+- Keep all secrets server-side. Never package `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `TWILIO_AUTH_TOKEN`, or `OPENAI_API_KEY` into native code.
+- Create store-ready privacy policy, terms, support, account deletion, and data safety disclosures before submission.
+- Verify billing policy. Stripe can remain web-based for SaaS account management, but app review may scrutinize digital feature purchases inside the app.
+- Preserve CareRelay positioning: family coordination only, not medical advice or emergency response.
+
+## 3. App Identity
 
 - App name: `CareRelay`
 - iOS Bundle ID: `com.carerelay.app`
 - Android package: `com.carerelay.app`
 
-## Required Changes Before Wrapping
+## 4. Wrapper Architecture
 
-1. Decide the wrapper mode.
+Use hosted mode first:
 
-   Use hosted mode first:
+- Native shell: Capacitor.
+- Web app origin: `https://carerelay.xyz`.
+- Backend: existing Next.js deployment on Vercel.
+- Auth, API routes, Stripe Checkout/Billing Portal, Twilio webhooks, Supabase SSR, and summaries remain server-backed.
 
-   - Capacitor shell loads `https://carerelay.xyz`.
-   - Next.js stays deployed on Vercel.
-   - API routes, auth callbacks, Stripe redirects, Twilio webhooks, and Supabase SSR behavior remain server-backed.
+Do not add fake native features. If push, contacts, background sync, native SMS, health data, or secure storage are not implemented and tested, the app should not claim them.
 
-   Avoid static bundled mode until the app has a separate static/mobile client architecture.
+## 5. Deep Link Strategy
 
-2. Add Capacitor dependencies only when ready to prototype.
+Primary strategy: HTTPS universal links on iOS and Android App Links on Android.
 
-   Do not add `ios/` or `android/` directories to the repo until the team explicitly wants native project files tracked.
+Primary domain:
 
-3. Create production app icons and splash assets.
+```text
+https://carerelay.xyz
+```
 
-   Current PWA icon references reuse existing brand assets. Native stores need purpose-built icons and launch screens with correct safe areas, no tiny text, and no misleading medical or emergency implication.
+Initial link routes:
 
-4. Confirm auth redirect URLs.
+- `/`
+- `/sign-in`
+- `/sign-up`
+- `/forgot-password`
+- `/reset-password`
+- `/setup`
+- `/dashboard`
+- `/team`
+- `/settings`
+- `/account`
 
-   Supabase Auth should allow:
-
-   - `https://carerelay.xyz/reset-password`
-   - `https://carerelay.xyz/dashboard`
-   - A future custom scheme or universal/app link callback if native deep links are added.
-
-5. Confirm Stripe redirect behavior.
-
-   Stripe Checkout and Billing Portal should return to HTTPS web URLs first. If native deep links are introduced later, keep HTTPS universal/app links as the primary strategy so the same links work in browser and installed apps.
-
-6. Define environment boundaries.
-
-   Keep secrets on Vercel/server routes. Do not put Supabase service role keys, Stripe secret keys, Twilio auth tokens, or OpenAI API keys into the native app.
-
-7. Review Content Security Policy and native WebView needs.
-
-   Current CSP allows Supabase, Stripe, OpenAI API calls, and Stripe frames. A hosted Capacitor shell may need native allowlist configuration, but the web CSP should remain strict.
-
-8. Validate mobile safe areas.
-
-   The PWA/mobile pass improved phone layouts, but native wrappers need testing for iOS safe areas, Android navigation bars, external keyboard behavior, and WebView viewport differences.
-
-## Deep Link Strategy
-
-Use HTTPS universal links and Android App Links as the long-term default:
-
-- Primary domain: `https://carerelay.xyz`
-- Scope routes:
-  - `/dashboard`
-  - `/setup`
-  - `/reset-password`
-  - `/team`
-  - `/settings`
-  - `/account`
-
-Recommended behavior:
-
-- Public links open in the browser when the app is not installed.
-- Installed app links open the Capacitor shell and route to the same Next.js path.
-- Auth recovery links should continue to work in Safari/Chrome even if the app is absent.
-
-Avoid relying only on a custom URL scheme. A scheme such as `carerelay://` can be useful as a fallback, but HTTPS links are easier to reason about across Supabase, Stripe, email clients, and support workflows.
-
-Native deep link setup later:
+Native setup later:
 
 - iOS: Associated Domains entitlement for `applinks:carerelay.xyz`.
 - Android: Digital Asset Links for `carerelay.xyz`.
-- Capacitor: add an App URL Open listener only after a real native shell exists.
+- Capacitor: add an App URL Open listener only after the native shell exists.
 
-## Auth And Session Handling Strategy
+Optional fallback:
 
-Current web auth:
+- Custom scheme such as `carerelay://` may be added later, but should not replace HTTPS links because Supabase, Stripe, email clients, support workflows, and browsers all work more predictably with HTTPS.
 
-- Browser Supabase client signs in with email/password.
-- The app posts the Supabase access token to `/api/auth/session`.
-- The server verifies the token and sets an HTTP-only `sb-access-token` cookie.
-- Server components and API routes use cookies or bearer tokens to resolve the current user.
-- Some client mutations use `authFetch`, which adds a bearer token from the Supabase browser session.
+## 6. Auth And Session Handling Strategy
+
+Current auth flow:
+
+- `components/AuthForm.tsx` signs in or signs up through the Supabase browser client.
+- After a Supabase session is returned, the app posts the access token to `/api/auth/session`.
+- `app/api/auth/session/route.ts` verifies the token with Supabase and sets an HTTP-only `sb-access-token` cookie.
+- Server components and API routes resolve the user through `lib/supabase/auth.ts`.
+- `lib/supabase/clientAuthFetch.ts` adds bearer tokens to client-side mutation requests where needed.
+- `components/ResetPasswordForm.tsx` exchanges recovery codes and then posts the new access token to `/api/auth/session`.
+- `components/SignOutButton.tsx` signs out of Supabase and deletes the server cookie.
 
 Capacitor strategy:
 
-1. Hosted WebView should keep the current cookie-based web session model.
-2. Use HTTPS production URLs so secure cookies work normally.
-3. Keep Supabase browser session storage available inside the WebView.
-4. Do not store service secrets in native storage.
-5. If app restarts reveal session persistence issues, evaluate Capacitor Preferences or Secure Storage only for non-secret session hints, not service role credentials.
-6. Keep `/api/auth/session` as the bridge between browser Supabase auth and server-rendered Next routes.
-7. For reset password, prefer HTTPS `/reset-password` links and `exchangeCodeForSession` as currently implemented.
+- Keep the hosted HTTPS web session model for the prototype.
+- Use secure HTTPS URLs so production cookies work normally in the WebView.
+- Test iOS and Android WebView cookie persistence across app restarts.
+- Test reset-password links opened from Mail, Gmail, Safari, Chrome, and the installed app.
+- Test sign out clears both the Supabase browser session and `sb-access-token`.
+- Do not move service credentials into native storage.
+- Consider Capacitor Preferences or secure storage only if a real native requirement appears, and only for non-service-role session support after threat modeling.
 
-Risk to test early:
+## 7. Push Notification Future Strategy
 
-- iOS WebView cookie persistence.
-- Android WebView cookie persistence.
-- Supabase recovery link opened from Mail/Gmail into Safari/Chrome versus installed app.
-- Sign out clearing both Supabase client session and server cookie.
+Do not add push notifications in the initial wrapper.
 
-## Push Notification Future Strategy
+Future push requirements:
 
-Do not add push notifications during the wrapper prototype.
+- Use a real native push implementation such as `@capacitor/push-notifications`.
+- Request permission only after sign-in and clear user intent.
+- Register APNs/FCM device tokens to an authenticated user and care circle.
+- Store notification preferences per user and care circle.
+- Send notifications only from trusted server-side code.
+- Avoid sensitive care details in notification previews unless policy, settings, and review guidance explicitly support it.
+- Include unsubscribe, device token cleanup, quiet hours, and audit logging.
+- Do not show fake permission success states or fake delivery states.
 
-Future push should be a real product feature:
+## 8. App Store Review Risks
 
-- Ask permission only after the user is signed in.
-- Register device tokens against a user and care circle.
-- Support per-care-circle notification preferences.
-- Send through APNs and FCM from trusted server routes only.
-- Never send PHI-like sensitive message content in notification previews unless policy and user settings explicitly support it.
-- Include quiet hours and account-level opt out.
-- Add audit logging for notification delivery attempts.
+Apple review risks:
 
-Potential future packages:
-
-- `@capacitor/push-notifications`
-- Server-side APNs/FCM provider integration
-
-No fake push notifications should be added.
-
-## App Store Review Risks
-
-CareRelay touches caregiving coordination, so review risk is higher than a generic productivity app.
-
-Risks:
-
-- Appearing to provide medical advice, diagnosis, monitoring, emergency response, or medication instructions.
-- Misleading users into thinking CareRelay replaces professional care or emergency services.
-- User-generated care updates may contain sensitive health information.
-- SMS-based coordination can involve invited family members and phone numbers.
-- Stripe billing must match store policy if native digital features are sold in-app.
-- Push notifications, if added later, may need careful wording and permission timing.
+- Caregiving content may be interpreted as medical or health guidance.
+- Medication confirmations, concern flags, summaries, and SMS updates may look like monitoring or care management.
+- Any wording suggesting emergency response, guaranteed safety, diagnosis, treatment, dosage guidance, or medical advice is high risk.
+- User-generated care updates may include sensitive health information.
+- Web-based Stripe billing inside a native app may trigger review questions depending on what is sold and how it is presented.
+- Missing account deletion, privacy, support, or data-use disclosures can block review.
 
 Mitigations:
 
-- Preserve current medical disclaimers.
-- Keep “not for emergencies” visible in onboarding, dashboard, support, and store copy.
-- Avoid medical claims in screenshots, app descriptions, keywords, and onboarding.
-- Provide privacy policy and terms links in app and store metadata.
-- Be clear that updates are family-reported coordination notes.
-- Avoid native in-app purchase scope until billing policy is reviewed.
+- Keep disclaimers visible in app and store copy.
+- State that CareRelay is for family coordination only.
+- Do not claim medical advice, emergency response, monitoring, diagnosis, treatment, dosage guidance, or guaranteed safety.
+- Use screenshots and listing copy that show coordination tasks without implying clinical authority.
+- Provide privacy policy, terms, support contact, and account deletion instructions.
 
-## Apple And Google Privacy Requirements
+## 9. Google Play Review Risks
 
-Prepare store privacy disclosures before submission.
+Google Play risks:
 
-Likely data categories:
+- Health-adjacent claims may require careful Data Safety and content declarations.
+- SMS-related positioning may be scrutinized even though CareRelay uses server-side Twilio inbound SMS rather than reading device SMS.
+- Sensitive user-generated care content requires accurate data collection, sharing, and deletion disclosures.
+- Background behavior and push claims must match actual implementation.
+- Billing/subscription descriptions must match how Stripe subscriptions work.
 
-- Account identifiers: email, user ID, name.
-- Contact info: phone numbers, invited family member details.
-- User content: care updates, tasks, supplies, appointments, medication confirmations, concerns, summaries.
-- Purchase data: Stripe subscription/customer status.
-- Diagnostics: logs and error data if enabled.
-- Usage data or analytics if enabled.
+Mitigations:
 
-Required documents and settings:
+- Be explicit that the app does not access device SMS inboxes.
+- Describe Twilio/server SMS routing accurately.
+- Complete Play Data Safety based on actual data collection and sharing.
+- Avoid health outcome claims and emergency claims.
+- Keep test accounts and reviewer instructions ready.
+
+## 10. Apple And Google Privacy Requirements
+
+Likely data categories to disclose:
+
+- Account data: name, email, user ID.
+- Contact data: phone numbers and invited family member details.
+- User content: care updates, tasks, supplies, appointments, medication confirmations, concerns, summaries, handoffs, and exports.
+- Purchase data: Stripe customer and subscription state.
+- Communications: SMS content routed through CareRelay's Twilio number.
+- Diagnostics: logs, errors, and operational telemetry if enabled.
+- Usage data or analytics only if `NEXT_PUBLIC_ANALYTICS_ENABLED=true` or another analytics tool is added.
+
+Required before submission:
 
 - Public privacy policy URL.
 - Public terms URL.
-- Data deletion/access support path.
-- Clear support contact.
+- Support contact.
+- Account deletion path and data deletion support process.
 - Apple App Privacy nutrition labels.
 - Google Play Data Safety form.
 - Age rating questionnaire.
-- Encryption/export compliance review for HTTPS/auth usage.
-- Account deletion guidance if accounts can be created in app.
+- Encryption/export compliance answers for HTTPS/auth usage.
+- Legal review before any HIPAA-related statement. Do not claim HIPAA compliance unless the legal, operational, vendor, and BAA requirements are actually in place.
 
-Important: do not claim HIPAA compliance unless the legal, operational, and vendor requirements are actually in place.
+## 11. Exact Setup Commands
 
-## Exact Setup Commands
-
-Run these only when the team is ready to create a native prototype:
+Run these only in a prototype branch when the team is ready to create native project files:
 
 ```bash
 npm install @capacitor/core @capacitor/cli
@@ -207,7 +199,21 @@ npx cap open ios
 npx cap open android
 ```
 
-Hosted web wrapper configuration should set Capacitor to load the production CareRelay URL rather than assuming a static export. Do not commit generated `ios/` or `android/` directories until the repository policy is decided.
+After `npx cap init`, configure hosted mode before syncing. The exact generated `capacitor.config.*` format depends on the installed Capacitor version, but the intended settings are:
+
+```ts
+const config = {
+  appId: "com.carerelay.app",
+  appName: "CareRelay",
+  webDir: "out-or-unused-for-hosted-mode",
+  server: {
+    url: "https://carerelay.xyz",
+    cleartext: false,
+  },
+};
+```
+
+Do not point the native app at localhost for release builds. Do not rely on `webDir` as a real bundled app until CareRelay supports static export or a separate static mobile client.
 
 ## Platform Requirements
 
@@ -216,8 +222,8 @@ iOS requires:
 - macOS.
 - Xcode.
 - Apple Developer account.
-- Signing certificates and provisioning profiles.
 - App Store Connect access.
+- Signing certificates and provisioning profiles.
 
 Android requires:
 
@@ -226,17 +232,27 @@ Android requires:
 - Google Play Console account.
 - Release keystore and signing process.
 
-## Recommended Prototype Checklist
+## Verification Checklist For First Prototype
 
-1. Add Capacitor dependencies in a branch.
-2. Initialize Capacitor with `CareRelay` and `com.carerelay.app`.
-3. Configure hosted URL mode for the deployed Vercel app.
-4. Verify sign in, sign out, setup, dashboard, team, settings, account, reset password, Stripe checkout, and support routes.
-5. Verify no native push prompts appear.
-6. Verify offline fallback remains web-only and does not imply live data availability.
-7. Test iOS Safari, iOS WebView, Android Chrome, and Android WebView.
-8. Decide whether native projects are committed or generated in CI/manual release process.
+- `npm run typecheck`
+- `npm run lint`
+- `npm test`
+- `npm run build`
+- `npm audit --omit=dev`
+- Sign in.
+- Sign out.
+- Sign up with email confirmation behavior.
+- Forgot password and reset password.
+- Setup flow.
+- Dashboard load and mutation actions.
+- Team management.
+- Settings and account pages.
+- Stripe Checkout and Billing Portal redirects.
+- Twilio inbound webhook remains server-only and unaffected by native wrapper.
+- Offline fallback remains limited to the PWA `/offline` route and does not imply live offline data.
+- iOS WebView restart preserves or correctly refreshes session.
+- Android WebView restart preserves or correctly refreshes session.
 
 ## Current Recommendation
 
-CareRelay is ready for a **Capacitor planning/prototype branch** after the team confirms hosted-wrapper mode. It is not ready for a committed native app project or store submission until deep links, app icons, privacy disclosures, auth persistence, billing policy, and app review copy are validated.
+Proceed with a Capacitor prototype branch only after confirming hosted-wrapper mode. CareRelay should not be submitted to App Store or Google Play until deep links, auth persistence, native assets, privacy disclosures, billing policy, review copy, and WebView regression testing are complete.
