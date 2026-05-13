@@ -3,6 +3,7 @@ import { getStripeClient } from "@/lib/stripe/client";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import Stripe from "stripe";
 import { AccountPlanId, STRIPE_PRICE_IDS } from "@/lib/stripe/plans";
+import { markStripeWebhookEvent, reserveStripeWebhookEvent } from "@/lib/stripe/webhookIdempotency";
 
 function planIdFromPriceId(priceId: string | undefined | null): AccountPlanId {
   if (priceId === STRIPE_PRICE_IDS.starter) return "starter";
@@ -57,7 +58,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 500 });
   }
 
+  const reservation = await reserveStripeWebhookEvent(event.id, event.type);
+  if (reservation.duplicate) {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+  if (!reservation.reserved) {
+    return NextResponse.json({ error: "Webhook idempotency check failed" }, { status: 500 });
+  }
+
   try {
+    let handled = true;
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -152,9 +162,16 @@ export async function POST(req: Request) {
           .eq("stripe_subscription_id", subscription.id);
         break;
       }
+      default:
+        handled = false;
+        break;
     }
+
+    await markStripeWebhookEvent(event.id, handled ? "processed" : "ignored");
   } catch (err) {
     console.error("Webhook handler failed", err);
+    const message = err instanceof Error ? err.message : "Unknown webhook handler error";
+    await markStripeWebhookEvent(event.id, "failed", message);
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
 

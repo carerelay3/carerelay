@@ -1,6 +1,6 @@
-# CareRelay
+# CircleRelay
 
-CareRelay is an SMS-based caregiver command center for families. One shared CareRelay number receives family text updates, routes each message by the sender phone number, and organizes the result into a shared dashboard.
+CircleRelay is a shared-number coordination platform for groups and circles. One shared CircleRelay line receives text updates, routes each message by the sender phone number, and organizes the result into a shared dashboard. The original caregiving product now lives as CircleRelay Care Mode.
 
 ## What It Does
 
@@ -14,7 +14,7 @@ CareRelay is an SMS-based caregiver command center for families. One shared Care
 
 ## What It Is Not
 
-CareRelay is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
+CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
 
 ## Tech Stack
 
@@ -43,6 +43,7 @@ See `.env.example` for the complete list:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `APP_BASE_URL`
 - `TWILIO_ACCOUNT_SID`
 - `TWILIO_AUTH_TOKEN`
 - `TWILIO_PHONE_NUMBER`
@@ -63,7 +64,7 @@ Missing Supabase, Twilio, OpenAI, Stripe, or analytics keys do not block local u
 
 ## Shared-Number Routing
 
-CareRelay MVP uses one shared Twilio number. Each sender phone number is normalized to E.164 and matched against `family_members.phone_normalized`. If a sender belongs to one care circle, CareRelay routes automatically. If a sender belongs to more than one care circle, the message must start with that care circle keyword, such as `GRANDMA Meds: took night pills at 8pm`.
+CircleRelay MVP uses one shared Twilio number. Each sender phone number is normalized to E.164 and matched against `family_members.phone_normalized`. If a sender belongs to one care circle, CircleRelay routes automatically. If a sender belongs to more than one care circle, the message must start with that care circle keyword, such as `GRANDMA Meds: took night pills at 8pm`.
 
 ## Commands
 
@@ -76,6 +77,6 @@ npm run build
 
 ## Production Notes
 
-Run Supabase migrations before enabling live mode. Configure the Twilio webhook to `POST /api/sms/inbound`. Configure Stripe webhook delivery to `POST /api/stripe/webhook` if billing is enabled. Set `NEXT_PUBLIC_APP_URL` to the production URL before deploy.
+Run Supabase migrations before enabling live mode. Configure the Twilio webhook to `POST /api/sms/inbound`. Set `APP_BASE_URL` to the public HTTPS app origin, such as `https://carerelay.xyz`, because Twilio signature validation uses it to reconstruct the exact webhook URL server-side. `NEXT_PUBLIC_APP_URL` remains available for browser-facing links and local non-production fallback only. Configure Stripe webhook delivery to `POST /api/stripe/webhook` if billing is enabled.
 
 Human legal review is required before public launch.

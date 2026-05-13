@@ -52,6 +52,33 @@ describe("platform admin tools", () => {
           return countOrRowsBuilder([{ id: "circle-1", name: "Mom's Care Circle", owner_id: "user-1" }], 1);
         }
         if (table === "family_members") return countOrRowsBuilder([], 0);
+        if (table === "sms_events") {
+          return countOrRowsBuilder([
+            {
+              id: "sms-event-1",
+              created_at: "2026-05-13T12:00:00.000Z",
+              from_phone: "+15551234567",
+              to_phone: "+15557654321",
+              routing_status: "matched_single_circle",
+              parse_category: "task",
+              persistence_status: "success",
+              error_code: null,
+            },
+          ], 1);
+        }
+        if (table === "privacy_requests") {
+          return countOrRowsBuilder([
+            {
+              id: "privacy-1",
+              user_id: "user-1",
+              request_type: "delete_my_account",
+              details: "Please review my account deletion request.",
+              status: "open",
+              created_at: "2026-05-13T12:30:00.000Z",
+              handled_at: null,
+            },
+          ], 1);
+        }
         return countOrRowsBuilder([{ plan_id: "family", status: "active" }], 1);
       }),
     };
@@ -67,9 +94,13 @@ describe("platform admin tools", () => {
     const { default: AdminPage } = await import("@/app/admin/page");
     const html = renderToStaticMarkup(await AdminPage());
 
-    expect(html).toContain("CareRelay operations");
+    expect(html).toContain("CircleRelay operations");
     expect(html).toContain("Total users");
     expect(html).toContain("Recent care circles");
+    expect(html).toContain("SMS Operations");
+    expect(html).toContain("matched_single_circle");
+    expect(html).toContain("Privacy Requests");
+    expect(html).toContain("delete_my_account");
   });
 
   it("platform role helper works", async () => {

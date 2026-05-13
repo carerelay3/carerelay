@@ -1,3 +1,5 @@
+import type { CircleType } from "@/lib/circles/circleTypes";
+
 export type CareCategory =
   | "medication"
   | "appointment"
@@ -5,7 +7,6 @@ export type CareCategory =
   | "supply"
   | "general_update"
   | "concern";
-
 export type SmsCommand =
   | "complete_task"
   | "update_supply"
@@ -130,6 +131,7 @@ export type DemoPreferences = {
 export type DemoSnapshot = {
   careCircleId?: string;
   careCircleName?: string;
+  circleType?: CircleType;
   recipientName?: string;
   sharedPhone?: string;
   profile?: {

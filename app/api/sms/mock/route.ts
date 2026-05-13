@@ -67,9 +67,9 @@ export async function POST(req: Request) {
       });
     }
 
-    let displayMessage = "CareRelay logged your update.";
+    let displayMessage = "CircleRelay logged your update.";
     if (parsedMessage.concernFlag) {
-      displayMessage = "CareRelay logged this as a concern for the family to review. If this is an emergency, call 911 or your local emergency number.";
+      displayMessage = "CircleRelay logged this as a concern for the family to review. If this is an emergency, call 911 or your local emergency number.";
     }
     if (routing.routingStatus === "matched_multiple_needs_keyword" || routing.routingStatus === "unknown_sender" || routing.routingStatus === "invalid_phone") {
       displayMessage = routing.safeReply || displayMessage;

@@ -71,7 +71,7 @@ export function FamilyPresencePanel({
         <h3 className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Invite message template</h3>
         <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>Copy and send this to family members.</p>
         <div className="mt-3 rounded-xl p-4 text-xs" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-          You have been invited to {members[0] ? `${members[0].name}'s Care Circle` : "a Care Circle"} on CareRelay. CareRelay helps the family organize caregiving updates by text. It is for coordination only, not emergencies or medical advice. Reply YES to join or STOP to opt out.
+          You have been invited to {members[0] ? `${members[0].name}'s Care Circle` : "a Care Circle"} on CircleRelay. CircleRelay Care Mode helps the family organize caregiving updates by text. It is for coordination only, not emergencies or medical advice. Reply YES to join or STOP to opt out.
         </div>
       </div>
 

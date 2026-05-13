@@ -17,6 +17,7 @@ import { CareCircleSwitcher } from "./CareCircleSwitcher";
 import { MultipleRecipientsNotice } from "./MultipleRecipientsNotice";
 import { WeeklySummaryBetaPanel } from "./WeeklySummaryBetaPanel";
 import { formatUsPhoneDisplay } from "@/lib/utils/phone";
+import { getCircleTypeLabel, isCareMode } from "@/lib/circles/circleTypes";
 
 export function DashboardClient({
   initialSnapshot,
@@ -32,6 +33,8 @@ export function DashboardClient({
   liveSmsReady?: boolean;
 }) {
   const [snapshot, setSnapshot] = useState<DemoSnapshot>(initialSnapshot);
+  const careMode = isCareMode(snapshot.circleType);
+  const circleTypeLabel = getCircleTypeLabel(snapshot.circleType);
   const sharedLineLabel = smsStatus || (snapshot.sharedPhone ? formatUsPhoneDisplay(snapshot.sharedPhone) : "Shared line setup needed");
   const sharedLinePrefix = initialMode === "demo" ? "Demo shared line" : snapshot.sharedPhone && !smsStatus ? "Shared line" : "SMS status";
 
@@ -73,10 +76,11 @@ export function DashboardClient({
         <div className="mx-auto flex max-w-7xl min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="order-2 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start lg:order-1">
             <div className="min-w-0">
-              <h1 className="max-w-full text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl" style={{ color: "var(--text)" }}>Family command center</h1>
+              <h1 className="max-w-full text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl" style={{ color: "var(--text)" }}>{careMode ? "Family command center" : "Circle command center"}</h1>
               <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
                 Selected care circle: <span style={{ color: "var(--text)" }}>{snapshot.careCircleName || "Care circle"}</span>
               </p>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--teal)" }}>{circleTypeLabel}</p>
             </div>
             <ModeBadge mode={initialMode} liveSmsReady={liveSmsReady} />
           </div>
@@ -91,7 +95,7 @@ export function DashboardClient({
       </header>
 
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:space-y-8 sm:px-6 sm:py-8">
-        {initialMode === "live" && <MultipleRecipientsNotice />}
+        {initialMode === "live" && careMode && <MultipleRecipientsNotice />}
         
         <DashboardOverviewCards snapshot={snapshot} />
 
@@ -102,7 +106,7 @@ export function DashboardClient({
             </section>
           )}
           <section className="lg:col-span-2">
-            <MessageFeed messages={snapshot.messages} mode={initialMode} />
+            <MessageFeed messages={snapshot.messages} mode={initialMode} circleType={snapshot.circleType} />
           </section>
           <section>
             <TaskList tasks={snapshot.tasks} />
@@ -114,22 +118,24 @@ export function DashboardClient({
             <AppointmentList appointments={snapshot.appointments} />
           </section>
           <section>
-            <MedicationLog messages={snapshot.messages} />
+            <MedicationLog messages={snapshot.messages} circleType={snapshot.circleType} />
           </section>
           <section>
-            <ConcernPanel concerns={snapshot.concerns} />
+            <ConcernPanel concerns={snapshot.concerns} circleType={snapshot.circleType} />
           </section>
           <section className="lg:col-span-2">
             <DailySummary snapshot={snapshot} />
           </section>
-          {initialMode === "live" && (
+          {initialMode === "live" && careMode && (
             <section className="lg:col-span-2">
               <WeeklySummaryBetaPanel careCircleId={snapshot.careCircleId} />
             </section>
           )}
-          <section className="lg:col-span-3">
-            <DisclaimerBanner />
-          </section>
+          {careMode && (
+            <section className="lg:col-span-3">
+              <DisclaimerBanner />
+            </section>
+          )}
         </div>
       </main>
     </div>

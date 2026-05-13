@@ -29,6 +29,7 @@ describe("GET /api/health", () => {
     expect(json.status).toBe("ok");
     expect(typeof json.supabaseConfigured).toBe("boolean");
     expect(typeof json.twilioConfigured).toBe("boolean");
+    expect(typeof json.twilioSignatureUrlConfigured).toBe("boolean");
     expect(typeof json.openaiConfigured).toBe("boolean");
     expect(typeof json.stripeConfigured).toBe("boolean");
     expect(json.currentMode).toMatch(/demo|live/);
@@ -295,7 +296,7 @@ describe("POST /api/handoffs/generate", () => {
     const json = await res.json();
     expect(json.handoffText).toBeTruthy();
     expect(json.handoffText).toContain("Daily Handoff");
-    expect(json.handoffText).toContain("CareRelay does not provide medical advice");
+    expect(json.handoffText).toContain("CircleRelay Care Mode does not provide medical advice");
     expect(json.snapshot).toBeDefined();
   });
 
@@ -346,7 +347,7 @@ describe("POST /api/export/timeline", () => {
     const json = await res.json();
     expect(json.format).toBe("json");
     expect(json.content).toContain("careCircleName");
-    expect(json.content).toContain("CareRelay is for family coordination only and does not provide medical advice.");
+    expect(json.content).toContain("CircleRelay Care Mode is for family coordination only and does not provide medical advice.");
   });
 
   it("exports CSV timeline", async () => {
@@ -360,7 +361,7 @@ describe("POST /api/export/timeline", () => {
     const json = await res.json();
     expect(json.format).toBe("csv");
     expect(json.content).toContain("Type,ID,Date,Actor,Details");
-    expect(json.content).toContain("CareRelay is for family coordination only and does not provide medical advice.");
+    expect(json.content).toContain("CircleRelay Care Mode is for family coordination only and does not provide medical advice.");
   });
 });
 

@@ -7,7 +7,7 @@ export function TaskList({ tasks }: { tasks: DemoTask[] }) {
       <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>Tasks</h2>
       
       {tasks.length === 0 ? (
-        <EmptyState title="No open tasks right now" text="Add tasks by texting the CareRelay number." />
+        <EmptyState title="No open tasks right now" text="Add tasks by texting the CircleRelay shared line." />
       ) : (
         <div className="space-y-3">
           {tasks.map(t => (

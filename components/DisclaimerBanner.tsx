@@ -14,7 +14,7 @@ export function DisclaimerBanner({ compact }: Props) {
         </div>
         <div className="min-w-0 flex-1 space-y-1.5">
           <p className={`font-bold tracking-tight ${compact ? 'text-sm' : 'text-base'}`} style={{ color: 'var(--warning)' }}>
-            CareRelay is for family coordination only.
+            CircleRelay Care Mode is for family coordination only.
           </p>
           <p className="max-w-full break-words text-sm font-medium leading-relaxed" style={{ color: 'var(--text-muted)' }}>
             It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services.

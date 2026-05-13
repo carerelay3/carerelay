@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       "Suggested family follow-up:",
       "- Confirm who is handling open tasks and review any flagged concerns together.",
       "",
-      "CareRelay does not provide medical advice. For emergencies, call 911 or your local emergency number.",
+      "CircleRelay Care Mode does not provide medical advice. For emergencies, call 911 or your local emergency number.",
     ];
 
     const handoffText = lines.join("\n");

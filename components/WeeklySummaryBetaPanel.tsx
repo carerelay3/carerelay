@@ -49,7 +49,7 @@ export function WeeklySummaryBetaPanel({ careCircleId }: { careCircleId?: string
             Generates factual, family-reported counts and notes only. PDF download is not available yet.
           </p>
           <p className="mt-2 text-xs" style={{ color: "var(--text-subtle)" }}>
-            CareRelay is for family coordination only and does not provide medical advice. If this is an emergency, call emergency services.
+            CircleRelay Care Mode is for family coordination only and does not provide medical advice. If this is an emergency, call emergency services.
           </p>
         </div>
         <button

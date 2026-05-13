@@ -62,7 +62,7 @@ export default function DemoPage() {
       setResult({
         category: data.category || "general_update",
         routingStatus: data.routingStatus || "demo",
-        displayMessage: data.displayMessage || "CareRelay logged your update.",
+        displayMessage: data.displayMessage || "CircleRelay logged your update.",
         recordType: data.dashboardUpdateData?.recordType,
       });
       if (data.snapshot) setSnapshot(data.snapshot);
@@ -80,7 +80,7 @@ export default function DemoPage() {
             Watch a family text turn into an organized dashboard item.
           </h1>
           <p className="text-lg">
-            Choose a sender, send a realistic update, and see how CareRelay routes, categorizes, and organizes it without requiring signup.
+            Choose a sender, send a realistic update, and see how CircleRelay routes, categorizes, and organizes it without requiring signup.
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {stats.map(([label, value]) => (
@@ -96,7 +96,7 @@ export default function DemoPage() {
           <div className="relative z-10 rounded-[2rem] bg-[#203a43] p-5 text-white">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-white/60">CareRelay shared line</p>
+                <p className="text-xs font-semibold text-white/60">CircleRelay shared line</p>
                 <p className="font-bold">{snapshot.sharedPhone}</p>
               </div>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">Demo</span>
@@ -194,7 +194,7 @@ export default function DemoPage() {
               ) : (
                 <div className="rounded-3xl border border-dashed p-8 text-center" style={{ borderColor: "var(--border)" }}>
                   <p className="font-semibold" style={{ color: "var(--text)" }}>Send a message to see the organized result.</p>
-                  <p className="mt-2 text-sm">CareRelay will show the category, route, and linked dashboard record.</p>
+                  <p className="mt-2 text-sm">CircleRelay will show the category, route, and linked dashboard record.</p>
                 </div>
               )}
             </div>

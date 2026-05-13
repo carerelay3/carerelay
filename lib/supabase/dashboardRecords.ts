@@ -10,6 +10,7 @@ import type {
   DemoSupply,
   DemoTask,
 } from "@/lib/types";
+import { normalizeCircleType } from "@/lib/circles/circleTypes";
 import { getCurrentSupabaseUser, requireCareCircleMembership } from "./auth";
 import { getSupabaseAdmin } from "./admin";
 
@@ -25,6 +26,7 @@ function emptyLiveSnapshot(message: string): DemoSnapshot {
   return {
     careCircleId: undefined,
     careCircleName: "No care circle yet",
+    circleType: "care",
     recipientName: "Create a care circle",
     sharedPhone: "",
     members: [],
@@ -45,13 +47,13 @@ export async function getUserCareCircles(userId: string) {
 
   const { data: owned } = await admin
     .from("care_circles")
-    .select("id, name, owner_id, shared_phone_number, sms_keyword")
+    .select("id, name, owner_id, shared_phone_number, sms_keyword, circle_type")
     .eq("owner_id", userId)
     .order("created_at", { ascending: true });
 
   const { data: memberships } = await admin
     .from("family_members")
-    .select("care_circle_id, status, care_circles(id, name, owner_id, shared_phone_number, sms_keyword)")
+    .select("care_circle_id, status, care_circles(id, name, owner_id, shared_phone_number, sms_keyword, circle_type)")
     .eq("user_id", userId)
     .neq("status", "removed");
 
@@ -217,7 +219,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
     : circles[0];
 
   if (!selectedCircle?.id) {
-    return emptyLiveSnapshot("Create a care circle to begin using live CareRelay records.");
+    return emptyLiveSnapshot("Create a care circle to begin using live CircleRelay records.");
   }
 
   const activeCircleId = asString(selectedCircle.id);
@@ -265,6 +267,7 @@ export async function getDashboardSnapshotForUser(careCircleId?: string): Promis
   return {
     careCircleId: activeCircleId,
     careCircleName: asString(selectedCircle.name, "Care Circle"),
+    circleType: normalizeCircleType(selectedCircle.circle_type),
     recipientName: asString(recipientResult.data?.first_name, asString(selectedCircle.name, "Loved one")),
     sharedPhone: asString(selectedCircle.shared_phone_number),
     profile: {

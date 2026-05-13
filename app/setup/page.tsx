@@ -29,10 +29,10 @@ export default async function SetupPage() {
           <div className="product-card mx-auto max-w-2xl p-8 text-center">
             <h1 className="text-3xl font-bold" style={{ color: "var(--text)" }}>Live setup is not configured</h1>
             <p className="mt-4">
-              Add Supabase environment variables to create live care circles. You can still explore CareRelay in demo mode.
+              Add Supabase environment variables to create live care circles. You can still explore CircleRelay in demo mode.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
+              <Link href="/demo" className="btn btn-sage">Try the demo</Link>
               <Link href="/sign-in" className="btn btn-soft">Sign in</Link>
             </div>
           </div>

@@ -47,7 +47,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps =
             Add Supabase environment variables to manage live account settings. Demo mode remains available.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
+            <Link href="/demo" className="btn btn-sage">Try the demo</Link>
             <Link href="/pricing" className="btn btn-soft">View Pricing</Link>
           </div>
         </div>
@@ -105,7 +105,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps =
       <div className="mb-8">
         <p className="section-kicker">Account</p>
         <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>Settings</h1>
-        <p className="mt-2">Signed in as {user.email || "CareRelay user"}.</p>
+        <p className="mt-2">Signed in as {user.email || "CircleRelay user"}.</p>
       </div>
 
       {selectedCircle ? (
@@ -128,7 +128,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps =
         <SettingsCard title="Account" body="Update your profile, phone number, timezone, and account details." href={selectedCircle ? `/account?careCircleId=${selectedCircle.id}` : "/account"} cta="Open account" />
         <SettingsCard title="Care circle" body="Create or review your live care circle setup from dashboard and setup." href={selectedCircle ? `/dashboard?careCircleId=${selectedCircle.id}` : "/dashboard"} cta="Open dashboard" />
         <SettingsCard title="Team" body="Add, remove, deactivate, and manage family member roles." href={selectedCircle ? `/team?careCircleId=${selectedCircle.id}` : "/team"} cta="Manage team" />
-        <SettingsCard title="Safety and legal" body="Review CareRelay privacy and terms. CareRelay is coordination software, not medical advice or emergency monitoring." href="/terms" cta="View terms" />
+        <SettingsCard title="Safety and legal" body="Review CircleRelay privacy and terms. CircleRelay Care Mode is coordination software, not medical advice or emergency monitoring." href="/terms" cta="View terms" />
         <SettingsCard title="Support" body="Get help with account access, billing, SMS routing, invites, and access removal." href="/support" cta="Contact support" />
       </div>
 

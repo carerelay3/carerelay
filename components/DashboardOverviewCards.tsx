@@ -1,6 +1,51 @@
 import { DemoSnapshot } from "@/lib/types";
+import { normalizeCircleType } from "@/lib/circles/circleTypes";
+
+const modeOverviewLabels = {
+  care: {
+    updates: "Today's updates",
+    tasks: "Open tasks",
+    appointments: "Appointments",
+    supplies: "Needed supplies",
+    confirmations: "Med confirmations",
+    flagged: "Open concerns",
+  },
+  family: {
+    updates: "Family updates",
+    tasks: "Open chores",
+    appointments: "Appointments",
+    supplies: "Groceries",
+    confirmations: "Reminders",
+    flagged: "School notes",
+  },
+  household: {
+    updates: "House updates",
+    tasks: "Open chores",
+    appointments: "Maintenance",
+    supplies: "Supplies",
+    confirmations: "Bills",
+    flagged: "Reminders",
+  },
+  team: {
+    updates: "Announcements",
+    tasks: "Volunteer tasks",
+    appointments: "Games/events",
+    supplies: "Equipment",
+    confirmations: "Rides",
+    flagged: "Reminders",
+  },
+  group: {
+    updates: "Announcements",
+    tasks: "Open tasks",
+    appointments: "Events",
+    supplies: "Supplies",
+    confirmations: "Decisions",
+    flagged: "Responsibilities",
+  },
+} as const;
 
 export function DashboardOverviewCards({ snapshot }: { snapshot: DemoSnapshot }) {
+  const labels = modeOverviewLabels[normalizeCircleType(snapshot.circleType)];
   const todayUpdates = snapshot.messages.filter(m => {
     const d = new Date(m.createdAt);
     const today = new Date();
@@ -9,17 +54,17 @@ export function DashboardOverviewCards({ snapshot }: { snapshot: DemoSnapshot })
   const openTasks = snapshot.tasks.filter(t => t.status === "open").length;
   const upcomingAppts = snapshot.appointments.length;
   const neededSupplies = snapshot.supplies.filter(s => s.status === "needed").length;
-  const medConfirmations = snapshot.messages.filter(m => m.category === "medication").length;
+  const confirmations = snapshot.messages.filter(m => m.category === "medication").length;
   const openConcerns = snapshot.concerns.filter(c => !c.acknowledged).length;
 
   return (
     <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-      <Card title="Today's updates" count={todayUpdates} accent="var(--teal)" />
-      <Card title="Open tasks" count={openTasks} accent="var(--purple-soft)" />
-      <Card title="Appointments" count={upcomingAppts} accent="var(--blue-soft)" />
-      <Card title="Needed supplies" count={neededSupplies} accent="var(--warning)" />
-      <Card title="Med confirmations" count={medConfirmations} accent="var(--sage)" />
-      <Card title="Open concerns" count={openConcerns} accent={openConcerns > 0 ? "var(--warning)" : "var(--teal)"} />
+      <Card title={labels.updates} count={todayUpdates} accent="var(--teal)" />
+      <Card title={labels.tasks} count={openTasks} accent="var(--purple-soft)" />
+      <Card title={labels.appointments} count={upcomingAppts} accent="var(--blue-soft)" />
+      <Card title={labels.supplies} count={neededSupplies} accent="var(--warning)" />
+      <Card title={labels.confirmations} count={confirmations} accent="var(--sage)" />
+      <Card title={labels.flagged} count={openConcerns} accent={openConcerns > 0 ? "var(--warning)" : "var(--teal)"} />
     </div>
   );
 }

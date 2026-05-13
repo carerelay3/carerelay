@@ -9,6 +9,7 @@ function createInitialSnapshot(): DemoSnapshot {
   return {
     careCircleId: "circle-demo-1",
     careCircleName: "Rivera Family Care Circle",
+    circleType: "care",
     recipientName: "Elena Rivera",
     sharedPhone: "+15559990000",
     members: [
@@ -221,7 +222,7 @@ export function exportTimeline(format: "json" | "csv", from?: string, to?: strin
       "Type,ID,Date,Actor,Details",
       ...snapshot.messages.map((message) => `Message,${message.id},${message.createdAt},${message.sender},"${message.body}"`),
       ...snapshot.activity.map((item) => `Activity,${item.id},${item.createdAt},${item.actor ?? ""},"${item.description}"`),
-      `Disclaimer,,${exportedAt},CareRelay,"CareRelay is for family coordination only and does not provide medical advice."`,
+      `Disclaimer,,${exportedAt},CircleRelay,"CircleRelay Care Mode is for family coordination only and does not provide medical advice."`,
     ];
     return { format, from, to, exportedAt, content: rows.join("\n") };
   }
@@ -234,7 +235,7 @@ export function exportTimeline(format: "json" | "csv", from?: string, to?: strin
     content: JSON.stringify(
       {
         careCircleName: snapshot.careCircleName,
-        disclaimer: "CareRelay is for family coordination only and does not provide medical advice.",
+        disclaimer: "CircleRelay Care Mode is for family coordination only and does not provide medical advice.",
         snapshot,
       },
       null,

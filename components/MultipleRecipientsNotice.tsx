@@ -5,7 +5,7 @@ export function MultipleRecipientsNotice() {
         Multiple care recipients are coming soon for Family Plus.
       </p>
       <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-        CareRelay currently keeps the live dashboard on one selected care circle recipient so today&apos;s SMS routing and summaries stay reliable.
+        CircleRelay currently keeps the live dashboard on one selected care circle recipient so today&apos;s SMS routing and summaries stay reliable.
       </p>
     </section>
   );

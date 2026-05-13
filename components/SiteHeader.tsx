@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { User } from "@/app/user-data";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -31,6 +32,7 @@ export function SiteHeader({ user = null }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [resolvedUser, setResolvedUser] = useState<HeaderUser | null>(user);
   const [authChecked, setAuthChecked] = useState(Boolean(user));
+  const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -99,31 +101,34 @@ export function SiteHeader({ user = null }: SiteHeaderProps) {
     <header
       className="sticky top-0 z-50 pt-[env(safe-area-inset-top)]"
       style={{
-        background: "rgba(251, 250, 247, 0.9)",
+        background: "rgba(250, 247, 243, 0.94)",
         backdropFilter: "blur(22px) saturate(1.4)",
-        borderBottom: "1px solid rgba(32,58,67,0.08)",
+        borderBottom: "1px solid rgba(23,19,38,0.1)",
       }}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-3 sm:px-4 md:px-8">
         <Link
           href={resolvedUser ? "/dashboard" : "/"}
-          className="flex min-w-0 items-center gap-2 text-lg font-bold tracking-tight transition-colors hover:opacity-80 sm:gap-3 sm:text-xl"
+          className="flex min-w-0 shrink items-center gap-2 text-lg font-bold tracking-tight transition-colors hover:opacity-80 sm:gap-3 sm:text-xl"
           style={{ color: "var(--text)" }}
         >
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-white shadow-md"
-            style={{ background: "linear-gradient(135deg, var(--teal), var(--blue-soft))" }}
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+          {!logoError ? (
+            <div className="relative h-8 w-28 max-w-[45vw] sm:h-9 sm:w-36">
+              <Image
+                src="/brand/logos/circlerelay-logo-horizontal.png"
+                alt="CircleRelay"
+                fill
+                className="object-contain object-left"
+                onError={() => setLogoError(true)}
+                priority
               />
-            </svg>
-          </div>
-          <span className="truncate">CareRelay</span>
+            </div>
+          ) : (
+            <span className="flex items-center gap-1 font-extrabold tracking-tight">
+              <span style={{ color: "#171326" }}>Circle</span>
+              <span style={{ color: "#F23A3A" }}>Relay</span>
+            </span>
+          )}
         </Link>
 
         <nav className="hidden min-w-0 items-center justify-end gap-1 text-sm md:flex">

@@ -170,11 +170,15 @@ create table if not exists public.care_circles (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid references auth.users(id) on delete cascade,
   name text not null,
+  circle_type text not null default 'care',
+  category_config jsonb,
+  enabled_features jsonb,
   sms_keyword text,
   shared_phone_number text,
   demo_mode boolean default false,
   created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  updated_at timestamptz default now(),
+  constraint care_circles_circle_type_check check (circle_type in ('care', 'family', 'household', 'team', 'group'))
 );
 
 create table if not exists public.care_recipients (
@@ -225,6 +229,55 @@ create table if not exists public.inbound_messages (
   parsed_payload jsonb default '{}'::jsonb,
   source text default 'sms',
   created_at timestamptz default now()
+);
+
+create table if not exists public.sms_events (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  message_sid text,
+  from_phone text,
+  to_phone text,
+  body_preview text,
+  signature_valid boolean,
+  routing_status text,
+  care_circle_id uuid references public.care_circles(id) on delete set null,
+  family_member_id uuid references public.family_members(id) on delete set null,
+  parse_category text,
+  concern_flag boolean not null default false,
+  persistence_status text,
+  error_code text,
+  error_message text,
+  request_id text,
+  environment text
+);
+
+create table if not exists public.processed_twilio_messages (
+  message_sid text primary key,
+  created_at timestamptz not null default now(),
+  care_circle_id uuid references public.care_circles(id) on delete set null,
+  status text
+);
+
+create table if not exists public.stripe_webhook_events (
+  stripe_event_id text primary key,
+  event_type text,
+  processed_at timestamptz not null default now(),
+  status text,
+  error_message text
+);
+
+create table if not exists public.privacy_requests (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  request_type text not null,
+  details text,
+  status text not null default 'open',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  handled_by uuid references auth.users(id) on delete set null,
+  handled_at timestamptz,
+  constraint privacy_requests_request_type_check check (request_type in ('export_my_data', 'delete_my_account', 'delete_care_circle_data', 'billing_help', 'other')),
+  constraint privacy_requests_status_check check (status in ('open', 'in_review', 'completed', 'rejected'))
 );
 
 create table if not exists public.tasks (
@@ -858,6 +911,7 @@ $$;
 create index if not exists profiles_phone_normalized_idx on public.profiles(phone_normalized);
 create index if not exists profiles_platform_role_idx on public.profiles(platform_role);
 create index if not exists care_circles_owner_id_idx on public.care_circles(owner_id);
+create index if not exists care_circles_circle_type_idx on public.care_circles(circle_type);
 create index if not exists care_circles_sms_keyword_idx on public.care_circles(sms_keyword);
 create index if not exists care_circles_shared_phone_idx on public.care_circles(shared_phone_number);
 
@@ -877,6 +931,14 @@ create index if not exists inbound_messages_category_idx on public.inbound_messa
 create index if not exists inbound_messages_concern_idx on public.inbound_messages(care_circle_id, concern_flag);
 create index if not exists inbound_messages_payload_gin_idx on public.inbound_messages using gin(parsed_payload);
 create index if not exists inbound_messages_keywords_gin_idx on public.inbound_messages using gin(matched_keywords);
+create index if not exists sms_events_created_at_idx on public.sms_events(created_at desc);
+create index if not exists sms_events_message_sid_idx on public.sms_events(message_sid) where message_sid is not null;
+create index if not exists sms_events_routing_status_idx on public.sms_events(routing_status);
+create index if not exists sms_events_error_code_idx on public.sms_events(error_code) where error_code is not null;
+create index if not exists processed_twilio_messages_created_at_idx on public.processed_twilio_messages(created_at desc);
+create index if not exists stripe_webhook_events_processed_at_idx on public.stripe_webhook_events(processed_at desc);
+create index if not exists privacy_requests_user_id_idx on public.privacy_requests(user_id, created_at desc);
+create index if not exists privacy_requests_status_idx on public.privacy_requests(status, created_at desc);
 
 create index if not exists tasks_circle_status_idx on public.tasks(care_circle_id, status);
 create index if not exists tasks_assigned_to_idx on public.tasks(assigned_to);
@@ -1037,6 +1099,10 @@ alter table public.care_circles enable row level security;
 alter table public.care_recipients enable row level security;
 alter table public.family_members enable row level security;
 alter table public.inbound_messages enable row level security;
+alter table public.sms_events enable row level security;
+alter table public.processed_twilio_messages enable row level security;
+alter table public.stripe_webhook_events enable row level security;
+alter table public.privacy_requests enable row level security;
 alter table public.tasks enable row level security;
 alter table public.appointments enable row level security;
 alter table public.supplies enable row level security;
@@ -1274,6 +1340,14 @@ create policy notifications_delete_owner
 create policy billing_subscriptions_select_own
   on public.billing_subscriptions for select to authenticated
   using (auth.uid() = user_id);
+
+create policy privacy_requests_insert_own
+  on public.privacy_requests for insert to authenticated
+  with check (user_id = auth.uid());
+
+create policy privacy_requests_select_own
+  on public.privacy_requests for select to authenticated
+  using (user_id = auth.uid());
 
 create policy subscription_tiers_select_all_authenticated
   on public.subscription_tiers for select to authenticated

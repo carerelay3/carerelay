@@ -2,23 +2,23 @@
 
 ## App Identity
 
-- App name: CareRelay
-- Subtitle: Family caregiving coordination
-- Short description: One shared number to keep the whole family on the same page.
+- App name: CircleRelay
+- Subtitle: Shared line coordination
+- Short description: One shared line for every circle in your life.
 - Primary category: Productivity
 - Secondary category: Lifestyle
 
 ## App Store Promotional Text
 
-Coordinate family caregiving updates through shared SMS and a simple dashboard.
+Coordinate family care, household, team, and group updates through shared SMS and a simple dashboard.
 
 ## App Store Description
 
-CareRelay helps families coordinate care-related updates through shared SMS and a simple dashboard. Family members can send updates about tasks, appointments, supplies, medication confirmations, concerns, and daily summaries.
+CircleRelay helps groups coordinate updates through shared SMS and a simple dashboard. In Care Mode, family members can send updates about tasks, appointments, supplies, medication confirmations, concerns, and daily summaries.
 
-CareRelay is designed for families who need one calmer place to see what has been shared. Instead of searching through scattered group texts, invited family members can review organized updates in a shared dashboard.
+CircleRelay is designed for groups who need one calmer place to see what has been shared. Instead of searching through scattered group texts, invited members can review organized updates in a shared dashboard.
 
-Families can use CareRelay to help organize:
+Groups can use CircleRelay to help organize:
 
 - Tasks and follow-ups
 - Appointments and transportation notes
@@ -27,11 +27,11 @@ Families can use CareRelay to help organize:
 - Concerns for family review
 - Daily summaries of family-reported updates
 
-CareRelay uses a shared SMS number so family members can keep texting normally while updates are organized for the care circle.
+CircleRelay uses a shared SMS line so members can keep texting normally while updates are organized for the circle.
 
 ## Medical Boundary
 
-CareRelay is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
+CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
 
 ## Keywords
 
@@ -58,7 +58,7 @@ Avoid screenshots that imply emergency response, clinical monitoring, diagnosis,
 
 ## Data Safety Notes For Apple Review
 
-CareRelay may collect or process:
+CircleRelay may collect or process:
 
 - Contact information: name, email address, phone number.
 - User content: SMS updates, task notes, appointment notes, supplies, concerns, summaries.
@@ -66,9 +66,9 @@ CareRelay may collect or process:
 - Purchases: subscription status and billing identifiers through Stripe, if enabled.
 - Diagnostics or usage data if analytics/logging are enabled.
 
-CareRelay uses this data to route family-reported updates, manage care circle access, show dashboard records, support billing, and operate the service.
+CircleRelay uses this data to route reported updates, manage circle access, show dashboard records, support billing, and operate the service.
 
-CareRelay should not claim HIPAA compliance unless legal, operational, and vendor requirements are actually in place.
+CircleRelay should not claim HIPAA compliance unless legal, operational, and vendor requirements are actually in place.
 
 ## Age Rating Notes
 
@@ -87,7 +87,7 @@ Final age rating must be completed in App Store Connect based on actual shipped 
 
 Suggested reviewer note:
 
-CareRelay is a family coordination app. It organizes family-reported SMS updates into a shared dashboard for tasks, appointments, supplies, medication confirmations, concerns, and summaries. It is not a medical provider, does not provide medical advice, and is not for emergencies. The app includes safety boundary language in onboarding, dashboard, support, privacy, and terms materials.
+CircleRelay is a shared-line coordination app. CircleRelay Care Mode organizes family-reported SMS updates into a shared dashboard for tasks, appointments, supplies, medication confirmations, concerns, and summaries. It is not a medical provider, does not provide medical advice, and is not for emergencies. The app includes safety boundary language in onboarding, dashboard, support, privacy, and terms materials.
 
 If reviewer access is needed, provide a demo account with sample data only. Do not include real family or care recipient information in reviewer accounts.
 

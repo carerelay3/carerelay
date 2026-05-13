@@ -8,7 +8,7 @@ import { requirePlatformAdmin, type PlatformRole } from "@/lib/admin/platform";
 export const dynamic = "force-dynamic";
 
 type AdminPageProps = {
-  searchParams?: Promise<{ email?: string }>;
+  searchParams?: Promise<{ email?: string; smsFilter?: string }>;
 };
 
 type CountRow = { count: number | null; error: unknown };
@@ -96,6 +96,71 @@ async function getRecentRows() {
   };
 }
 
+type SmsEventRow = {
+  id: string;
+  created_at?: string | null;
+  message_sid?: string | null;
+  from_phone?: string | null;
+  to_phone?: string | null;
+  signature_valid?: boolean | null;
+  routing_status?: string | null;
+  parse_category?: string | null;
+  persistence_status?: string | null;
+  error_code?: string | null;
+};
+
+type PrivacyRequestRow = {
+  id: string;
+  user_id?: string | null;
+  request_type?: string | null;
+  details?: string | null;
+  status?: string | null;
+  created_at?: string | null;
+  handled_at?: string | null;
+};
+
+function smsStatus(event: SmsEventRow) {
+  if (event.error_code || event.persistence_status === "failed" || event.signature_valid === false) return "Failed";
+  if (event.persistence_status === "success") return "Logged";
+  if (event.persistence_status === "not_attempted") return "Not logged";
+  return "Received";
+}
+
+async function getSmsEvents(filter?: string): Promise<SmsEventRow[]> {
+  const admin = getSupabaseAdmin();
+  if (!admin) return [];
+
+  let query = admin
+    .from("sms_events")
+    .select("id, created_at, message_sid, from_phone, to_phone, signature_valid, routing_status, parse_category, persistence_status, error_code")
+    .order("created_at", { ascending: false })
+    .limit(25);
+
+  if (filter === "failed") {
+    query = query.not("error_code", "is", null);
+  } else if (filter === "unknown_sender") {
+    query = query.eq("routing_status", "unknown_sender");
+  } else if (filter === "signature_errors") {
+    query = query.eq("signature_valid", false);
+  }
+
+  const { data, error } = await query;
+  return error ? [] : data || [];
+}
+
+async function getPrivacyRequests(): Promise<PrivacyRequestRow[]> {
+  const admin = getSupabaseAdmin();
+  if (!admin) return [];
+
+  const { data, error } = await admin
+    .from("privacy_requests")
+    .select("id, user_id, request_type, details, status, created_at, handled_at")
+    .order("created_at", { ascending: false })
+    .limit(25);
+
+  return error ? [] : data || [];
+}
+
 export default async function AdminPage({ searchParams }: AdminPageProps = {}) {
   const user = await getCurrentSupabaseUser();
   if (!user) redirect("/sign-in");
@@ -122,12 +187,15 @@ export default async function AdminPage({ searchParams }: AdminPageProps = {}) {
 
   const params = searchParams ? await searchParams : {};
   const lookupEmail = params.email?.trim();
-  const [totalUsers, totalCareCircles, totalFamilyMembers, recent, lookup] = await Promise.all([
+  const smsFilter = params.smsFilter;
+  const [totalUsers, totalCareCircles, totalFamilyMembers, recent, lookup, smsEvents, privacyRequests] = await Promise.all([
     safeCount("profiles"),
     safeCount("care_circles"),
     safeCount("family_members"),
     getRecentRows(),
     getAdminUserByEmail(lookupEmail),
+    getSmsEvents(smsFilter),
+    getPrivacyRequests(),
   ]);
 
   const subscriptionsByPlan = (recent.subscriptions as Array<{ plan_id?: string | null }>).reduce<Record<string, number>>((acc, sub) => {
@@ -140,7 +208,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps = {}) {
     <main className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="mb-8">
         <p className="section-kicker">Platform admin</p>
-        <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>CareRelay operations</h1>
+        <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>CircleRelay operations</h1>
         <p className="mt-2" style={{ color: "var(--text-muted)" }}>
           Signed in as {platformRole}. No hard-delete user tools are exposed here.
         </p>
@@ -168,6 +236,94 @@ export default async function AdminPage({ searchParams }: AdminPageProps = {}) {
               {plan}: {count}
             </span>
           )) : <p style={{ color: "var(--text-muted)" }}>No subscription rows found.</p>}
+        </div>
+      </section>
+
+      <section className="product-card mt-6 overflow-hidden p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>SMS Operations</h2>
+            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>Latest 25 inbound SMS processing events.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["All", "/admin"],
+              ["Failed only", "/admin?smsFilter=failed"],
+              ["Unknown sender", "/admin?smsFilter=unknown_sender"],
+              ["Signature errors", "/admin?smsFilter=signature_errors"],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full px-3 py-2 text-xs font-bold" style={{ background: "var(--primary-soft)", color: "var(--text-secondary)" }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[860px] text-left text-sm">
+            <thead>
+              <tr style={{ color: "var(--text-subtle)" }}>
+                {["Status", "From", "To", "Routing", "Parse", "Persistence", "Error", "Timestamp"].map((heading) => (
+                  <th key={heading} className="border-b px-3 py-2 font-bold" style={{ borderColor: "var(--border)" }}>{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {smsEvents.map((event) => (
+                <tr key={event.id}>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)", color: "var(--text)" }}>{smsStatus(event)}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.from_phone || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.to_phone || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.routing_status || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.parse_category || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.persistence_status || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{event.error_code || "None"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{formatDate(event.created_at)}</td>
+                </tr>
+              ))}
+              {smsEvents.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-3 py-5 text-center" style={{ color: "var(--text-muted)" }}>No SMS events found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="product-card mt-6 overflow-hidden p-6">
+        <div>
+          <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>Privacy Requests</h2>
+          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+            Latest 25 account, export, deletion review, billing, and privacy requests. No hard-delete tools are exposed here.
+          </p>
+        </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead>
+              <tr style={{ color: "var(--text-subtle)" }}>
+                {["Type", "Status", "User", "Details", "Created", "Handled"].map((heading) => (
+                  <th key={heading} className="border-b px-3 py-2 font-bold" style={{ borderColor: "var(--border)" }}>{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {privacyRequests.map((request) => (
+                <tr key={request.id}>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)", color: "var(--text)" }}>{request.request_type || "Unavailable"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{request.status || "open"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{request.user_id || "Unavailable"}</td>
+                  <td className="max-w-xs truncate border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{request.details || "None"}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{formatDate(request.created_at)}</td>
+                  <td className="border-b px-3 py-2" style={{ borderColor: "var(--border)" }}>{formatDate(request.handled_at)}</td>
+                </tr>
+              ))}
+              {privacyRequests.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-3 py-5 text-center" style={{ color: "var(--text-muted)" }}>No privacy requests found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 

@@ -8,6 +8,7 @@ export function relaySmsMode(): "demo" | "live" {
 export const currentMode = relaySmsMode;
 
 export const appConfig = {
+  appBaseUrl: process.env.APP_BASE_URL,
   appUrl: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   demoMode: relaySmsMode() === "demo",
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -22,6 +23,7 @@ export const appConfig = {
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
   twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER,
   twilioConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER),
+  twilioSignatureUrlConfigured: !!process.env.APP_BASE_URL,
   analyticsEnabled: process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === "true",
   openAiKey: process.env.OPENAI_API_KEY,
   openAiConfigured: !!process.env.OPENAI_API_KEY,

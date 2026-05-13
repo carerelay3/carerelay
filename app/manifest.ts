@@ -1,44 +1,34 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CareRelay",
-    short_name: "CareRelay",
-    description: "One shared number to keep the whole family on the same page.",
+    name: "CircleRelay",
+    short_name: "CircleRelay",
+    description: "One shared line for every circle in your life.",
     start_url: "/dashboard",
-    scope: "/",
     display: "standalone",
-    background_color: "#E6F6F1",
-    theme_color: "#0D6B63",
-    categories: ["health", "productivity", "utilities"],
+    background_color: "#FAF7F3",
+    theme_color: "#171326",
     icons: [
       {
-        src: "/icons/icon-192.png",
+        src: "/brand/icons/circlerelay-app-icon-192.png",
         sizes: "192x192",
         type: "image/png",
-        purpose: "any",
       },
       {
-        src: "/icons/icon-512.png",
+        src: "/brand/icons/circlerelay-app-icon-512.png",
         sizes: "512x512",
         type: "image/png",
-        purpose: "any",
       },
       {
-        src: "/icons/icon-1024.png",
+        src: "/brand/icons/circlerelay-app-icon-1024.png",
         sizes: "1024x1024",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/maskable-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icons/maskable-512.png",
-        sizes: "512x512",
+        src: "/brand/icons/circlerelay-app-icon-1024.png",
+        sizes: "1024x1024",
         type: "image/png",
         purpose: "maskable",
       },

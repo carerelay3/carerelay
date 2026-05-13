@@ -7,7 +7,7 @@ export function PushNotificationsComingSoon() {
         Push notifications are coming soon.
       </p>
       <p className="mt-3 text-sm" style={{ color: "var(--text-subtle)" }}>
-        CareRelay will not ask your browser for notification permission until notification delivery is fully implemented and tied to your signed-in account.
+        CircleRelay will not ask your browser for notification permission until notification delivery is fully implemented and tied to your signed-in account.
       </p>
     </section>
   );
@@ -22,7 +22,7 @@ export function DedicatedFamilyNumberComingSoon() {
         Dedicated family number is planned for Family Plus.
       </p>
       <p className="mt-3 text-sm" style={{ color: "var(--text-subtle)" }}>
-        Today, CareRelay routes SMS through the configured shared number using each care circle&apos;s keyword and known sender phone numbers. Twilio number provisioning is not active yet.
+        Today, CircleRelay routes SMS through the configured shared line using each care circle&apos;s keyword and known sender phone numbers. Twilio number provisioning is not active yet.
       </p>
     </section>
   );

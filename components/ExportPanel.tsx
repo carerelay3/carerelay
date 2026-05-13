@@ -47,7 +47,7 @@ export function ExportPanel({ careCircleId, onExport }: { careCircleId: string; 
       <div className="glass p-5">
         <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Export timeline</h3>
         <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Download a record of messages, tasks, appointments, and more.</p>
-        <p className="mt-2 text-xs" style={{ color: 'var(--warning)' }}>CareRelay is for family coordination only and does not provide medical advice.</p>
+        <p className="mt-2 text-xs" style={{ color: 'var(--warning)' }}>CircleRelay Care Mode is for family coordination only and does not provide medical advice.</p>
 
         <div className="mt-4 flex flex-wrap gap-3">
           <div className="flex gap-1 rounded-xl p-1" style={{ background: 'var(--bg-subtle)' }}>

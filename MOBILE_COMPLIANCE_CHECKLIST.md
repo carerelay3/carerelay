@@ -1,13 +1,13 @@
 # Mobile Compliance Checklist
 
-This checklist is for CareRelay mobile web, PWA, and future native app launch review. It is not legal advice. Human legal, privacy, and app store review are required before public launch.
+This checklist is for CircleRelay mobile web, PWA, and future native app launch review. It is not legal advice. Human legal, privacy, and app store review are required before public launch.
 
 ## Product Boundary
 
-- [ ] App name is `CareRelay`.
+- [ ] App name is `CircleRelay`.
 - [ ] Subtitle is `Family caregiving coordination`.
-- [ ] Short description is `One shared number to keep the whole family on the same page.`
-- [ ] Store copy says CareRelay helps families coordinate care-related updates.
+- [ ] Short description is `One shared line for every circle in your life.`
+- [ ] Store copy says CircleRelay helps groups coordinate updates and that Care Mode supports family caregiving coordination.
 - [ ] Store copy does not claim medical advice, diagnosis, treatment, dosage guidance, monitoring, emergency response, or guaranteed safety.
 - [ ] Medication language says `family-reported medication confirmations` or `organization logs`, not adherence, dosage, or safety assurance.
 - [ ] Concerns are described as `for family review`, not medical triage or emergency detection.
@@ -16,7 +16,7 @@ This checklist is for CareRelay mobile web, PWA, and future native app launch re
 
 Use this exact boundary in store copy, onboarding, support, terms, and review notes:
 
-CareRelay is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
+CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
 
 ## Links And Public Pages
 
@@ -25,7 +25,7 @@ CareRelay is for family coordination only. It is not a medical provider and does
 - [ ] Support URL is live: `https://carerelay.xyz/support`.
 - [ ] Support page includes a working support email before store submission.
 - [ ] Privacy page names relevant service providers such as Supabase, Twilio, OpenAI, Stripe, hosting, and analytics providers if enabled.
-- [ ] Terms page states service availability is not guaranteed and CareRelay is not an emergency notification system.
+- [ ] Terms page states service availability is not guaranteed and CircleRelay is not an emergency notification system.
 
 ## App Categories
 
@@ -123,7 +123,7 @@ Creative restrictions:
 - [ ] Provide clear explanation that the app is family coordination software.
 - [ ] Explain shared SMS number behavior.
 - [ ] Explain that updates are family-reported.
-- [ ] Explain that CareRelay is not for emergencies.
+- [ ] Explain that CircleRelay Care Mode is not for emergencies.
 - [ ] Make billing behavior clear if Stripe subscriptions are enabled.
 - [ ] Confirm no fake push notification prompts are present.
 

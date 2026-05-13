@@ -18,26 +18,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  applicationName: "CareRelay",
-  title: "CareRelay",
-  description: "One shared number to keep the whole family on the same page.",
+  applicationName: "CircleRelay",
+  title: "CircleRelay",
+  description: "One shared line for every circle in your life.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "CareRelay",
+    title: "CircleRelay",
     statusBarStyle: "default",
   },
   formatDetection: {
     telephone: false,
   },
   icons: {
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/brand/icons/circlerelay-app-icon-192.png", sizes: "180x180", type: "image/png" }],
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/brand/icons/circlerelay-app-icon-192.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/icons/circlerelay-app-icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/brand/icons/circlerelay-app-icon-512.png", sizes: "512x512", type: "image/png" },
     ],
+  },
+  openGraph: {
+    title: "CircleRelay",
+    description: "One shared line for every circle in your life.",
+    images: [{ url: "/brand/heroe/circlerelay-hero-banner.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CircleRelay",
+    description: "One shared line for every circle in your life.",
+    images: ["/brand/heroe/circlerelay-hero-banner.png"],
   },
 };
 
@@ -45,7 +56,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0D6B63",
+  themeColor: "#171326",
   colorScheme: "light",
 };
 
@@ -74,7 +85,7 @@ export default async function RootLayout({
         <footer className="py-10 text-center" style={{ borderTop: '1px solid var(--border)' }}>
           <div className="mx-auto max-w-6xl px-4">
             <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
-              CareRelay is for family coordination only. Not for emergencies.
+              CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
             </p>
             <div className="mt-3 flex items-center justify-center gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
               <Link href="/privacy" className="transition-colors hover:text-[var(--text)]">Privacy</Link>

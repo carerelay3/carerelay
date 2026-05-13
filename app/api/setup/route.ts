@@ -6,11 +6,13 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { AuthError, authErrorResponse, requireUser } from "@/lib/supabase/auth";
 import { getCurrentUserPlan } from "@/lib/stripe/getCurrentUserPlan";
 import { getPlanLimits } from "@/lib/stripe/getPlanLimits";
+import { circleTypes, getCategoriesForCircleType, getCircleTypeLabel } from "@/lib/circles/circleTypes";
 
 const setupSchema = z.object({
   firstName: z.string().min(1),
   keyword: z.string().min(2).max(24),
   sharedPhone: z.string().optional(),
+  circleType: z.enum(circleTypes).default("care"),
   members: z
     .array(
       z.object({
@@ -21,15 +23,24 @@ const setupSchema = z.object({
     .default([]),
 });
 
+function circleDisplayName(baseName: string, circleLabel: string) {
+  const trimmed = baseName.trim();
+  return trimmed.endsWith("s") ? `${trimmed} ${circleLabel}` : `${trimmed}'s ${circleLabel}`;
+}
+
+function setupValidationError(details: unknown) {
+  return NextResponse.json(
+    { code: "validation_failed", error: "Setup details are invalid. Choose one of the supported CircleRelay modes.", details },
+    { status: 400 },
+  );
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const parsed = setupSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { code: "validation_failed", error: "Setup details are invalid.", details: parsed.error.flatten() },
-        { status: 400 },
-      );
+      return setupValidationError(parsed.error.flatten());
     }
 
     const members = parsed.data.members.map((member) => ({
@@ -42,6 +53,9 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    const circleType = parsed.data.circleType;
+    const circleLabel = getCircleTypeLabel(circleType).replace(" Mode", " Circle");
+    const categoryConfig = { categories: getCategoriesForCircleType(circleType) };
 
     const admin = getSupabaseAdmin();
     if (hasSupabase()) {
@@ -76,7 +90,7 @@ export async function POST(req: Request) {
 
       if (members.length + 1 > planLimits.maxFamilyMembers) {
         return NextResponse.json(
-          { code: "plan_limit_reached", error: `Your current plan allows up to ${planLimits.maxFamilyMembers} family member${planLimits.maxFamilyMembers === 1 ? "" : "s"} in this care circle.` },
+          { code: "plan_limit_reached", error: `Your current plan allows up to ${planLimits.maxFamilyMembers} member${planLimits.maxFamilyMembers === 1 ? "" : "s"} in this circle.` },
           { status: 403 },
         );
       }
@@ -84,7 +98,7 @@ export async function POST(req: Request) {
       const { error: profileError } = await admin.from("profiles").upsert({
         id: user.id,
         email: user.email,
-        full_name: user.user_metadata?.full_name || user.email || "CareRelay user",
+        full_name: user.user_metadata?.full_name || user.email || "CircleRelay user",
         updated_at: new Date().toISOString(),
       });
       if (profileError) {
@@ -98,9 +112,11 @@ export async function POST(req: Request) {
         .from("care_circles")
         .insert({
           owner_id: user.id,
-          name: `${parsed.data.firstName}'s Care Circle`,
+          name: circleDisplayName(parsed.data.firstName, circleLabel),
+          circle_type: circleType,
+          category_config: categoryConfig,
           sms_keyword: parsed.data.keyword.toUpperCase().replace(/[^A-Z0-9]/g, ""),
-          shared_phone_number: parsed.data.sharedPhone || appConfig.twilioPhoneNumber || null,
+          shared_phone_number: appConfig.twilioPhoneNumber || null,
           demo_mode: false,
         })
         .select("id")
@@ -108,7 +124,7 @@ export async function POST(req: Request) {
 
       if (circleError || !circle) {
         return NextResponse.json(
-          { code: "care_circle_insert_failed", error: "Could not create your care circle." },
+          { code: "care_circle_insert_failed", error: `We could not create your ${circleLabel.toLowerCase()}. Please try again.` },
           { status: 500 },
         );
       }
@@ -170,8 +186,9 @@ export async function POST(req: Request) {
         careCircleId: circle.id,
         recipientName: parsed.data.firstName,
         keyword: parsed.data.keyword.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+        circleType,
         members,
-        sharedPhone: parsed.data.sharedPhone || appConfig.twilioPhoneNumber || "+15559990000",
+        sharedPhone: appConfig.twilioPhoneNumber || "",
       });
     }
 
@@ -180,6 +197,7 @@ export async function POST(req: Request) {
       careCircleId: "circle-demo-1",
       recipientName: parsed.data.firstName,
       keyword: parsed.data.keyword.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+      circleType,
       members,
       sharedPhone: parsed.data.sharedPhone || appConfig.twilioPhoneNumber || "+15559990000",
     });

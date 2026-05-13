@@ -10,7 +10,7 @@ export function Footer() {
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
-            <p className="text-lg font-bold text-slate-800 tracking-tight">CareRelay</p>
+            <p className="text-lg font-bold text-slate-800 tracking-tight">CircleRelay</p>
             <p className="text-sm text-slate-500 mt-1">
               Family care coordination, organized by text.
             </p>
@@ -24,8 +24,8 @@ export function Footer() {
           </nav>
         </div>
         <div className="mt-8 pt-8 border-t border-slate-200 text-center text-xs text-slate-400">
-          <p>CareRelay does not provide medical advice. Human legal review required before public launch.</p>
-          <p className="mt-2">&copy; {new Date().getFullYear()} CareRelay. All rights reserved.</p>
+          <p>CircleRelay Care Mode does not provide medical advice. Human legal review required before public launch.</p>
+          <p className="mt-2">&copy; {new Date().getFullYear()} CircleRelay. All rights reserved.</p>
         </div>
       </div>
     </footer>

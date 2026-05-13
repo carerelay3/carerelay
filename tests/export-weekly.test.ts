@@ -146,7 +146,7 @@ describe("export timeline and weekly summary beta", () => {
     expect(json.content).toContain("msg-1");
     expect(json.content).not.toContain("msg-cross");
     expect(json.content).not.toContain("+15550000000");
-    expect(json.content).toContain("CareRelay is for family coordination only and does not provide medical advice.");
+    expect(json.content).toContain("CircleRelay Care Mode is for family coordination only and does not provide medical advice.");
   });
 
   it("export plan gate works", async () => {
@@ -193,7 +193,7 @@ describe("export timeline and weekly summary beta", () => {
     expect(res.status).toBe(200);
     expect(json.summaryText).toContain("does not provide medical advice");
     expect(json.summaryText).toContain("If this is an emergency");
-    expect(json.html).toContain("CareRelay Weekly Summary");
+    expect(json.html).toContain("CircleRelay Weekly Summary");
   });
 
   it("disabled PDF state is clear because printable HTML is implemented first", async () => {

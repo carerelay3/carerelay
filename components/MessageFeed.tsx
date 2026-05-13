@@ -1,18 +1,21 @@
 import { DemoMessage } from "@/lib/types";
 import { EmptyState } from "./EmptyState";
 import { CategoryBadge } from "./CategoryBadge";
+import { isCareMode } from "@/lib/circles/circleTypes";
 
-export function MessageFeed({ messages, mode = "live" }: { messages: DemoMessage[]; mode?: "demo" | "live" }) {
-  if (messages.length === 0) {
+export function MessageFeed({ messages, mode = "live", circleType }: { messages: DemoMessage[]; mode?: "demo" | "live"; circleType?: string }) {
+  const visibleMessages = isCareMode(circleType) ? messages : messages.filter((message) => message.category !== "medication");
+
+  if (visibleMessages.length === 0) {
     return (
       <EmptyState
         title="No updates yet"
-        text={mode === "demo" ? "Try the demo message tester to see how updates get organized." : "Text the CareRelay number to see live family updates here."}
+        text={mode === "demo" ? "Try the demo message tester to see how updates get organized." : "Text the CircleRelay shared line to see live updates here."}
       />
     );
   }
 
-  const sorted = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sorted = [...visibleMessages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="surface-panel min-w-0 space-y-4 p-4 sm:p-6">

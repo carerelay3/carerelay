@@ -1,19 +1,24 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { DEMO_SHARED_PHONE } from "@/lib/demo/constants";
 import { formatUsPhoneDisplay, normalizePhone } from "@/lib/utils/phone";
 import { authFetch } from "@/lib/supabase/clientAuthFetch";
+import { ModeSelector } from "@/components/ModeSelector";
+import {
+  type CircleType,
+  getCircleTypeLabel,
+  isCareMode,
+} from "@/lib/circles/circleTypes";
 
 const setupErrorLabels: Record<string, string> = {
-  auth_missing: "Please sign in again before creating a care circle.",
+  auth_missing: "Please sign in again before creating a circle.",
   service_role_missing: "Live setup is missing the server database key. Add the Supabase service role key in your deployment settings.",
   validation_failed: "Please check the setup fields and try again.",
   profile_upsert_failed: "We could not create your account profile. Please try again.",
-  care_circle_insert_failed: "We could not create your care circle. Please try again.",
-  care_recipient_insert_failed: "Your care circle was created, but the care recipient could not be added.",
-  owner_member_insert_failed: "Your care circle was created, but owner access could not be added.",
-  invited_member_insert_failed: "Your care circle was created, but invited family members could not be added.",
+  care_circle_insert_failed: "We could not create your circle. Please try again.",
+  care_recipient_insert_failed: "Your circle was created, but the initial record could not be added.",
+  owner_member_insert_failed: "Your circle was created, but owner access could not be added.",
+  invited_member_insert_failed: "Your circle was created, but invited members could not be added.",
   plan_limit_reached: "Your current plan limit has been reached.",
 };
 
@@ -22,12 +27,13 @@ function setupErrorMessage(data: { code?: unknown; error?: unknown }) {
   const error = typeof data.error === "string" ? data.error : "";
   if (code && error) return `${setupErrorLabels[code] || "Setup could not be completed"} ${error}`;
   if (code) return setupErrorLabels[code] || "Setup could not be completed.";
-  return error || "Could not create care circle. Please sign in and try again.";
+  return error || "Could not create circle. Please sign in and try again.";
 }
 
 export function CareCircleSetupForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [circleType, setCircleType] = useState<CircleType>("care");
   const [firstName, setFirstName] = useState("Linda");
   const [keyword, setKeyword] = useState("LINDA");
   
@@ -38,11 +44,9 @@ export function CareCircleSetupForm() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const demoLine = formatUsPhoneDisplay(DEMO_SHARED_PHONE);
-
   const steps = [
-    { num: 1, label: "Recipient" },
-    { num: 2, label: "Family" },
+    { num: 1, label: "Type" },
+    { num: 2, label: "Members" },
     { num: 3, label: "Keyword" },
     { num: 4, label: "Number" },
     { num: 5, label: "Review" },
@@ -67,7 +71,7 @@ export function CareCircleSetupForm() {
       const res = await authFetch("/api/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, keyword, members, sharedPhone: DEMO_SHARED_PHONE }),
+        body: JSON.stringify({ firstName, keyword, members, circleType }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -81,6 +85,9 @@ export function CareCircleSetupForm() {
       setIsSubmitting(false);
     }
   };
+  const careMode = isCareMode(circleType);
+  const modeLabel = getCircleTypeLabel(circleType);
+  const circleNamePlaceholder = careMode ? "e.g., Mom, Linda, Dad" : "e.g., Smith family, Pine House, Tigers U12";
 
   return (
     <div className="glass-elevated relative overflow-hidden mx-auto w-full max-w-2xl transition-all duration-500">
@@ -140,7 +147,16 @@ export function CareCircleSetupForm() {
         <div className="animate-fade-in-up">
           {step === 1 && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Who are you caring for?</h2>
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>What kind of circle are you starting?</h2>
+                <p className="mt-2 text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+                  Choose a starting mode. You can keep the current caregiving flow with Care Mode or start broader group coordination.
+                </p>
+              </div>
+              <ModeSelector selectedType={circleType} onSelect={setCircleType} />
+              <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>
+                {careMode ? "Who are you caring for?" : "What should this circle be called?"}
+              </h3>
               <div>
                 <input
                   id="name"
@@ -151,7 +167,7 @@ export function CareCircleSetupForm() {
                     setFirstName(e.target.value);
                     setKeyword(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''));
                   }}
-                  placeholder="e.g., Mom, Linda, Dad"
+                  placeholder={circleNamePlaceholder}
                   autoComplete="given-name"
                   autoFocus
                 />
@@ -161,7 +177,9 @@ export function CareCircleSetupForm() {
                   <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--blue-soft)' }}>
-                  Use everyday language. CareRelay is for organizing family updates and coordinating tasks, not for storing medical charts.
+                  {careMode
+                    ? "Use everyday language. CircleRelay Care Mode is for organizing family updates and coordinating tasks, not for storing medical charts."
+                    : "CircleRelay helps organize group updates, tasks, reminders, supplies, and summaries."}
                 </p>
               </div>
             </div>
@@ -170,9 +188,9 @@ export function CareCircleSetupForm() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Add your care team</h2>
+                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>{careMode ? "Add your care team" : "Add circle members"}</h2>
                 <p className="text-sm mt-2 font-medium" style={{ color: 'var(--text-muted)' }}>
-                  Each family member texts the same CareRelay number from their own phone. CareRelay uses the phone numbers you add here to route updates to the right care circle.
+                  Each member texts the same CircleRelay shared line from their own phone. CircleRelay uses the phone numbers you add here to route updates to the right circle.
                 </p>
               </div>
 
@@ -214,9 +232,9 @@ export function CareCircleSetupForm() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Set a care circle keyword</h2>
+                <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Set a circle keyword</h2>
                 <p className="text-sm mt-2 font-medium" style={{ color: 'var(--text-muted)' }}>
-                  If a family member helps with more than one person, they can use this keyword so CareRelay knows which dashboard to update.
+                  If a member helps with more than one circle, they can use this keyword so CircleRelay knows which dashboard to update.
                 </p>
               </div>
               <div>
@@ -230,7 +248,7 @@ export function CareCircleSetupForm() {
               </div>
               <div className="rounded-2xl border p-5 glass">
                 <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  <strong>Example:</strong> If Aunt Sarah is in two care circles, she can text <em>&quot;{keyword || 'LINDA'} Meds: gave morning pills&quot;</em> and we will route it here automatically.
+                  <strong>Example:</strong> {careMode ? <>If Aunt Sarah is in two care circles, she can text <em>&quot;{keyword || 'LINDA'} Meds: gave morning pills&quot;</em> and we will route it here automatically.</> : <>If someone belongs to multiple circles, they can text <em>&quot;{keyword || 'HOUSE'} Need: paper towels&quot;</em> and we will route it here automatically.</>}
                 </p>
               </div>
             </div>
@@ -240,19 +258,19 @@ export function CareCircleSetupForm() {
             <div className="space-y-6 text-center">
               <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Your shared number</h2>
               <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                This is the single number your entire care circle will text to log updates, tasks, appointments, supplies, medication confirmations, and concerns.
+                This is the single number your entire {modeLabel.toLowerCase().replace(" mode", "")} circle will text to log {careMode ? "updates, tasks, appointments, supplies, medication confirmations, and concerns" : "updates, tasks, reminders, supplies, and summaries"}.
               </p>
               
               <div className="relative mx-auto max-w-sm mt-8">
                 <div className="absolute inset-0 bg-[var(--sage)] blur-2xl opacity-20 rounded-full animate-pulse-soft" />
                 <div className="glass-elevated rounded-[2rem] p-5 sm:p-8 relative z-10 border-2" style={{ borderColor: 'var(--sage-soft)' }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--sage)' }}>Demo Line Active</p>
-                  <p className="text-2xl sm:text-4xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>{demoLine}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--sage)' }}>Shared line setup</p>
+                  <p className="text-xl sm:text-3xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Assigned from Twilio config</p>
                 </div>
               </div>
               
               <p className="text-xs font-medium max-w-sm mx-auto mt-6" style={{ color: 'var(--text-subtle)' }}>
-                Everyone texts the same CareRelay number. CareRelay knows where the message belongs based on the phone numbers linked to each care circle.
+                If Twilio is not configured yet, the dashboard will show SMS not configured instead of a fake number.
               </p>
             </div>
           )}
@@ -266,14 +284,16 @@ export function CareCircleSetupForm() {
               </div>
               <h2 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Ready to activate</h2>
               <p className="text-base font-medium" style={{ color: 'var(--text-muted)' }}>
-                Your command center for <span className="font-bold" style={{ color: 'var(--text)' }}>{firstName}</span> is prepared.
+                Your {modeLabel} command center for <span className="font-bold" style={{ color: 'var(--text)' }}>{firstName}</span> is prepared.
               </p>
               
               <div className="rounded-2xl p-4 text-left border" style={{ background: 'var(--warning-soft)', borderColor: 'var(--warning)' }}>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" className="mt-1" required />
                   <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    I acknowledge that CareRelay is for family coordination only. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. For emergencies, call 911.
+                    {careMode
+                      ? "I acknowledge that CircleRelay Care Mode is for family coordination only. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. For emergencies, call 911."
+                      : "I acknowledge that CircleRelay organizes group coordination updates and that this circle is not being set up for medical advice, monitoring, emergency services, or safety guarantees."}
                   </span>
                 </label>
               </div>

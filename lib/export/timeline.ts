@@ -3,7 +3,7 @@ import "server-only";
 import { AuthError } from "@/lib/supabase/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-export const EXPORT_DISCLAIMER = "CareRelay is for family coordination only and does not provide medical advice.";
+export const EXPORT_DISCLAIMER = "CircleRelay Care Mode is for family coordination only and does not provide medical advice.";
 
 type TimelineFormat = "json" | "csv";
 

@@ -1,12 +1,12 @@
-# CareRelay Capacitor Native App Plan
+# CircleRelay Capacitor Native App Plan
 
 Date reviewed: 2026-05-12
 
-CareRelay's PWA foundation is complete enough to support installable mobile web usage. The next safe step is a Capacitor native wrapper plan, not a full native app build. Do not generate or commit `ios/` or `android/` projects until the team intentionally starts a native prototype branch.
+CircleRelay's PWA foundation is complete enough to support installable mobile web usage. The next safe step is a Capacitor native wrapper plan, not a full native app build. Do not generate or commit `ios/` or `android/` projects until the team intentionally starts a native prototype branch.
 
 ## 1. Native Readiness Assessment
 
-CareRelay is ready to plan and prototype a Capacitor wrapper, but it is not ready for App Store or Google Play submission yet.
+CircleRelay is ready to plan and prototype a Capacitor wrapper, but it is not ready for App Store or Google Play submission yet.
 
 What is ready:
 
@@ -36,7 +36,7 @@ Recommendation: ship/iterate the PWA first, then prototype a hosted Capacitor wr
 
 ## 2. Recommended App Identity
 
-- App name: `CareRelay`
+- App name: `CircleRelay`
 - iOS Bundle ID: `com.carerelay.app`
 - Android package name: `com.carerelay.app`
 - Subtitle: `Family caregiving coordination`
@@ -54,7 +54,7 @@ Run these only in a native prototype branch:
 
 ```bash
 npm install @capacitor/core @capacitor/cli
-npx cap init CareRelay com.carerelay.app
+npx cap init CircleRelay com.carerelay.app
 npx cap add ios
 npx cap add android
 npm run build
@@ -69,7 +69,7 @@ Do not commit generated `ios/` or `android/` projects until the team decides tha
 
 Safest current approach: hosted web app inside Capacitor.
 
-CareRelay should load the live Vercel app from the Capacitor shell:
+CircleRelay should load the live Vercel app from the Capacitor shell:
 
 ```text
 https://carerelay.xyz
@@ -84,7 +84,7 @@ Why hosted mode is safest:
 
 Static export is not recommended now:
 
-- CareRelay is not a static-only app.
+- CircleRelay is not a static-only app.
 - Static export would not support the current API routes, auth bridge, Stripe webhooks, Twilio inbound SMS webhook, or server-rendered authenticated pages.
 
 Hybrid approach:
@@ -99,7 +99,7 @@ Example intended Capacitor config after `npx cap init`:
 ```ts
 const config = {
   appId: "com.carerelay.app",
-  appName: "CareRelay",
+  appName: "CircleRelay",
   webDir: "out-or-unused-for-hosted-mode",
   server: {
     url: "https://carerelay.xyz",
@@ -186,7 +186,7 @@ Success/cancel URL strategy:
 Apple/Google billing risks:
 
 - Stripe is appropriate for many SaaS subscriptions and real-world services, but Apple/Google may scrutinize subscriptions that unlock digital-only features inside the native app.
-- Before submission, confirm whether CareRelay subscription tiers are considered digital goods, real-world service coordination, or a mixed SaaS offering under current store policies.
+- Before submission, confirm whether CircleRelay subscription tiers are considered digital goods, real-world service coordination, or a mixed SaaS offering under current store policies.
 - Do not mention bypassing in-app purchase in app review notes or UI.
 - Keep pricing, entitlement, and cancellation language consistent across web, app, Stripe, and store metadata.
 
@@ -198,7 +198,7 @@ Current notification channel:
 
 - SMS remains the primary notification and update channel.
 - Twilio inbound SMS is handled server-side at `/api/sms/inbound`.
-- CareRelay does not read the user's device SMS inbox.
+- CircleRelay does not read the user's device SMS inbox.
 
 Future native push path:
 
@@ -222,10 +222,10 @@ Permission UX:
 Approved language:
 
 ```text
-CareRelay is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
+CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
 ```
 
-CareRelay must not claim:
+CircleRelay must not claim:
 
 - Medical advice.
 - Diagnosis.
@@ -245,7 +245,7 @@ Apple risks:
 Google Play risks:
 
 - Data Safety answers must accurately describe account data, phone numbers, user content, SMS-routed content, purchases, and diagnostics.
-- SMS language must be clear that CareRelay uses a server-side Twilio number and does not read device SMS.
+- SMS language must be clear that CircleRelay uses a server-side Twilio number and does not read device SMS.
 - Store listing, screenshots, and onboarding must avoid clinical and emergency claims.
 
 ## 9. Required App Store Assets
@@ -275,7 +275,7 @@ Likely data categories:
 - Account data: name, email, user ID.
 - Contact data: family member names and phone numbers.
 - User content: care updates, tasks, supplies, appointments, medication confirmations, concerns, summaries, handoffs, exports.
-- Communications: SMS content routed through CareRelay's Twilio number.
+- Communications: SMS content routed through CircleRelay's Twilio number.
 - Purchase data: Stripe customer/subscription state.
 - Diagnostics and usage data if logging or analytics are enabled.
 

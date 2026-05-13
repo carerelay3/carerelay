@@ -28,7 +28,7 @@ describe("summary fallback", () => {
   it("includes concern disclaimer text when concerns exist", async () => {
     const summary = await generateDailySummary({ careCircleId: "circle-demo-1" });
     if (summary.concernsMentioned.length > 0) {
-      expect(summary.summaryText).toContain("CareRelay does not provide medical advice");
+      expect(summary.summaryText).toContain("CircleRelay Care Mode does not provide medical advice");
     }
   });
 });

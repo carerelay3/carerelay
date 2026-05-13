@@ -10,25 +10,30 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          teal: "#0D6B63",
-          ink: "#0F1E32",
-          mint: "#E6F6F1",
-          amber: "#F4B247",
+          purple: "#171326",
+          red: "#F23A3A",
+          gold: "#C97800",
+          rose: "#F7D6D8",
+          charcoal: "#111018",
+          teal: "#171326",
+          ink: "#111018",
+          mint: "#F7D6D8",
+          amber: "#C97800",
         },
         surface: {
-          base: "#FBFEFA",
+          base: "#FAF7F3",
           elevated: "#FFFFFF",
-          overlay: "#E6F6F1",
+          overlay: "#F7D6D8",
         },
         semantic: {
-          success: "#0D6B63",
-          alert: "#B45309",
-          warning: "#F4B247",
-          info: "#3B82F6",
+          success: "#171326",
+          alert: "#F23A3A",
+          warning: "#C97800",
+          info: "#171326",
         },
         content: {
-          primary: "#0F1E32",
-          secondary: "#536173",
+          primary: "#171326",
+          secondary: "#3a3842",
         }
       }
     },

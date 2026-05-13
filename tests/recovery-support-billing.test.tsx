@@ -56,7 +56,7 @@ describe("recovery, support, and billing UX", () => {
     const { default: SupportPage } = await import("@/app/(marketing)/support/page");
     const html = renderToStaticMarkup(<SupportPage />);
 
-    expect(html).toContain("CareRelay help");
+    expect(html).toContain("CircleRelay help");
     expect(html).toContain("Account help");
     expect(html).toContain("Billing help");
     expect(html).toContain("SMS not showing");

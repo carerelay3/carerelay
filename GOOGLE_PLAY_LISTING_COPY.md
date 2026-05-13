@@ -2,19 +2,19 @@
 
 ## App Identity
 
-- App name: CareRelay
-- Short description: One shared number to keep the whole family on the same page.
-- Full subtitle/tagline: Family caregiving coordination
+- App name: CircleRelay
+- Short description: One shared line for every circle in your life.
+- Full subtitle/tagline: Shared line coordination for groups and families
 - App category: Productivity
 - Secondary positioning: Lifestyle / family organization
 
 ## Full Description
 
-CareRelay helps families coordinate care-related updates through shared SMS and a simple dashboard. Family members can send updates about tasks, appointments, supplies, medication confirmations, concerns, and daily summaries.
+CircleRelay helps groups coordinate updates through shared SMS and a simple dashboard. In Care Mode, family members can send updates about tasks, appointments, supplies, medication confirmations, concerns, and daily summaries.
 
-CareRelay gives invited family members one shared place to review everyday coordination updates. The shared SMS number lets family members keep texting normally, while CareRelay organizes family-reported updates into dashboard records.
+CircleRelay gives invited members one shared place to review everyday coordination updates. The shared SMS line lets members keep texting normally, while CircleRelay organizes reported updates into dashboard records.
 
-Use CareRelay to help coordinate:
+Use CircleRelay to help coordinate:
 
 - Open tasks and follow-ups
 - Appointments and transportation notes
@@ -23,11 +23,11 @@ Use CareRelay to help coordinate:
 - Concerns for family review
 - Daily summaries of family-reported updates
 
-CareRelay is built for family communication and organization. It is not a medical service.
+CircleRelay is built for group communication and organization. CircleRelay Care Mode is not a medical service.
 
 ## Medical Boundary
 
-CareRelay is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
+CircleRelay Care Mode is for family coordination only. It is not a medical provider and does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. In an emergency, call 911 or your local emergency number.
 
 ## Suggested Tags And Keywords
 
@@ -42,7 +42,7 @@ Use calm, practical screenshots. Avoid clinical, emergency, or safety-guarantee 
 3. Team access or care circle management.
 4. Supplies needed and open tasks.
 5. Appointments and recent updates.
-6. Safety boundary screen that says CareRelay is not for emergencies.
+6. Safety boundary screen that says CircleRelay Care Mode is not for emergencies.
 
 Store assets still needed:
 
@@ -60,7 +60,7 @@ Store assets still needed:
 
 ## Data Safety Notes For Google Play
 
-CareRelay may collect or process:
+CircleRelay may collect or process:
 
 - Personal info: name, email address, phone number.
 - Messages/user content: SMS updates, tasks, appointment notes, supplies, concerns, summaries.
@@ -100,7 +100,7 @@ Complete the Google Play age rating questionnaire based on actual shipped capabi
 
 Suggested reviewer note:
 
-CareRelay is a family coordination app. It organizes family-reported SMS updates into a shared dashboard for tasks, appointments, supplies, medication confirmations, concerns, and summaries. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. The app includes visible safety boundary language and support, privacy, and terms pages.
+CircleRelay is a shared-line coordination app. CircleRelay Care Mode organizes family-reported SMS updates into a shared dashboard for tasks, appointments, supplies, medication confirmations, concerns, and summaries. It does not provide medical advice, diagnosis, treatment, medication dosage recommendations, monitoring, or emergency services. The app includes visible safety boundary language and support, privacy, and terms pages.
 
 Provide a sample demo account for review if authentication blocks core flows. Use sample data only.
 

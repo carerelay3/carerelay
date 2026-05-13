@@ -22,6 +22,49 @@ describe("launch hardening guardrails", () => {
     expect(files.every((file) => file.endsWith(".sql"))).toBe(true);
   });
 
+  it("circle type migration defaults existing circles to care with a safe constraint", () => {
+    const migration = fs.readFileSync(
+      path.join(process.cwd(), "supabase/migrations/20260513000000_add_circle_types.sql"),
+      "utf8",
+    );
+
+    expect(migration).toContain("circle_type text NOT NULL DEFAULT 'care'");
+    expect(migration).toContain("category_config jsonb");
+    expect(migration).toContain("enabled_features jsonb");
+    expect(migration).toContain("CHECK (circle_type IN ('care', 'family', 'household', 'team', 'group'))");
+    expect(migration).toContain("care_circles_circle_type_idx");
+  });
+
+  it("adds durable webhook idempotency ledgers for Twilio and Stripe", () => {
+    const migration = fs.readFileSync(
+      path.join(process.cwd(), "supabase/migrations/20260513123424_add_webhook_idempotency.sql"),
+      "utf8",
+    );
+
+    expect(migration).toContain("create table if not exists public.processed_twilio_messages");
+    expect(migration).toContain("message_sid text primary key");
+    expect(migration).toContain("care_circle_id uuid references public.care_circles(id) on delete set null");
+    expect(migration).toContain("create table if not exists public.stripe_webhook_events");
+    expect(migration).toContain("stripe_event_id text primary key");
+    expect(migration).toContain("alter table public.processed_twilio_messages enable row level security");
+    expect(migration).toContain("alter table public.stripe_webhook_events enable row level security");
+  });
+
+  it("adds privacy request intake without automatic deletion behavior", () => {
+    const migration = fs.readFileSync(
+      path.join(process.cwd(), "supabase/migrations/20260513130315_add_privacy_requests.sql"),
+      "utf8",
+    );
+
+    expect(migration).toContain("create table if not exists public.privacy_requests");
+    expect(migration).toContain("request_type in ('export_my_data', 'delete_my_account', 'delete_care_circle_data', 'billing_help', 'other')");
+    expect(migration).toContain("status text not null default 'open'");
+    expect(migration).toContain("alter table public.privacy_requests enable row level security");
+    expect(migration).toContain("auth.uid() = user_id");
+    expect(migration).not.toContain("delete from");
+    expect(migration).not.toContain("drop table");
+  });
+
   it("rejects Twilio form posts without a signature when a Twilio token is configured", async () => {
     vi.resetModules();
     process.env.TWILIO_AUTH_TOKEN = "test-token";
@@ -36,7 +79,7 @@ describe("launch hardening guardrails", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(403);
-    expect(await res.text()).toContain("CareRelay could not log this update right now");
+    expect(await res.text()).toContain("CircleRelay could not log this update right now");
   });
 
   it("rejects Twilio JSON posts when a Twilio token is configured", async () => {
@@ -57,7 +100,7 @@ describe("launch hardening guardrails", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(403);
-    expect(await res.text()).toContain("CareRelay could not log this update right now");
+    expect(await res.text()).toContain("CircleRelay could not log this update right now");
   });
 
   it("requires auth before live setup can create a Supabase care circle", async () => {

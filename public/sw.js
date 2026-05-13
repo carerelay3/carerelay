@@ -1,19 +1,17 @@
-const CACHE_NAME = "carerelay-pwa-v2";
+const CACHE_VERSION = "v4";
+const CACHE_NAME = `circlerelay-pwa-${CACHE_VERSION}`;
 const PRECACHE_URLS = [
   "/offline",
   "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/apple-touch-icon.png",
-  "/icons/favicon-32.png",
+  "/brand/icons/circlerelay-app-icon-192.png",
+  "/brand/icons/circlerelay-app-icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting()),
+      .then((cache) => cache.addAll(PRECACHE_URLS)),
   );
 });
 
@@ -46,6 +44,12 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
+  if (url.pathname.startsWith("/dashboard")) return;
+  if (url.pathname.startsWith("/account")) return;
+  if (url.pathname.startsWith("/settings")) return;
+  if (url.pathname.startsWith("/team")) return;
+  if (url.pathname.startsWith("/admin")) return;
 
   if (PRECACHE_URLS.includes(url.pathname)) {
     event.respondWith(

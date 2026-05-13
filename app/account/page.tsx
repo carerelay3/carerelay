@@ -134,7 +134,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps = {
       <div className="mb-8">
         <p className="section-kicker">Account</p>
         <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>Profile</h1>
-        <p className="mt-2">Manage the account details tied to your CareRelay sign-in.</p>
+        <p className="mt-2">Manage the account details tied to your CircleRelay sign-in.</p>
       </div>
 
       {selectedCircle ? (

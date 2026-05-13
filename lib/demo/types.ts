@@ -9,10 +9,12 @@ import type {
   DemoHandoff,
   DemoPreferences,
 } from "@/lib/types";
+import type { CircleType } from "@/lib/circles/circleTypes";
 
 export type DemoSnapshot = {
   careCircleId: string;
   careCircleName: string;
+  circleType?: CircleType;
   recipientName: string;
   sharedPhone: string;
   members: DemoMember[];

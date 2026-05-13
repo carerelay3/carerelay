@@ -31,7 +31,7 @@ export async function resolveCareCircleFromSender(
     return {
       routingStatus: "invalid_phone",
       cleanedBody: cleanMessage,
-      safeReply: "CareRelay could not process this phone number. Please ask the care circle owner to invite a valid phone number.",
+      safeReply: "CircleRelay could not process this phone number. Please ask the care circle owner to invite a valid phone number.",
     };
   }
 
@@ -59,7 +59,7 @@ export async function resolveCareCircleFromSender(
     return {
       routingStatus: "unknown_sender",
       cleanedBody: cleanMessage,
-      safeReply: "CareRelay could not match this phone number to a care circle. Please ask the care circle owner to invite this number.",
+      safeReply: "CircleRelay could not match this phone number to a care circle. Please ask the care circle owner to invite this number.",
     };
   }
 
@@ -74,7 +74,7 @@ export async function resolveCareCircleFromSender(
     return {
       routingStatus: "unknown_sender",
       cleanedBody: cleanMessage,
-      safeReply: "CareRelay could not match this phone number to a care circle. Please ask the care circle owner to invite this number.",
+      safeReply: "CircleRelay could not match this phone number to a care circle. Please ask the care circle owner to invite this number.",
     };
   }
 
@@ -96,7 +96,7 @@ export async function resolveCareCircleFromSender(
     return {
       routingStatus: "matched_multiple_needs_keyword",
       cleanedBody: cleanMessage,
-      safeReply: "You’re linked to more than one CareRelay circle. Reply with the care circle keyword before your update, like GRANDMA Meds: took night pills at 8pm.",
+      safeReply: "You’re linked to more than one CircleRelay circle. Reply with the care circle keyword before your update, like GRANDMA Meds: took night pills at 8pm.",
     };
   }
 
@@ -115,7 +115,7 @@ export async function resolveCareCircleFromSender(
     return {
       routingStatus: "matched_multiple_needs_keyword",
       cleanedBody: cleanMessage,
-      safeReply: "You’re linked to more than one CareRelay circle. Reply with the care circle keyword before your update, like GRANDMA Meds: took night pills at 8pm.",
+      safeReply: "You’re linked to more than one CircleRelay circle. Reply with the care circle keyword before your update, like GRANDMA Meds: took night pills at 8pm.",
     };
   }
 

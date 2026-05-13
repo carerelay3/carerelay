@@ -11,7 +11,7 @@ export default function NotFound() {
           <h1 className="mt-6 text-4xl font-bold tracking-tight" style={{ color: "var(--text)" }}>This page is not in the care circle.</h1>
           <p className="mt-4">The link may have moved, but you can return to the demo or dashboard from here.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/demo" className="btn btn-sage">Try the Demo</Link>
+            <Link href="/demo" className="btn btn-sage">Try the demo</Link>
             <Link href="/" className="btn btn-soft">Back home</Link>
           </div>
         </div>

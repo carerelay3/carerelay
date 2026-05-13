@@ -8,7 +8,7 @@ export default function OfflinePage() {
         <div className="relative z-10">
           <p className="section-kicker mx-auto">Offline</p>
           <h1 className="mt-4 text-3xl font-bold" style={{ color: "var(--text)" }}>
-            CareRelay needs a connection for live care updates.
+            CircleRelay needs a connection for live circle updates.
           </h1>
           <p className="mt-4" style={{ color: "var(--text-muted)" }}>
             You can reopen the dashboard when your connection returns. Cached pages may be visible, but live SMS updates, team changes, billing, and summaries require network access.

@@ -6,7 +6,7 @@ import { trackEvent } from "@/lib/analytics/track";
 type Props = {
   title: string;
   price: string;
-  planId: "starter" | "family" | "family_plus";
+  planId: "free" | "starter" | "family" | "family_plus";
   features: string[];
   accent?: string;
   popular?: boolean;
@@ -16,6 +16,12 @@ export function PricingCard({ title, price, features, planId, accent = "var(--te
   const [busy, setBusy] = useState(false);
 
   const onCheckout = async () => {
+    if (planId === "free") {
+      trackEvent("pricing_cta_clicked", { planId });
+      window.location.href = "/setup";
+      return;
+    }
+
     setBusy(true);
     trackEvent("pricing_cta_clicked", { planId });
     try {

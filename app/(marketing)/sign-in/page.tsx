@@ -33,7 +33,7 @@ export default async function SignInPage() {
 
         <p className="mt-6 rounded-2xl p-4 text-center text-sm" style={{ background: "var(--teal-soft)", color: "var(--text-secondary)" }}>
           {appConfig.supabaseConfigured
-            ? "Use your CareRelay account credentials. Live dashboard access is checked against your care circle membership."
+            ? "Use your CircleRelay account credentials. Live dashboard access is checked against your care circle membership."
             : "Account sign in is unavailable until Supabase environment variables are configured."}
         </p>
       </div>

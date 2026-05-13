@@ -6,24 +6,35 @@ export default function PricingPage() {
     <main className="mx-auto w-full max-w-6xl space-y-10 px-4 py-12 md:py-16">
       <section className="mx-auto max-w-3xl text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--text)" }}>
-          Simple plans for family coordination
+          Simple plans for circles
         </h1>
         <p className="mt-4 text-lg" style={{ color: "var(--text-muted)" }}>
           Start in demo mode without a card. When Stripe is configured, checkout can create a live subscription.
         </p>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <PricingCard
+          title="Free"
+          price="$0"
+          planId="free"
+          features={[
+            "1 circle",
+            "Up to 2 members",
+            "Shared SMS update feed",
+            "Basic dashboard",
+          ]}
+          accent="var(--text-subtle)"
+        />
         <PricingCard
           title="Starter"
           price="$5"
           planId="starter"
           features={[
-            "1 care circle",
-            "Up to 3 family members",
+            "1 circle",
+            "Up to 3 members",
             "Shared SMS update feed",
             "Daily summary",
-            "Tasks, supplies, appointments, medication confirmations, and concern flags",
           ]}
           accent="var(--text-subtle)"
         />
@@ -32,11 +43,11 @@ export default function PricingPage() {
           price="$10"
           planId="family"
           features={[
-            "1 care circle",
-            "Up to 8 family members",
+            "1 circle",
+            "Up to 8 members",
             "Everything in Starter",
             "Daily and weekly summaries",
-            "More dashboard history and family activity tracking",
+            "More dashboard history and circle activity tracking",
           ]}
           accent="var(--sage)"
           popular
@@ -46,11 +57,10 @@ export default function PricingPage() {
           price="$20"
           planId="family_plus"
           features={[
-            "Multiple care circles",
-            "Higher practical family member limits",
+            "Multiple circles",
+            "Larger teams, groups, and households",
             "Exportable timeline",
-            "Priority setup support",
-            "Future option for a dedicated family number if supported later",
+            "Future dedicated number option",
           ]}
           accent="var(--purple-soft)"
         />

@@ -12,7 +12,7 @@ const helpTopics = [
   },
   {
     title: "SMS not showing",
-    body: "Check that the sender phone number matches the invited family member and that the message went to the configured CareRelay number. Removed members cannot post live updates.",
+    body: "Check that the sender phone number matches the invited family member and that the message went to the configured CircleRelay shared line. Removed members cannot post live updates.",
   },
   {
     title: "Inviting family",
@@ -31,7 +31,7 @@ export default function SupportPage() {
     <main className="mx-auto w-full max-w-5xl px-4 py-12">
       <div className="mb-8">
         <p className="section-kicker">Support</p>
-        <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>CareRelay help</h1>
+        <h1 className="mt-3 text-3xl font-bold" style={{ color: "var(--text)" }}>CircleRelay help</h1>
         <p className="mt-2 max-w-2xl" style={{ color: "var(--text-muted)" }}>
           Common account, billing, SMS, and family access questions for live care circles.
         </p>
@@ -70,7 +70,7 @@ export default function SupportPage() {
         <p className="section-kicker">Safety</p>
         <h2 className="mt-2 text-2xl font-bold" style={{ color: "var(--text)" }}>Not for emergencies</h2>
         <p className="mt-2" style={{ color: "var(--text-muted)" }}>
-          CareRelay organizes family-reported care coordination updates. It does not provide medical advice, emergency monitoring, diagnosis, treatment recommendations, or safety guarantees. If this is an emergency, call 911 or your local emergency number.
+          CircleRelay Care Mode organizes family-reported care coordination updates. It does not provide medical advice, emergency monitoring, diagnosis, treatment recommendations, or safety guarantees. If this is an emergency, call 911 or your local emergency number.
         </p>
       </section>
 

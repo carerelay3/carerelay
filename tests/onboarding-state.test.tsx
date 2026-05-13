@@ -34,6 +34,11 @@ function setupAdmin(existingCircles: Array<{ id: string }> = []) {
     care_recipients: vi.fn(async () => ({ error: null })),
     family_members: vi.fn(async () => ({ error: null })),
   };
+  const careCircleInsert = vi.fn(() => ({
+    select: vi.fn(() => ({
+      single: vi.fn(async () => ({ data: { id: "circle-new" }, error: null })),
+    })),
+  }));
 
   const admin = {
     from: vi.fn((table: string) => {
@@ -42,11 +47,7 @@ function setupAdmin(existingCircles: Array<{ id: string }> = []) {
           select: vi.fn(() => ({
             eq: vi.fn(async () => ({ data: existingCircles, error: null })),
           })),
-          insert: vi.fn(() => ({
-            select: vi.fn(() => ({
-              single: vi.fn(async () => ({ data: { id: "circle-new" }, error: null })),
-            })),
-          })),
+          insert: careCircleInsert,
         };
       }
 
@@ -76,7 +77,7 @@ function setupAdmin(existingCircles: Array<{ id: string }> = []) {
     }),
   };
 
-  return { admin, inserts };
+  return { admin, inserts, careCircleInsert };
 }
 
 describe("onboarding and live account state", () => {
@@ -122,7 +123,7 @@ describe("onboarding and live account state", () => {
         cancelAtPeriodEnd: false,
       })),
     }));
-    const { admin } = setupAdmin([]);
+    const { admin, careCircleInsert } = setupAdmin([]);
     vi.doMock("@/lib/supabase/admin", () => ({ getSupabaseAdmin: () => admin }));
 
     const { POST } = await import("@/app/api/setup/route");
@@ -136,6 +137,77 @@ describe("onboarding and live account state", () => {
     expect(res.status).toBe(200);
     expect(body.mode).toBe("live-ready");
     expect(body.planId).toBe("free");
+    expect(body.circleType).toBe("care");
+    expect(careCircleInsert).toHaveBeenCalledWith(expect.objectContaining({ circle_type: "care" }));
+  });
+
+  it.each([
+    ["care", "Mom", "Mom's Care Circle"],
+    ["family", "Smiths", "Smiths Family Circle"],
+    ["household", "Pine House", "Pine House's Household Circle"],
+    ["team", "Tigers", "Tigers Team Circle"],
+    ["group", "Beach Trip", "Beach Trip's Group Circle"],
+  ])("setup accepts %s circle type", async (circleType, firstName, expectedName) => {
+    vi.doMock("@/lib/config", () => ({
+      hasSupabase: () => true,
+      appConfig: { twilioPhoneNumber: "+15559990000" },
+    }));
+    vi.doMock("@/lib/supabase/auth", () => ({
+      requireUser: vi.fn(async () => ({
+        id: "user-1",
+        email: "care@example.com",
+        user_metadata: { full_name: "Care User" },
+      })),
+      AuthError: class AuthError extends Error {
+        status = 401;
+      },
+      authErrorResponse: vi.fn(() => Response.json({ error: "Request could not be completed" }, { status: 500 })),
+    }));
+    vi.doMock("@/lib/stripe/getCurrentUserPlan", () => ({
+      getCurrentUserPlan: vi.fn(async () => ({
+        planId: "free",
+        status: "inactive",
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      })),
+    }));
+    const { admin, careCircleInsert } = setupAdmin([]);
+    vi.doMock("@/lib/supabase/admin", () => ({ getSupabaseAdmin: () => admin }));
+
+    const { POST } = await import("@/app/api/setup/route");
+    const res = await POST(new Request("http://localhost/api/setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, keyword: "TEST", circleType, members: [] }),
+    }));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.circleType).toBe(circleType);
+    expect(careCircleInsert).toHaveBeenCalledWith(expect.objectContaining({
+      circle_type: circleType,
+      name: expectedName,
+      category_config: expect.objectContaining({
+        categories: expect.any(Array),
+      }),
+    }));
+  });
+
+  it("setup rejects invalid circle type", async () => {
+    vi.doMock("@/lib/config", () => ({
+      hasSupabase: () => false,
+      appConfig: { twilioPhoneNumber: "+15559990000" },
+    }));
+
+    const { POST } = await import("@/app/api/setup/route");
+    const res = await POST(new Request("http://localhost/api/setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName: "House", keyword: "HOUSE", circleType: "invalid", members: [] }),
+    }));
+
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toMatchObject({ code: "validation_failed" });
   });
 
   it("setup returns safe error when service role is missing", async () => {
