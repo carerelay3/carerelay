@@ -26,16 +26,17 @@ export const metadata: Metadata = {
     capable: true,
     title: "CareRelay",
     statusBarStyle: "default",
-    startupImage: "/brand/ads/carerelay-social-square.png",
   },
   formatDetection: {
     telephone: false,
   },
   icons: {
-    apple: [{ url: "/brand/ads/carerelay-social-square.png", sizes: "1254x1254", type: "image/png" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     icon: [
-      { url: "/brand/ads/carerelay-social-square.png", sizes: "1254x1254", type: "image/png" },
-      { url: "/brand/logos/carerelay-logo-system.png", sizes: "1448x1086", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
   },
 };

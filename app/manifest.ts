@@ -13,16 +13,34 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["health", "productivity", "utilities"],
     icons: [
       {
-        src: "/brand/ads/carerelay-social-square.png",
-        sizes: "1254x1254",
+        src: "/icons/icon-192.png",
+        sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/brand/logos/carerelay-logo-system.png",
-        sizes: "1448x1086",
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/icons/icon-1024.png",
+        sizes: "1024x1024",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/maskable-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/icons/maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

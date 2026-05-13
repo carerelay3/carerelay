@@ -18,18 +18,34 @@ CareRelay now has a Progressive Web App foundation for installable mobile web us
 
 ## Icon References
 
-The current PWA uses existing brand assets instead of generating new image files:
-
-- `/brand/ads/carerelay-social-square.png`
-- `/brand/logos/carerelay-logo-system.png`
-
-Before launch, add purpose-built app icons with safe padding and exact platform sizes:
+The PWA now uses purpose-built app icon assets instead of social graphics or large logo exports:
 
 - `/icons/icon-192.png`
 - `/icons/icon-512.png`
+- `/icons/icon-1024.png`
 - `/icons/maskable-192.png`
 - `/icons/maskable-512.png`
 - `/icons/apple-touch-icon.png`
+- `/icons/favicon-32.png`
+- `/icons/carerelay-icon-source.svg`
+
+Icon concept:
+
+- Deep Teal `#0D6B63` background.
+- Ink Navy `#0F1E32`, Soft Mint `#E6F6F1`, and Warm Amber `#F4B247` accents.
+- Simple shield/home outline, chat bubble, and small heart accent.
+- Readable at small sizes, with no tiny text or wordmark inside the icon.
+
+Required supported/documented sizes:
+
+- `192x192` PWA and Android icon.
+- `512x512` PWA and Android icon.
+- `1024x1024` native/app-store master icon.
+- `180x180` Apple touch icon.
+- `192x192` and `512x512` maskable Android icons.
+- `32x32` favicon PNG plus the existing `app/favicon.ico` fallback.
+
+See `MOBILE_ICON_ASSET_BRIEF.md` for export specs, source prompt, and replacement instructions.
 
 Do not use notification badges or push assets until real notification behavior is designed and implemented.
 

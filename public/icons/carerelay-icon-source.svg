@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">CareRelay app icon</title>
+  <desc id="desc">A CareRelay shield and home outline with a chat bubble and heart accent.</desc>
+  <rect width="1024" height="1024" rx="224" fill="#0D6B63"/>
+  <circle cx="812" cy="214" r="94" fill="#F4B247"/>
+  <path
+    d="M512 172 742 264v178c0 181-95 315-230 398C377 757 282 623 282 442V264l230-92Z"
+    fill="#E6F6F1"
+  />
+  <path
+    d="M512 224 690 296v144c0 146-70 252-178 324-108-72-178-178-178-324V296l178-72Z"
+    fill="#0F1E32"
+  />
+  <path
+    d="M396 444 512 348l116 96v142c0 24-19 43-43 43H439c-24 0-43-19-43-43V444Z"
+    fill="none"
+    stroke="#E6F6F1"
+    stroke-width="52"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M446 570h132c58 0 104 37 104 84s-46 84-104 84h-42l-62 54v-54h-28c-58 0-104-37-104-84s46-84 104-84Z"
+    fill="#E6F6F1"
+  />
+  <path
+    d="M512 678c-37-29-60-50-60-78 0-23 17-39 38-39 12 0 23 5 31 14 8-9 19-14 31-14 21 0 38 16 38 39 0 28-24 49-60 78l-9 7-9-7Z"
+    fill="#F4B247"
+  />
+</svg>
