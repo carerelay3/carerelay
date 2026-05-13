@@ -55,5 +55,27 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
-  return <DashboardClient initialSnapshot={snapshot} initialMode="live" careCircles={circles} />;
+  const configuredTwilioLine = process.env.TWILIO_PHONE_NUMBER || "";
+  const configuredSharedLine = snapshot.sharedPhone || configuredTwilioLine;
+  const twilioConfigured = Boolean(
+    process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER,
+  );
+  const smsModeLive = process.env.NEXT_PUBLIC_SMS_MODE === "live" && process.env.NEXT_PUBLIC_DEMO_MODE !== "true";
+  const liveSmsReady = smsModeLive && twilioConfigured && Boolean(configuredSharedLine);
+
+  return (
+    <DashboardClient
+      initialSnapshot={{ ...snapshot, sharedPhone: configuredSharedLine }}
+      initialMode="live"
+      careCircles={circles}
+      smsStatus={
+        !twilioConfigured
+          ? "SMS not configured yet"
+          : configuredSharedLine
+            ? undefined
+            : "Shared line setup needed"
+      }
+      liveSmsReady={liveSmsReady}
+    />
+  );
 }

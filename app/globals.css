@@ -126,7 +126,7 @@
 html,
 body {
   max-width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 img,
@@ -159,6 +159,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow-wrap: anywhere;
+}
+
+body > * {
+  min-width: 0;
 }
 
 /* Typography Scale */

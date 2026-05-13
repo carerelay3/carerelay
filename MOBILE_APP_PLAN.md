@@ -78,6 +78,8 @@ The service worker only provides a basic navigation fallback to `/offline` when 
 
 CareRelay live functionality still requires network access.
 
+After deploys, `public/sw.js` asks newly installed service workers to activate and reload controlled clients so installed PWAs pick up fresh UI and icon references. If an installed PWA still shows stale UI, remove CareRelay from the iPhone home screen, clear Safari website data for the CareRelay domain, then add it to the home screen again.
+
 ## What Still Needs A Native App Wrapper
 
 A native app wrapper is still needed for:

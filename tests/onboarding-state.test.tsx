@@ -183,7 +183,8 @@ describe("onboarding and live account state", () => {
     const html = renderToStaticMarkup(await DashboardPage());
 
     expect(html).not.toContain("Demo Mode");
-    expect(html).toContain("Live SMS");
+    expect(html).toContain("Live dashboard");
+    expect(html).toContain("SMS not configured yet");
   });
 
   it("settings shows current plan and billing status", async () => {

@@ -3,7 +3,7 @@ import { EmptyState } from "./EmptyState";
 
 export function SupplyList({ supplies }: { supplies: DemoSupply[] }) {
   return (
-    <div className="surface-panel space-y-4 p-5 sm:p-6">
+    <div className="surface-panel min-w-0 space-y-4 p-4 sm:p-6">
       <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>Supplies and groceries</h2>
       
       {supplies.length === 0 ? (
@@ -11,12 +11,12 @@ export function SupplyList({ supplies }: { supplies: DemoSupply[] }) {
       ) : (
         <div className="space-y-3">
           {supplies.map(s => (
-            <div key={s.id} className="flex flex-col gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm min-[390px]:flex-row min-[390px]:items-center" style={{ borderColor: "var(--border)" }}>
+            <div key={s.id} className="flex min-w-0 flex-col gap-3 rounded-2xl border bg-white/70 p-3 text-sm shadow-sm sm:flex-row sm:items-center" style={{ borderColor: "var(--border)" }}>
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.status === "needed" ? "var(--warning)" : "var(--success)" }} />
-              <div className={`flex-1 font-semibold ${s.status !== 'needed' ? 'line-through opacity-50' : ''}`} style={{ color: "var(--text)" }}>
+              <div className={`min-w-0 flex-1 break-words font-semibold ${s.status !== 'needed' ? 'line-through opacity-50' : ''}`} style={{ color: "var(--text)" }}>
                 {s.item}
               </div>
-              <span className="badge-pill badge-warm self-start min-[390px]:self-auto">{s.status}</span>
+              <span className="badge-pill badge-warm self-start sm:self-auto">{s.status}</span>
             </div>
           ))}
         </div>

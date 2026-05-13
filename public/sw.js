@@ -1,9 +1,11 @@
-const CACHE_NAME = "carerelay-pwa-v1";
+const CACHE_NAME = "carerelay-pwa-v2";
 const PRECACHE_URLS = [
   "/offline",
   "/manifest.webmanifest",
-  "/brand/ads/carerelay-social-square.png",
-  "/brand/logos/carerelay-logo-system.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
+  "/icons/favicon-32.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -24,6 +26,12 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
 
@@ -40,6 +48,14 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (PRECACHE_URLS.includes(url.pathname)) {
-    event.respondWith(caches.match(request).then((response) => response || fetch(request)));
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request)),
+    );
   }
 });

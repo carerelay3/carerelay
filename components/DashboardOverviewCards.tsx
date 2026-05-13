@@ -13,7 +13,7 @@ export function DashboardOverviewCards({ snapshot }: { snapshot: DemoSnapshot })
   const openConcerns = snapshot.concerns.filter(c => !c.acknowledged).length;
 
   return (
-    <div className="grid grid-cols-1 gap-3 min-[390px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+    <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       <Card title="Today's updates" count={todayUpdates} accent="var(--teal)" />
       <Card title="Open tasks" count={openTasks} accent="var(--purple-soft)" />
       <Card title="Appointments" count={upcomingAppts} accent="var(--blue-soft)" />
@@ -26,12 +26,12 @@ export function DashboardOverviewCards({ snapshot }: { snapshot: DemoSnapshot })
 
 function Card({ title, count, accent }: { title: string; count: number; accent: string }) {
   return (
-    <div className="product-card p-4 text-left">
+    <div className="product-card min-w-0 p-4 text-left">
       <div className="relative z-10">
         <div className="mb-3 h-1 w-10 rounded-full" style={{ background: accent }} />
-        <div className="flex items-end justify-between gap-3 min-[390px]:block">
+        <div className="flex min-w-0 items-end justify-between gap-3 sm:block">
           <div className="text-3xl font-bold" style={{ color: "var(--text)" }}>{count}</div>
-          <div className="mt-1 text-right text-[11px] font-bold uppercase tracking-wide min-[390px]:text-left" style={{ color: "var(--text-subtle)" }}>{title}</div>
+          <div className="mt-1 min-w-0 text-right text-[11px] font-bold uppercase tracking-wide sm:text-left" style={{ color: "var(--text-subtle)" }}>{title}</div>
         </div>
       </div>
     </div>
