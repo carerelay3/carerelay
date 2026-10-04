@@ -20,7 +20,7 @@
 		"ghcr.io/rails/devcontainer/features/mysql-client:1": {},
 		"ghcr.io/rails/devcontainer/features/postgres-client:1": {},
 		"ghcr.io/nlstn/devcontainer-features/psql:1": {},
-		"ghcr.io/devcontainer-config/features/dot-config:4": {},
+		"ghcr.io/devcontainer-config/features/dot-config:5": {},
 		"ghcr.io/postfinance/devcontainer-features/dotnet:1": {}
 	},
 	"customizations": {
